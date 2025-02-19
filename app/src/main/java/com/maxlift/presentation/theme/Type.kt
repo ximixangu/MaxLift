@@ -1,4 +1,4 @@
-package com.maxlift.ui.theme
+package com.maxlift.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

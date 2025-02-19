@@ -1,4 +1,4 @@
-package com.maxlift.ui.theme
+package com.maxlift.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
