@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.activities
+package com.maxlift.presentation.ui.activities.cameraActivity
 
 import android.content.pm.PackageManager
 import android.Manifest
@@ -14,8 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import com.maxlift.presentation.theme.MaxLiftTheme
 
-class MainActivity : ComponentActivity() {
-
+class CameraActivity : ComponentActivity() {
     private val cameraPermissionRequest =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if(isGranted) {

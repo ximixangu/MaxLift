@@ -18,7 +18,7 @@
         android:theme="@style/Theme.MaxLift"
         tools:targetApi="31" >
         <activity
-            android:name=".presentation.ui.activities.MainActivity"
+            android:name=".presentation.ui.activities.menuActivity.MenuActivity"
             android:exported="true"
             android:label="MaxLift"
             android:theme="@style/Theme.MaxLift" >
@@ -28,6 +28,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".presentation.ui.activities.cameraActivity.CameraActivity"
+            android:label="Camera"
+        />
     </application>
 
 </manifest>
