@@ -1,7 +1,7 @@
 package com.maxlift.presentation.ui.activities.cameraActivity
 
-import android.content.pm.PackageManager
 import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
