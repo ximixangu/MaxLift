@@ -8,6 +8,11 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.video.MediaStoreOutputOptions
+import androidx.camera.video.Recorder
+import androidx.camera.video.Recording
+import androidx.camera.video.VideoCapture
+import androidx.camera.video.VideoRecordEvent
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -21,10 +26,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
@@ -49,34 +54,50 @@ enum class CameraAction{
     CAPTURE_VIDEO
 }
 
+var recording: Recording? = null
+
 @Composable
 fun CameraPreviewScreen() {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val lensFacing = remember { mutableIntStateOf(CameraSelector.LENS_FACING_BACK) }
+    val lensFacing = remember { mutableIntStateOf(CameraSelector.LENS_FACING_FRONT) }
 
     val previewView = remember { PreviewView(context) }
     val imageCapture = remember { ImageCapture.Builder().build() }
+    val videoCapture = remember { VideoCapture.withOutput(Recorder.Builder().build()) }
     val currentAction = remember { mutableStateOf(CameraAction.CAPTURE_IMAGE) }
+    val currentIcon = remember { mutableIntStateOf(R.drawable.photo_camera) }
 
-    LaunchedEffect(lensFacing.intValue) {
+    LaunchedEffect(lensFacing.intValue, currentAction.value) {
         val cameraProvider = context.getCameraProvider()
         val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing.intValue).build()
-
         cameraProvider.unbindAll()
-        cameraProvider.bindToLifecycle(
-            lifecycleOwner,
-            cameraSelector,
-            Preview.Builder().build().also { it.surfaceProvider = previewView.surfaceProvider },
-            imageCapture
-        )
+
+        when(currentAction.value){
+            CameraAction.CAPTURE_IMAGE -> {
+                cameraProvider.bindToLifecycle(
+                    lifecycleOwner,
+                    cameraSelector,
+                    Preview.Builder().build().also { it.surfaceProvider = previewView.surfaceProvider },
+                    imageCapture
+                )
+            }
+            CameraAction.CAPTURE_VIDEO -> {
+                cameraProvider.bindToLifecycle(
+                    lifecycleOwner,
+                    cameraSelector,
+                    Preview.Builder().build().also { it.surfaceProvider = previewView.surfaceProvider },
+                    videoCapture
+                )
+            }
+        }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(3f),
+                .weight(6f),
             contentAlignment = Alignment.BottomCenter
         ) {
             AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
@@ -86,20 +107,45 @@ fun CameraPreviewScreen() {
                 shape = CircleShape,
                 onClick = {
                     when (currentAction.value) {
-                        CameraAction.CAPTURE_IMAGE -> captureImage(imageCapture, context, "1")
-                        CameraAction.CAPTURE_VIDEO -> captureImage2(imageCapture, context, "2")
+                        CameraAction.CAPTURE_IMAGE -> captureImage(imageCapture, context)
+                        CameraAction.CAPTURE_VIDEO -> captureVideo(videoCapture, context)
                     }
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.photo_camera),
+                    imageVector = ImageVector.vectorResource(currentIcon.intValue),
                     contentDescription = "Take Photo",
                     modifier = Modifier.fillMaxSize(0.9f)
                 )
             }
+
+            Button(
+                modifier = Modifier.align(Alignment.BottomStart).padding(vertical = 10.dp),
+                colors = ButtonDefaults.buttonColors(Color.Transparent),
+                shape = CircleShape,
+                onClick = {
+                    if (currentAction.value == CameraAction.CAPTURE_IMAGE ) {
+                        currentAction.value = CameraAction.CAPTURE_VIDEO
+                        currentIcon.intValue = R.drawable.videocam
+                    } else {
+                        currentAction.value = CameraAction.CAPTURE_IMAGE
+                        currentIcon.intValue = R.drawable.photo_camera
+                    }
+                    println(currentAction.value)
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Switch Action",
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+
+
             Button(
                 colors = ButtonDefaults.buttonColors(Color.Transparent),
                 shape = CircleShape,
+                modifier = Modifier.align(Alignment.BottomEnd).padding(vertical = 10.dp),
                 onClick = {
                     lensFacing.intValue =
                         if (lensFacing.intValue == CameraSelector.LENS_FACING_BACK) {
@@ -107,12 +153,11 @@ fun CameraPreviewScreen() {
                         } else {
                             CameraSelector.LENS_FACING_BACK
                         }
-                },
-                modifier = Modifier.align(Alignment.BottomEnd).padding(vertical = 10.dp)
+                }
             ) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
-                    contentDescription = "Switch Camera",
+                    contentDescription = "Switch Lens",
                     modifier = Modifier.size(40.dp)
                 )
             }
@@ -125,20 +170,7 @@ fun CameraPreviewScreen() {
                 .background(Color.LightGray),
             contentAlignment = Alignment.Center
         ) {
-            // Afegir altres funcionalitats aquí
-            Button(
-                onClick = {
-                    currentAction.value =
-                        if (currentAction.value == CameraAction.CAPTURE_IMAGE ) {
-                            CameraAction.CAPTURE_VIDEO
-                        } else {
-                            CameraAction.CAPTURE_IMAGE
-                        }
-                    println(currentAction.value)
-                }
-            ) {
-                Text("Swap Func")
-            }
+            // Afegir altres funcionalitats aquí (part inferior)
         }
     }
 }
@@ -153,8 +185,8 @@ private suspend fun Context.getCameraProvider(): ProcessCameraProvider =
         }
     }
 
-private fun captureImage(imageCapture: ImageCapture, context: Context, text: String) {
-    val name = text + "Image_${System.currentTimeMillis()}.jpeg"
+private fun captureImage(imageCapture: ImageCapture, context: Context) {
+    val name = "Image_${System.currentTimeMillis()}.jpeg"
     val contentValues = ContentValues().apply {
         put(MediaStore.MediaColumns.DISPLAY_NAME, name)
         put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
@@ -172,7 +204,7 @@ private fun captureImage(imageCapture: ImageCapture, context: Context, text: Str
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                println("Success"+text)
+                println("Success")
             }
 
             override fun onError(exception: ImageCaptureException) {
@@ -182,31 +214,38 @@ private fun captureImage(imageCapture: ImageCapture, context: Context, text: Str
         })
 }
 
-private fun captureImage2(imageCapture: ImageCapture, context: Context, text: String) {
-    val name = text + "Image_${System.currentTimeMillis()}.jpeg"
-    val contentValues = ContentValues().apply {
-        put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-        put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MaxLift")
+private fun captureVideo(videoCapture: VideoCapture<Recorder>, context: Context) {
+    if(recording != null) {
+        recording?.stop()
+        recording = null
+        return
     }
-    val outputOptions = ImageCapture.OutputFileOptions
-        .Builder(
-            context.contentResolver,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues
-        )
-        .build()
-    imageCapture.takePicture(
-        outputOptions,
-        ContextCompat.getMainExecutor(context),
-        object : ImageCapture.OnImageSavedCallback {
-            override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                println("Success"+text)
-            }
 
-            override fun onError(exception: ImageCaptureException) {
-                println("Failed $exception")
-            }
+    val name = "Video_${System.currentTimeMillis()}.mp4"
+    val contentValues = ContentValues().apply {
+        put(MediaStore.Video.Media.DISPLAY_NAME, name)
+        put(MediaStore.Video.Media.MIME_TYPE, "video/mp4")
+        put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/CameraX-Video")
+    }
 
-        })
+    val mediaStoreOutputOptions = MediaStoreOutputOptions.Builder(
+        context.contentResolver,
+        MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+    ).setContentValues(contentValues).build()
+
+    recording = videoCapture.output.prepareRecording(context, mediaStoreOutputOptions)
+    .start(ContextCompat.getMainExecutor(context)) { recordEvent ->
+        when (recordEvent) {
+            is VideoRecordEvent.Start -> {
+                println("Grabación iniciada")
+            }
+            is VideoRecordEvent.Finalize -> {
+                if (!recordEvent.hasError()) {
+                    println("Grabación finalizada: ${recordEvent.outputResults.outputUri}")
+                } else {
+                    println("Error en la grabación: ${recordEvent.error}")
+                }
+            }
+        }
+    }
 }
