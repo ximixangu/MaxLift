@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.maxlift.presentation.ui.activities.cameraActivity.CameraActivity
+import com.maxlift.presentation.ui.activities.loginActivity.LoginActivity
 
 @Composable
 fun MenuScreen() {
@@ -45,7 +46,7 @@ fun MenuScreen() {
         }
 
         Button(
-            onClick = { navigateToActivity(MenuActivity::class.java, context) },
+            onClick = { navigateToActivity(LoginActivity::class.java, context) },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)

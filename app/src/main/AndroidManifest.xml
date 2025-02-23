@@ -33,6 +33,10 @@
             android:name=".presentation.ui.activities.cameraActivity.CameraActivity"
             android:label="Camera"
         />
+        <activity
+            android:name=".presentation.ui.activities.loginActivity.LoginActivity"
+            android:label="LogIn"
+        />
     </application>
 
 </manifest>
