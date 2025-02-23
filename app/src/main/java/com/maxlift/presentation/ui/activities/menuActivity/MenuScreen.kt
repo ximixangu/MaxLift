@@ -55,7 +55,7 @@ fun MenuScreen() {
             shape = RectangleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffbf87f0))
         ) {
-            Text(text = "Activity 2", fontSize = 32.sp)
+            Text(text = "User Login", fontSize = 32.sp)
         }
 
         Button(

@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.activities.loginActivity
+package com.maxlift.presentation.ui.activities.registerActivity
 
 import android.content.Intent
 import android.widget.Toast
@@ -27,26 +27,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.maxlift.domain.usecase.login.Credentials
-import com.maxlift.domain.usecase.login.LoginUseCase
-import com.maxlift.presentation.ui.activities.menuActivity.MenuActivity
-import com.maxlift.presentation.ui.activities.registerActivity.RegisterActivity
-import com.maxlift.presentation.ui.common.BackButton
+import com.maxlift.domain.usecase.register.RegisterCredentials
+import com.maxlift.domain.usecase.register.RegisterUseCase
+import com.maxlift.presentation.ui.activities.loginActivity.LoginActivity
 
 @Composable
-fun UserLoginForm(loginUseCase: LoginUseCase?) {
-    var credentials by remember { mutableStateOf(Credentials()) }
+fun UserRegisterForm(registerUseCase: RegisterUseCase?) {
+    var registerCredentials by remember { mutableStateOf(RegisterCredentials()) }
     var passwordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Surface {
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.Top,
-            modifier = Modifier.padding(8.dp)
-        ) {
-            BackButton()
-        }
         Column(
             modifier = Modifier.width(300.dp),
             verticalArrangement = Arrangement.Center,
@@ -54,19 +45,28 @@ fun UserLoginForm(loginUseCase: LoginUseCase?) {
         ) {
             Row(modifier = Modifier.padding(vertical = 8.dp)) {
                 TextField(
-                    value = credentials.email,
-                    label = { Text(text = "Email") },
+                    value = registerCredentials.name,
+                    label = { Text(text = "Username") },
                     onValueChange = {
-                            data -> credentials = credentials.copy(email = data)
+                            data -> registerCredentials = registerCredentials.copy(name = data)
                     }
                 )
             }
             Row(modifier = Modifier.padding(vertical = 8.dp)) {
                 TextField(
-                    value = credentials.password,
+                    value = registerCredentials.email,
+                    label = { Text(text = "Email") },
+                    onValueChange = {
+                            data -> registerCredentials = registerCredentials.copy(email = data)
+                    }
+                )
+            }
+            Row(modifier = Modifier.padding(vertical = 8.dp)) {
+                TextField(
+                    value = registerCredentials.password,
                     label = { Text(text = "Password") },
                     onValueChange = { data ->
-                        credentials = credentials.copy(password = data)
+                        registerCredentials = registerCredentials.copy(password = data)
                     },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
@@ -79,31 +79,22 @@ fun UserLoginForm(loginUseCase: LoginUseCase?) {
                     }
                 )
             }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Row {
-                    Button(
-                        modifier = Modifier.width(200.dp),
-                        content = { Text(text = "Login") },
-                        enabled = credentials.isNotEmpty(),
-                        onClick = {
-                            if(loginUseCase!!.execute(credentials)) {
-                                val intent = Intent()
-                                intent.setClass(context, MenuActivity::class.java)
-                                context.startActivity(intent)
-                            } else {
-                                Toast.makeText(context, "Error Login", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    )
-                }
+            Column(horizontalAlignment = Alignment.CenterHorizontally){
                 Row {
                     Button(
                         modifier = Modifier.width(200.dp),
                         content = { Text(text = "Register") },
+                        enabled = registerCredentials.isNotEmpty(),
                         onClick = {
-                            val intent = Intent()
-                            intent.setClass(context, RegisterActivity::class.java)
-                            context.startActivity(intent)
+                            if (registerUseCase!!.execute(registerCredentials)) {
+                                val intent = Intent()
+                                intent.setClass(context, LoginActivity::class.java)
+                                context.startActivity(intent)
+                                println("bello")
+                            }else {
+                                println("pells")
+                                Toast.makeText(context, "Error Registering", Toast.LENGTH_LONG).show()
+                            }
                         }
                     )
                 }

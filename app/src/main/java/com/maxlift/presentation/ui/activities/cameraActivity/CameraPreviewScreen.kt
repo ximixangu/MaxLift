@@ -25,8 +25,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Cameraswitch
+import androidx.compose.material.icons.filled.SwitchCamera
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -38,14 +40,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import com.maxlift.R
+import com.maxlift.presentation.ui.common.BackButton
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -66,7 +66,7 @@ fun CameraPreviewScreen() {
     val imageCapture = remember { ImageCapture.Builder().build() }
     val videoCapture = remember { VideoCapture.withOutput(Recorder.Builder().build()) }
     val currentAction = remember { mutableStateOf(CameraAction.CAPTURE_IMAGE) }
-    val currentIcon = remember { mutableIntStateOf(R.drawable.photo_camera) }
+    val currentIcon = remember { mutableStateOf(Icons.Filled.CameraAlt) }
 
     LaunchedEffect(lensFacing.intValue, currentAction.value) {
         val cameraProvider = context.getCameraProvider()
@@ -93,6 +93,8 @@ fun CameraPreviewScreen() {
         }
     }
 
+
+
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -100,7 +102,12 @@ fun CameraPreviewScreen() {
                 .weight(6f),
             contentAlignment = Alignment.BottomCenter
         ) {
-            AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
+            AndroidView( { previewView }, modifier = Modifier.fillMaxSize())
+
+            BackButton(
+                Modifier.align(Alignment.TopStart)
+                    .padding(8.dp)
+            )
 
             Button(
                 modifier = Modifier.padding(20.dp).width(100.dp).height(100.dp),
@@ -113,7 +120,7 @@ fun CameraPreviewScreen() {
                 },
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(currentIcon.intValue),
+                    imageVector = currentIcon.value,
                     contentDescription = "Take Photo",
                     modifier = Modifier.fillMaxSize(0.9f)
                 )
@@ -126,16 +133,15 @@ fun CameraPreviewScreen() {
                 onClick = {
                     if (currentAction.value == CameraAction.CAPTURE_IMAGE ) {
                         currentAction.value = CameraAction.CAPTURE_VIDEO
-                        currentIcon.intValue = R.drawable.videocam
+                        currentIcon.value = Icons.Filled.Videocam
                     } else {
                         currentAction.value = CameraAction.CAPTURE_IMAGE
-                        currentIcon.intValue = R.drawable.photo_camera
+                        currentIcon.value = Icons.Filled.CameraAlt
                     }
-                    println(currentAction.value)
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Default.Star,
+                    imageVector = Icons.Filled.SwitchCamera,
                     contentDescription = "Switch Action",
                     modifier = Modifier.size(40.dp)
                 )
@@ -156,7 +162,7 @@ fun CameraPreviewScreen() {
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Default.Refresh,
+                    imageVector = Icons.Default.Cameraswitch,
                     contentDescription = "Switch Lens",
                     modifier = Modifier.size(40.dp)
                 )
@@ -237,13 +243,13 @@ private fun captureVideo(videoCapture: VideoCapture<Recorder>, context: Context)
     .start(ContextCompat.getMainExecutor(context)) { recordEvent ->
         when (recordEvent) {
             is VideoRecordEvent.Start -> {
-                println("Grabación iniciada")
+                println("Recording Started")
             }
             is VideoRecordEvent.Finalize -> {
                 if (!recordEvent.hasError()) {
-                    println("Grabación finalizada: ${recordEvent.outputResults.outputUri}")
+                    println("Recording Ended: ${recordEvent.outputResults.outputUri}")
                 } else {
-                    println("Error en la grabación: ${recordEvent.error}")
+                    println("Error recording: ${recordEvent.error}")
                 }
             }
         }

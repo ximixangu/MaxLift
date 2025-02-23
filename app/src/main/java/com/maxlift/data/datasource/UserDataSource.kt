@@ -51,6 +51,7 @@ class UserDataSource private constructor(){
         if(!usersMailMap.containsKey(user.email) && !usersUUIDMap.containsKey(user.uuid)){
             usersUUIDMap[user.uuid] = user
             usersMailMap[user.email] = user
+            println(user.email)
         }
     }
 

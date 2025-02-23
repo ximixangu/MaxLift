@@ -37,6 +37,10 @@
             android:name=".presentation.ui.activities.loginActivity.LoginActivity"
             android:label="LogIn"
         />
+        <activity
+            android:name=".presentation.ui.activities.registerActivity.RegisterActivity"
+            android:label="Register"
+        />
     </application>
 
 </manifest>
