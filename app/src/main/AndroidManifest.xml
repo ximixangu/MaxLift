@@ -41,6 +41,10 @@
             android:name=".presentation.ui.activities.registerActivity.RegisterActivity"
             android:label="Register"
         />
+        <activity
+            android:name=".presentation.ui.activities.profileActivity.ProfileActivity"
+            android:label="UserProfile"
+            />
     </application>
 
 </manifest>

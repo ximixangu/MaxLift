@@ -7,8 +7,9 @@ class LoginUseCase(private var userRepository: UserRepository) {
     fun execute(credentials: Credentials): Boolean {
         try {
             val user = userRepository.fetchUserByEmail(credentials.email)
-            println(user?.email)
+            println(user?.name)
             user?.let {
+                userRepository.setLoggedUser(user)
                 return true
             }
             return false

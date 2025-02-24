@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.maxlift.presentation.ui.activities.cameraActivity.CameraActivity
 import com.maxlift.presentation.ui.activities.loginActivity.LoginActivity
+import com.maxlift.presentation.ui.activities.profileActivity.ProfileActivity
 
 @Composable
 fun MenuScreen() {
@@ -59,7 +60,7 @@ fun MenuScreen() {
         }
 
         Button(
-            onClick = { navigateToActivity(MenuActivity::class.java, context) },
+            onClick = { navigateToActivity(ProfileActivity::class.java, context) },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
@@ -68,7 +69,7 @@ fun MenuScreen() {
             shape = RectangleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffb8b7c0))
         ) {
-            Text(text = "Activity 3", fontSize = 32.sp)
+            Text(text = "Profile", fontSize = 32.sp)
         }
     }
 }

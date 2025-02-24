@@ -84,7 +84,7 @@ fun UserRegisterForm(registerUseCase: RegisterUseCase?) {
                     Button(
                         modifier = Modifier.width(200.dp),
                         content = { Text(text = "Register") },
-                        enabled = registerCredentials.isNotEmpty(),
+                        enabled = registerCredentials.isValid(),
                         onClick = {
                             if (registerUseCase!!.execute(registerCredentials)) {
                                 val intent = Intent()

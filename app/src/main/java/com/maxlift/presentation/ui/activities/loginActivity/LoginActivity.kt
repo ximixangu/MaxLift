@@ -11,20 +11,27 @@ import androidx.compose.ui.platform.LocalContext
 import com.maxlift.data.datasource.UserDataSource
 import com.maxlift.data.repository.UserRepository
 import com.maxlift.domain.usecase.login.LoginUseCase
+import com.maxlift.presentation.theme.MaxLiftTheme
 
 class LoginActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
-            ) {
-                UserLoginForm(
-                    LoginUseCase(
-                        UserRepository(
-                            UserDataSource.getInstance(
-                                LocalContext.current))))
+            MaxLiftTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    UserLoginForm(
+                        LoginUseCase(
+                            UserRepository(
+                                UserDataSource.getInstance(
+                                    LocalContext.current
+                                )
+                            )
+                        )
+                    )
+                }
             }
         }
     }

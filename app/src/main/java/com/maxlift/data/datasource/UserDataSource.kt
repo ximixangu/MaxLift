@@ -22,6 +22,7 @@ class UserDataSource private constructor(){
     }
 
     private var context: Context? = null
+    private var loggedUser: UserModel? = null
     private val usersUUIDMap: MutableMap<UUID, UserModel> = HashMap()
     private val usersMailMap: MutableMap<String, UserModel> = HashMap()
 
@@ -61,5 +62,13 @@ class UserDataSource private constructor(){
 
     fun getUserByMail(mail: String): UserModel?{
         return usersMailMap[mail]
+    }
+
+    fun setLoggedUser(user: UserModel) {
+        loggedUser = user
+    }
+
+    fun getLoggedUser(): UserModel? {
+        return loggedUser
     }
 }

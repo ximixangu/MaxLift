@@ -93,8 +93,6 @@ fun CameraPreviewScreen() {
         }
     }
 
-
-
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -106,11 +104,11 @@ fun CameraPreviewScreen() {
 
             BackButton(
                 Modifier.align(Alignment.TopStart)
-                    .padding(8.dp)
+                    .padding(vertical = 32.dp, horizontal = 8.dp)
             )
 
             Button(
-                modifier = Modifier.padding(20.dp).width(100.dp).height(100.dp),
+                modifier = Modifier.padding(10.dp).width(100.dp).height(100.dp),
                 shape = CircleShape,
                 onClick = {
                     when (currentAction.value) {
@@ -134,7 +132,7 @@ fun CameraPreviewScreen() {
                     if (currentAction.value == CameraAction.CAPTURE_IMAGE ) {
                         currentAction.value = CameraAction.CAPTURE_VIDEO
                         currentIcon.value = Icons.Filled.Videocam
-                    } else {
+                    } else if(recording == null){
                         currentAction.value = CameraAction.CAPTURE_IMAGE
                         currentIcon.value = Icons.Filled.CameraAlt
                     }

@@ -7,6 +7,7 @@ import com.maxlift.domain.repository.IUserRepository
 import java.util.UUID
 
 class UserRepository(private val userDataSource: UserDataSource): IUserRepository {
+
     override fun fetchUserByUUID(uuid: UUID): User? {
         val userModel = userDataSource.getUserByUUID(uuid)
         userModel?.let {
@@ -25,6 +26,14 @@ class UserRepository(private val userDataSource: UserDataSource): IUserRepositor
 
     override fun saveUser(user: User) {
         userDataSource.saveUser(user.toUserModel())
+    }
+
+    override fun setLoggedUser(user: User) {
+        userDataSource.setLoggedUser(user.toUserModel())
+    }
+
+    override fun getLoggedUser(): User? {
+        return userDataSource.getLoggedUser()?.toUserDomain()
     }
 
     private fun UserModel.toUserDomain(): User {

@@ -84,7 +84,7 @@ fun UserLoginForm(loginUseCase: LoginUseCase?) {
                     Button(
                         modifier = Modifier.width(200.dp),
                         content = { Text(text = "Login") },
-                        enabled = credentials.isNotEmpty(),
+                        enabled = credentials.isValid(),
                         onClick = {
                             if(loginUseCase!!.execute(credentials)) {
                                 val intent = Intent()
