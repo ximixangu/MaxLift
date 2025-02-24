@@ -62,6 +62,7 @@ fun CameraPreviewScreen() {
     val lifecycleOwner = LocalLifecycleOwner.current
     val lensFacing = remember { mutableIntStateOf(CameraSelector.LENS_FACING_FRONT) }
 
+    val isRecording = remember { mutableStateOf(false) }
     val previewView = remember { PreviewView(context) }
     val imageCapture = remember { ImageCapture.Builder().build() }
     val videoCapture = remember { VideoCapture.withOutput(Recorder.Builder().build()) }
@@ -110,10 +111,16 @@ fun CameraPreviewScreen() {
             Button(
                 modifier = Modifier.padding(10.dp).width(100.dp).height(100.dp),
                 shape = CircleShape,
+                colors =
+                    if(isRecording.value) ButtonDefaults.buttonColors(Color.Red)
+                    else ButtonDefaults.buttonColors(Color.Unspecified),
                 onClick = {
                     when (currentAction.value) {
                         CameraAction.CAPTURE_IMAGE -> captureImage(imageCapture, context)
-                        CameraAction.CAPTURE_VIDEO -> captureVideo(videoCapture, context)
+                        CameraAction.CAPTURE_VIDEO -> {
+                            captureVideo(videoCapture, context)
+                            isRecording.value = (recording != null)
+                        }
                     }
                 },
             ) {
