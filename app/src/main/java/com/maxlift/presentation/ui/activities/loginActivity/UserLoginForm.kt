@@ -31,7 +31,6 @@ import com.maxlift.domain.usecase.login.Credentials
 import com.maxlift.domain.usecase.login.LoginUseCase
 import com.maxlift.presentation.ui.activities.menuActivity.MenuActivity
 import com.maxlift.presentation.ui.activities.registerActivity.RegisterActivity
-import com.maxlift.presentation.ui.common.BackButton
 
 @Composable
 fun UserLoginForm(loginUseCase: LoginUseCase?) {
@@ -40,13 +39,6 @@ fun UserLoginForm(loginUseCase: LoginUseCase?) {
     val context = LocalContext.current
 
     Surface {
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.Top,
-            modifier = Modifier.padding(8.dp)
-        ) {
-            BackButton()
-        }
         Column(
             modifier = Modifier.width(300.dp),
             verticalArrangement = Arrangement.Center,

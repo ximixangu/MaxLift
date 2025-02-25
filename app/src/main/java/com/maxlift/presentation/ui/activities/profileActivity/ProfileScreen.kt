@@ -1,7 +1,6 @@
 package com.maxlift.presentation.ui.activities.profileActivity
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import com.maxlift.presentation.ui.common.BackButton
 
 @Composable
 fun ProfileScreen(userViewModel: UserViewModel) {
@@ -31,12 +29,6 @@ fun ProfileScreen(userViewModel: UserViewModel) {
     }
 
     Surface {
-        Box(Modifier.fillMaxSize()){
-            BackButton(
-                Modifier.align(Alignment.TopStart)
-                    .padding(8.dp)
-            )
-        }
         Column(
             modifier = Modifier
                 .fillMaxSize(),

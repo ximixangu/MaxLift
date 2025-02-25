@@ -14,7 +14,6 @@ import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,7 +44,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import com.maxlift.presentation.ui.common.BackButton
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -101,19 +99,14 @@ fun CameraPreviewScreen() {
                 .weight(6f),
             contentAlignment = Alignment.BottomCenter
         ) {
-            AndroidView( { previewView }, modifier = Modifier.fillMaxSize())
-
-            BackButton(
-                Modifier.align(Alignment.TopStart)
-                    .padding(vertical = 32.dp, horizontal = 8.dp)
-            )
+            AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
 
             Button(
                 modifier = Modifier.padding(10.dp).width(100.dp).height(100.dp),
                 shape = CircleShape,
                 colors =
-                    if(isRecording.value) ButtonDefaults.buttonColors(Color.Red)
-                    else ButtonDefaults.buttonColors(Color.Unspecified),
+                if (isRecording.value) ButtonDefaults.buttonColors(Color.Red)
+                else ButtonDefaults.buttonColors(Color.Unspecified),
                 onClick = {
                     when (currentAction.value) {
                         CameraAction.CAPTURE_IMAGE -> captureImage(imageCapture, context)
@@ -136,10 +129,10 @@ fun CameraPreviewScreen() {
                 colors = ButtonDefaults.buttonColors(Color.Transparent),
                 shape = CircleShape,
                 onClick = {
-                    if (currentAction.value == CameraAction.CAPTURE_IMAGE ) {
+                    if (currentAction.value == CameraAction.CAPTURE_IMAGE) {
                         currentAction.value = CameraAction.CAPTURE_VIDEO
                         currentIcon.value = Icons.Filled.Videocam
-                    } else if(recording == null){
+                    } else if (recording == null) {
                         currentAction.value = CameraAction.CAPTURE_IMAGE
                         currentIcon.value = Icons.Filled.CameraAlt
                     }
@@ -173,19 +166,8 @@ fun CameraPreviewScreen() {
                 )
             }
         }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .background(Color.LightGray),
-            contentAlignment = Alignment.Center
-        ) {
-            // Afegir altres funcionalitats aquí (part inferior)
-        }
     }
 }
-
 
 private suspend fun Context.getCameraProvider(): ProcessCameraProvider =
     suspendCoroutine { continuation ->

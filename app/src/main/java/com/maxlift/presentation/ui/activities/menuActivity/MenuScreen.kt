@@ -1,7 +1,5 @@
 package com.maxlift.presentation.ui.activities.menuActivity
 
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.maxlift.presentation.ui.activities.cameraActivity.CameraActivity
 import com.maxlift.presentation.ui.activities.loginActivity.LoginActivity
 import com.maxlift.presentation.ui.activities.profileActivity.ProfileActivity
+import com.maxlift.presentation.ui.common.navigateToActivity
 
 @Composable
 fun MenuScreen() {
@@ -31,7 +30,7 @@ fun MenuScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceEvenly,
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(
@@ -72,12 +71,6 @@ fun MenuScreen() {
             Text(text = "Profile", fontSize = 32.sp)
         }
     }
-}
-
-private fun navigateToActivity(activityClass: Class<*>, context: Context) {
-    val intent = Intent()
-    intent.setClass(context, activityClass)
-    context.startActivity(intent)
 }
 
 @Preview(showBackground = true, showSystemUi = true)
