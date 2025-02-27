@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.activities.cameraActivity
+package com.maxlift.presentation.ui.feature.camera
 
 import android.content.ContentValues
 import android.content.Context
@@ -40,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -57,7 +56,7 @@ var recording: Recording? = null
 @Composable
 fun CameraPreviewScreen() {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val lensFacing = remember { mutableIntStateOf(CameraSelector.LENS_FACING_FRONT) }
 
     val isRecording = remember { mutableStateOf(false) }

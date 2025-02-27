@@ -21,11 +21,11 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.maxlift.presentation.ui.activities.menuActivity.MenuActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyScaffold(
+    showBackButton: Boolean = true,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -47,15 +47,17 @@ fun MyScaffold(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { if(context is Activity) context.finish() }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBackIosNew,
-                            contentDescription = "Back"
-                        )
+                    if (showBackButton) {
+                        IconButton(onClick = { if (context is Activity) context.finish() }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBackIosNew,
+                                contentDescription = "Back"
+                            )
+                        }
                     }
                 },
                 actions = {
-                    IconButton(onClick = { navigateToActivity(MenuActivity::class.java, context) }) {
+                    IconButton(onClick = {  }) {
                         Icon(
                             imageVector = Icons.Filled.Menu,
                             contentDescription = "Menu",

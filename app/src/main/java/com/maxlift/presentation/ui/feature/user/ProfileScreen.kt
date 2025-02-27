@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.activities.profileActivity
+package com.maxlift.presentation.ui.feature.user
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

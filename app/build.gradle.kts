@@ -58,7 +58,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    //Material Icons
+    // Jetpack Compose Navigation
+    implementation(libs.androidx.navigation.compose)
+
+    // Material Icons
     implementation(libs.androidx.material.icons.extended)
 
     // Gson

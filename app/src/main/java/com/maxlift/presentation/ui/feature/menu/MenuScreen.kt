@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.activities.menuActivity
+package com.maxlift.presentation.ui.feature.menu
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -14,18 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.maxlift.presentation.ui.activities.cameraActivity.CameraActivity
-import com.maxlift.presentation.ui.activities.loginActivity.LoginActivity
-import com.maxlift.presentation.ui.activities.profileActivity.ProfileActivity
-import com.maxlift.presentation.ui.common.navigateToActivity
+import androidx.navigation.NavController
 
 @Composable
-fun MenuScreen() {
-    val context = LocalContext.current
+fun MenuScreen(navController: NavController) {
 
     Column(
         modifier = Modifier
@@ -34,7 +28,7 @@ fun MenuScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(
-            onClick = { navigateToActivity(CameraActivity::class.java, context) },
+            onClick = { navController.navigate("camera") },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
@@ -46,12 +40,11 @@ fun MenuScreen() {
         }
 
         Button(
-            onClick = { navigateToActivity(LoginActivity::class.java, context) },
+            onClick = { navController.navigate("login") },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .border(BorderStroke(3.dp, color = Color.White))
-            ,
+                .border(BorderStroke(3.dp, color = Color.White)),
             shape = RectangleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffbf87f0))
         ) {
@@ -59,7 +52,7 @@ fun MenuScreen() {
         }
 
         Button(
-            onClick = { navigateToActivity(ProfileActivity::class.java, context) },
+            onClick = { navController.navigate("profile") },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
@@ -71,10 +64,4 @@ fun MenuScreen() {
             Text(text = "Profile", fontSize = 32.sp)
         }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewMenuScreen() {
-    MenuScreen()
 }
