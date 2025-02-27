@@ -3,7 +3,9 @@ package com.maxlift.presentation.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,12 +15,14 @@ import com.maxlift.data.repository.UserRepository
 import com.maxlift.domain.usecase.GetLoggedUserUseCase
 import com.maxlift.domain.usecase.login.LoginUseCase
 import com.maxlift.domain.usecase.register.RegisterUseCase
+import com.maxlift.presentation.ui.common.MyScaffold
+import com.maxlift.presentation.ui.feature.calculator.RMForm
 import com.maxlift.presentation.ui.feature.camera.CameraPreviewScreen
-import com.maxlift.presentation.ui.feature.user.UserLoginForm
 import com.maxlift.presentation.ui.feature.menu.MenuScreen
 import com.maxlift.presentation.ui.feature.user.ProfileScreen
-import com.maxlift.presentation.ui.feature.user.UserViewModel
+import com.maxlift.presentation.ui.feature.user.UserLoginForm
 import com.maxlift.presentation.ui.feature.user.UserRegisterForm
+import com.maxlift.presentation.ui.feature.user.UserViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,12 +38,15 @@ fun MyApp() {
     val userRepository = UserRepository(UserDataSource.getInstance(LocalContext.current))
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "menu") {
-        composable("menu") { MenuScreen(navController) }
-        composable("login") { UserLoginForm(LoginUseCase(userRepository), navController) }
-        composable("register") { UserRegisterForm(RegisterUseCase(userRepository), navController) }
-        composable("camera") { CameraPreviewScreen() }
-        composable("profile") { ProfileScreen(UserViewModel(GetLoggedUserUseCase(userRepository))) }
+    MyScaffold(navController) { innerPadding ->
+        NavHost(navController = navController, startDestination = "menu", Modifier.padding(innerPadding)) {
+            composable("menu") { MenuScreen(navController) }
+            composable("login") { UserLoginForm(LoginUseCase(userRepository), navController) }
+            composable("register") { UserRegisterForm(RegisterUseCase(userRepository), navController) }
+            composable("camera") { CameraPreviewScreen() }
+            composable("profile") { ProfileScreen(UserViewModel(GetLoggedUserUseCase(userRepository))) }
+            composable("calculator") { RMForm() }
+        }
     }
 }
 

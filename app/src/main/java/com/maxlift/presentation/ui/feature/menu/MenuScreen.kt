@@ -22,8 +22,7 @@ import androidx.navigation.NavController
 fun MenuScreen(navController: NavController) {
 
     Column(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -40,28 +39,28 @@ fun MenuScreen(navController: NavController) {
         }
 
         Button(
-            onClick = { navController.navigate("login") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .border(BorderStroke(3.dp, color = Color.White)),
-            shape = RectangleShape,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffbf87f0))
-        ) {
-            Text(text = "User Login", fontSize = 32.sp)
-        }
-
-        Button(
-            onClick = { navController.navigate("profile") },
+            onClick = { navController.navigate("calculator") },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
                 .border(BorderStroke(3.dp, color = Color.White))
             ,
             shape = RectangleShape,
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffbf87f0))
+        ) {
+            Text(text = "RM Calculator", fontSize = 32.sp)
+        }
+
+        Button(
+            onClick = { navController.navigate("login") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .border(BorderStroke(3.dp, color = Color.White)),
+            shape = RectangleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffb8b7c0))
         ) {
-            Text(text = "Profile", fontSize = 32.sp)
+            Text(text = "User Login", fontSize = 32.sp)
         }
     }
 }

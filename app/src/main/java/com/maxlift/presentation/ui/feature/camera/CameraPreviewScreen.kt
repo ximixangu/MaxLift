@@ -101,7 +101,10 @@ fun CameraPreviewScreen() {
             AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
 
             Button(
-                modifier = Modifier.padding(10.dp).width(100.dp).height(100.dp),
+                modifier = Modifier
+                    .padding(10.dp)
+                    .width(100.dp)
+                    .height(100.dp),
                 shape = CircleShape,
                 colors =
                 if (isRecording.value) ButtonDefaults.buttonColors(Color.Red)
@@ -124,7 +127,9 @@ fun CameraPreviewScreen() {
             }
 
             Button(
-                modifier = Modifier.align(Alignment.BottomStart).padding(vertical = 10.dp),
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(vertical = 10.dp),
                 colors = ButtonDefaults.buttonColors(Color.Transparent),
                 shape = CircleShape,
                 onClick = {
@@ -148,7 +153,9 @@ fun CameraPreviewScreen() {
             Button(
                 colors = ButtonDefaults.buttonColors(Color.Transparent),
                 shape = CircleShape,
-                modifier = Modifier.align(Alignment.BottomEnd).padding(vertical = 10.dp),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(vertical = 10.dp),
                 onClick = {
                     lensFacing.intValue =
                         if (lensFacing.intValue == CameraSelector.LENS_FACING_BACK) {
