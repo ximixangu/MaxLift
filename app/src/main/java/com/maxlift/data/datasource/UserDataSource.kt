@@ -15,7 +15,7 @@ class UserDataSource private constructor(){
         fun getInstance(context: Context) =
             instance ?: synchronized(this) { instance ?: UserDataSource().also {
                 instance = it
-                it.context=context
+                it.context = context
                 it.loadUserData()
                 }
             }
@@ -26,10 +26,10 @@ class UserDataSource private constructor(){
     private val usersUUIDMap: MutableMap<UUID, UserModel> = HashMap()
     private val usersMailMap: MutableMap<String, UserModel> = HashMap()
 
-    fun loadUserData(){ context?.let {
+    fun loadUserData() { context?.let {
         val stringDataFromRawAsset: String? = AssetsProvider.getJsonDataFromRawAsset(it)
-        stringDataFromRawAsset?.let {
-            val user: UserModel? = parseJson(it)
+        stringDataFromRawAsset?.let { str ->
+            val user: UserModel? = parseJson(str)
                 user?.let{
                     this.saveUser(user)
                 }
@@ -38,8 +38,7 @@ class UserDataSource private constructor(){
     }
 
     private fun parseJson(json: String): UserModel? {
-        val gson = //Gson()
-            GsonBuilder()/*.setDateFormat("yyyy-MM-dd'T'HH:mm:ssz")*/.create()
+        val gson = GsonBuilder().create()
         return try {
             gson.fromJson(json, UserModel::class.java)
         } catch (e: JsonSyntaxException) {

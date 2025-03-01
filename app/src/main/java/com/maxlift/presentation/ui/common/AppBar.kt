@@ -31,7 +31,7 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyScaffold(
+fun MyScaffoldTopAppBar(
     navController: NavController,
     content: @Composable (PaddingValues) -> Unit
 ) {

@@ -15,8 +15,9 @@ import com.maxlift.data.repository.UserRepository
 import com.maxlift.domain.usecase.GetLoggedUserUseCase
 import com.maxlift.domain.usecase.login.LoginUseCase
 import com.maxlift.domain.usecase.register.RegisterUseCase
-import com.maxlift.presentation.ui.common.MyScaffold
+import com.maxlift.presentation.ui.common.MyScaffoldTopAppBar
 import com.maxlift.presentation.ui.feature.calculator.RMForm
+import com.maxlift.presentation.ui.feature.calculator.RMViewModel
 import com.maxlift.presentation.ui.feature.camera.CameraPreviewScreen
 import com.maxlift.presentation.ui.feature.menu.MenuScreen
 import com.maxlift.presentation.ui.feature.user.ProfileScreen
@@ -38,14 +39,14 @@ fun MyApp() {
     val userRepository = UserRepository(UserDataSource.getInstance(LocalContext.current))
     val navController = rememberNavController()
 
-    MyScaffold(navController) { innerPadding ->
+    MyScaffoldTopAppBar(navController) { innerPadding ->
         NavHost(navController = navController, startDestination = "menu", Modifier.padding(innerPadding)) {
             composable("menu") { MenuScreen(navController) }
             composable("login") { UserLoginForm(LoginUseCase(userRepository), navController) }
             composable("register") { UserRegisterForm(RegisterUseCase(userRepository), navController) }
             composable("camera") { CameraPreviewScreen() }
             composable("profile") { ProfileScreen(UserViewModel(GetLoggedUserUseCase(userRepository))) }
-            composable("calculator") { RMForm() }
+            composable("calculator") { RMForm(RMViewModel()) }
         }
     }
 }

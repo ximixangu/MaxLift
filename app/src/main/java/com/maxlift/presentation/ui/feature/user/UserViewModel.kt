@@ -11,9 +11,7 @@ class UserViewModel(private val getUserUseCase: GetLoggedUserUseCase) : ViewMode
     val user: LiveData<User?> get() = _userState
 
     fun loadUser() {
-        println(user.value)
         val user = getUserUseCase.execute()
-        user?.let { println(user.name) }
         _userState.value = user
     }
 }

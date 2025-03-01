@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,9 +33,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.maxlift.domain.usecase.rmCompute.RMParameters
+import java.util.Locale
 
 @Composable
-fun RMForm() {
+fun RMForm(rmViewModel: RMViewModel) {
+    val rmValue by rmViewModel.rm.observeAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
     var rmParameters by remember { mutableStateOf(RMParameters()) }
 
@@ -70,42 +73,6 @@ fun RMForm() {
                 modifier = Modifier.padding(vertical = 3.dp)
             )
 
-            val genderOptions = listOf("Male", "Female", "Other")
-            var expanded by remember { mutableStateOf(false) }
-
-            Box() {
-                OutlinedTextField(
-                    value = rmParameters.gender,
-                    onValueChange = {},
-                    label = { Text("Gender") },
-                    readOnly = true,
-                    trailingIcon = {
-                        IconButton(onClick = { expanded = !expanded }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = "Gender DropDown Menu"
-                            )
-                        }
-                    },
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    genderOptions.forEach { gender ->
-                        DropdownMenuItem(
-                            text = { Text(gender) },
-                            onClick = {
-                                rmParameters.gender = gender
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
-
             TextField(
                 value = rmParameters.repetitions,
                 onValueChange = { data ->
@@ -122,16 +89,62 @@ fun RMForm() {
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
+            val formulaOptions = listOf("Default", "Epley", "Brzycki", "Mean")
+            var expanded by remember { mutableStateOf(false) }
+
+            Box {
+                OutlinedTextField(
+                    value = rmParameters.formula,
+                    onValueChange = {},
+                    label = { Text("Formula") },
+                    readOnly = true,
+                    trailingIcon = {
+                        IconButton(onClick = { expanded = !expanded }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = "Formula DropDown Menu"
+                            )
+                        }
+                    },
+                    modifier = Modifier.padding(vertical = 2.dp)
+                )
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    formulaOptions.forEach { formula ->
+                        DropdownMenuItem(
+                            text = { Text(formula) },
+                            onClick = {
+                                rmParameters.formula = formula
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
             Button(
                 enabled = rmParameters.isValid(),
                 onClick = {
                     keyboardController?.hide()
-                    println("Weight: ${rmParameters.weight}, Gender: ${rmParameters.gender}, Reps: ${rmParameters.repetitions}")
+                    rmViewModel.computeRM(rmParameters)
                 },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .padding(8.dp)
+                    .align(Alignment.CenterHorizontally)
             ) {
                 Text("Compute RM")
             }
+
+            Text(
+                text = rmValue?.let {
+                    String.format(Locale.getDefault(), "%.2f", it).plus(" kg")
+                } ?: " ",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(50.dp)
+            )
         }
     }
 }

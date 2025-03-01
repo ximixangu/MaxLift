@@ -109,7 +109,7 @@ fun CameraPreviewScreen() {
                 colors =
                 if (isRecording.value) ButtonDefaults.buttonColors(Color.Red)
                 else ButtonDefaults.buttonColors(Color.Unspecified),
-                onClick = {
+                onClick = { // Take a photo or start/end the recording
                     when (currentAction.value) {
                         CameraAction.CAPTURE_IMAGE -> captureImage(imageCapture, context)
                         CameraAction.CAPTURE_VIDEO -> {
@@ -132,7 +132,7 @@ fun CameraPreviewScreen() {
                     .padding(vertical = 10.dp),
                 colors = ButtonDefaults.buttonColors(Color.Transparent),
                 shape = CircleShape,
-                onClick = {
+                onClick = { // Switch the main button action -> photo/video
                     if (currentAction.value == CameraAction.CAPTURE_IMAGE) {
                         currentAction.value = CameraAction.CAPTURE_VIDEO
                         currentIcon.value = Icons.Filled.Videocam
@@ -156,7 +156,7 @@ fun CameraPreviewScreen() {
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(vertical = 10.dp),
-                onClick = {
+                onClick = { // Switch the lens used, causing recomposition of CameraPreview
                     lensFacing.intValue =
                         if (lensFacing.intValue == CameraSelector.LENS_FACING_BACK) {
                             CameraSelector.LENS_FACING_FRONT
@@ -191,13 +191,14 @@ private fun captureImage(imageCapture: ImageCapture, context: Context) {
         put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
         put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MaxLift")
     }
+
     val outputOptions = ImageCapture.OutputFileOptions
         .Builder(
             context.contentResolver,
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             contentValues
-        )
-        .build()
+        ).build()
+
     imageCapture.takePicture(
         outputOptions,
         ContextCompat.getMainExecutor(context),
@@ -209,8 +210,8 @@ private fun captureImage(imageCapture: ImageCapture, context: Context) {
             override fun onError(exception: ImageCaptureException) {
                 println("Failed $exception")
             }
-
-        })
+        }
+    )
 }
 
 private fun captureVideo(videoCapture: VideoCapture<Recorder>, context: Context) {
@@ -235,9 +236,8 @@ private fun captureVideo(videoCapture: VideoCapture<Recorder>, context: Context)
     recording = videoCapture.output.prepareRecording(context, mediaStoreOutputOptions)
     .start(ContextCompat.getMainExecutor(context)) { recordEvent ->
         when (recordEvent) {
-            is VideoRecordEvent.Start -> {
-                println("Recording Started")
-            }
+            is VideoRecordEvent.Start -> println("Recording Started")
+
             is VideoRecordEvent.Finalize -> {
                 if (!recordEvent.hasError()) {
                     println("Recording Ended: ${recordEvent.outputResults.outputUri}")

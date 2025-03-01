@@ -3,12 +3,12 @@ package com.maxlift.domain.usecase.rmCompute
 import android.util.Log
 
 data class RMParameters(
-    var gender: String = "",
+    var formula: String = "",
     var weight: String = "",
     var repetitions: String = ""
 ){
     fun isValid(): Boolean {
-        return isNotEmpty() && genderIsValid() && valueIsValidInt(weight) && valueIsValidInt(repetitions)
+        return isNotEmpty() && valueIsValidInt(weight) && valueIsValidInt(repetitions)
     }
 
     private fun valueIsValidInt(value: String): Boolean {
@@ -20,11 +20,7 @@ data class RMParameters(
         }
     }
 
-    private fun genderIsValid(): Boolean {
-        return gender.lowercase() in listOf("male", "female", "other", "m", "f", "o")
-    }
-
     private fun isNotEmpty(): Boolean {
-        return gender.isNotEmpty() && weight.isNotEmpty() && repetitions.isNotEmpty()
+        return weight.isNotEmpty() && repetitions.isNotEmpty()
     }
 }
