@@ -32,11 +32,12 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.maxlift.domain.usecase.rmCompute.RMParameters
 import java.util.Locale
 
 @Composable
-fun RMForm(rmViewModel: RMViewModel) {
+fun RMForm(rmViewModel: RMViewModel, navController: NavController) {
     val rmValue by rmViewModel.rm.observeAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
     var rmParameters by remember { mutableStateOf(RMParameters()) }
@@ -130,6 +131,7 @@ fun RMForm(rmViewModel: RMViewModel) {
                 onClick = {
                     keyboardController?.hide()
                     rmViewModel.computeRM(rmParameters)
+                    //navController.navigate("result")
                 },
                 modifier = Modifier
                     .padding(8.dp)

@@ -6,7 +6,7 @@ import com.maxlift.domain.model.User
 import java.util.UUID
 
 class RegisterUseCase(private var userRepository: UserRepository) {
-     fun execute(registerCredentials: RegisterCredentials): Boolean {
+    fun execute(registerCredentials: RegisterCredentials): Boolean {
         try {
             val existingUser = userRepository.fetchUserByEmail(email = registerCredentials.email)
             existingUser?.let {

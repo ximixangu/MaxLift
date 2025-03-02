@@ -63,7 +63,7 @@ class UserDataSource private constructor(){
         return usersMailMap[mail]
     }
 
-    fun setLoggedUser(user: UserModel) {
+    fun setLoggedUser(user: UserModel?) {
         loggedUser = user
     }
 

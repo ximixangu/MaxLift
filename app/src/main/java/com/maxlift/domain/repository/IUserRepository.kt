@@ -7,6 +7,6 @@ interface IUserRepository {
     fun fetchUserByUUID(uuid: UUID): User?
     fun fetchUserByEmail(email: String): User?
     fun saveUser(user: User)
-    fun setLoggedUser(user: User)
+    fun setLoggedUser(user: User?)
     fun getLoggedUser(): User?
 }

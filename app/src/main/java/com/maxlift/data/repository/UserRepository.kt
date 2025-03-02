@@ -28,8 +28,8 @@ class UserRepository(private val userDataSource: UserDataSource): IUserRepositor
         userDataSource.saveUser(user.toUserModel())
     }
 
-    override fun setLoggedUser(user: User) {
-        userDataSource.setLoggedUser(user.toUserModel())
+    override fun setLoggedUser(user: User?) {
+        userDataSource.setLoggedUser(user?.toUserModel())
     }
 
     override fun getLoggedUser(): User? {
