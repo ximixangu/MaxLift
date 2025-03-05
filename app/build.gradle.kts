@@ -58,6 +58,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // MLKit
+    implementation(libs.mlkit.obj.detection)
+
     // Jetpack Compose Navigation
     implementation(libs.androidx.navigation.compose)
 

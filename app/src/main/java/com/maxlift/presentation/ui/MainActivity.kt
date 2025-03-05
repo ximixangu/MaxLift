@@ -3,6 +3,7 @@ package com.maxlift.presentation.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,7 +21,7 @@ import com.maxlift.presentation.ui.common.MyScaffoldTopAppBar
 import com.maxlift.presentation.ui.feature.calculator.RMForm
 import com.maxlift.presentation.ui.feature.calculator.RMViewModel
 import com.maxlift.presentation.ui.feature.calculator.ResultScreen
-import com.maxlift.presentation.ui.feature.camera.CameraPreviewScreen
+import com.maxlift.presentation.ui.feature.camera.ObjectDetectionScreen
 import com.maxlift.presentation.ui.feature.menu.MenuScreen
 import com.maxlift.presentation.ui.feature.user.ProfileScreen
 import com.maxlift.presentation.ui.feature.user.UserLoginForm
@@ -30,6 +31,7 @@ import com.maxlift.presentation.ui.feature.user.UserViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             MyApp()
         }
@@ -46,7 +48,7 @@ fun MyApp() {
             composable("menu") { MenuScreen(navController) }
             composable("login") { UserLoginForm(LoginUseCase(userRepository), navController) }
             composable("register") { UserRegisterForm(RegisterUseCase(userRepository), navController) }
-            composable("camera") { CameraPreviewScreen() }
+            composable("camera") { ObjectDetectionScreen() }
             composable("profile") { ProfileScreen(UserViewModel(GetLoggedUserUseCase(userRepository))) }
             composable("calculator") { RMForm(RMViewModel(), navController) }
             composable("result") { ResultScreen() }
