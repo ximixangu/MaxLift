@@ -12,14 +12,11 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.camera.view.TransformExperimental
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,16 +30,21 @@ import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+private var offsetX: Float = 0f
+private var offsetY: Float = 0f
+
+private var scaleX: Float = 0f
+private var scaleY: Float = 0f
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
 fun ObjectDetectionScreen() {
     val context = LocalContext.current
-
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-    val lensFacing = remember { mutableIntStateOf(CameraSelector.LENS_FACING_BACK) }
+
     val boundingBoxState = remember { mutableStateOf<Rect?>(null) }
     val cropRect = remember { mutableStateOf<Rect?>(null) }
 
@@ -55,9 +57,9 @@ fun ObjectDetectionScreen() {
         .build()
     val objectDetector = ObjectDetection.getClient(options)
 
-    LaunchedEffect(lensFacing.intValue) {
-        val cameraProvider = context.getCameraProvider()
-        val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing.intValue).build()
+    LaunchedEffect(Unit) {
+        val cameraProvider = getCameraProvider(context)
+        val cameraSelector = CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build()
 
         val imageAnalysis = ImageAnalysis.Builder()
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -82,7 +84,7 @@ fun ObjectDetectionScreen() {
                         }
                     }
                     .addOnFailureListener { e ->
-                        Log.e("Analyzer Error", e.message ?: "")
+                        Log.e("Analyzer Error", e.message ?: "...")
                     }
                     .addOnCompleteListener {
                         thisImageProxy.close()
@@ -99,48 +101,27 @@ fun ObjectDetectionScreen() {
         )
     }
 
+    LaunchedEffect(cropRect.value) {
+        cropRect.value?.let{
+            setDrawingOffsetAndScale(previewView, cropRect.value!!)
+        }
+    }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        AndroidView( { previewView },
-            modifier = Modifier
-                .fillMaxSize()
-        )
+        AndroidView( { previewView }, modifier = Modifier.fillMaxSize() )
 
-        Box(modifier = Modifier.fillMaxWidth()) {
-            BoundingBoxOverlay(
-                boundingBoxState.value,
-                previewView,
-                cropRect.value
-            )
-        }
+        BoundingBoxOverlay(boundingBoxState.value)
     }
 }
 
-@OptIn(TransformExperimental::class)
 @Composable
-fun BoundingBoxOverlay(boundingBox: Rect?, previewView: PreviewView, cropRect: Rect?) {
+fun BoundingBoxOverlay(boundingBox: Rect?) {
     Canvas(Modifier.fillMaxSize()) {
-        if(boundingBox != null && cropRect != null) {
-            val cameraAspectRatio = cropRect.width().toFloat() / cropRect.height()
-            val previewViewAspectRatio = previewView.width.toFloat() / previewView.height
-
-            val scaledWidth: Float
-            val scaledHeight: Float
-
-            if(cameraAspectRatio > previewViewAspectRatio) {
-                scaledWidth = previewView.width.toFloat()
-                scaledHeight = scaledWidth / cameraAspectRatio
-            }else {
-                scaledHeight = previewView.height.toFloat()
-                scaledWidth = scaledHeight * cameraAspectRatio
-            }
-
-            val offsetX = (previewView.width - scaledWidth) / 2
-            val offsetY = (previewView.height - scaledHeight) / 2
-
-            val box = adjustBoundingBox(boundingBox, cropRect, scaledWidth, scaledHeight)
+        if(boundingBox != null) {
+            val box = adjustBoundingBox(boundingBox)
 
             withTransform({
                 translate(offsetX, offsetY)
@@ -153,19 +134,16 @@ fun BoundingBoxOverlay(boundingBox: Rect?, previewView: PreviewView, cropRect: R
                 drawCircle(center = Offset(box.left, box.bottom), radius = 10f,  color = Color.Blue)
                 drawCircle(center = bottomRight, radius = 10f,  color = Color.Blue)
 
-                drawLine(color = Color.Gray, topLeft, Offset(box.right, box.top))
-                drawLine(color = Color.Gray, topLeft, Offset(box.left, box.bottom))
-                drawLine(color = Color.Gray, bottomRight, Offset(box.right, box.top))
-                drawLine(color = Color.Gray, bottomRight, Offset(box.left, box.bottom))
+                drawLine(color = Color.Red, topLeft, Offset(box.right, box.top))
+                drawLine(color = Color.Red, topLeft, Offset(box.left, box.bottom))
+                drawLine(color = Color.Red, bottomRight, Offset(box.right, box.top))
+                drawLine(color = Color.Red, bottomRight, Offset(box.left, box.bottom))
             }
         }
     }
 }
 
-private fun adjustBoundingBox(rect: Rect, cropRect: Rect, scaledWidth: Float, scaledHeight: Float): RectF {
-    val scaleX = scaledWidth / cropRect.width()
-    val scaleY = scaledHeight / cropRect.height()
-
+private fun adjustBoundingBox(rect: Rect): RectF {
     return RectF(
         (rect.left * scaleX),
         (rect.top * scaleY),
@@ -174,11 +152,30 @@ private fun adjustBoundingBox(rect: Rect, cropRect: Rect, scaledWidth: Float, sc
     )
 }
 
-private suspend fun Context.getCameraProvider(): ProcessCameraProvider =
-    suspendCoroutine { continuation ->
-        ProcessCameraProvider.getInstance(this).also { cameraProvider ->
-            cameraProvider.addListener({
-                continuation.resume(cameraProvider.get())
-            }, ContextCompat.getMainExecutor(this))
-        }
+private fun setDrawingOffsetAndScale(previewView: PreviewView, cropRect: Rect) {
+    val cameraAspectRatio = cropRect.width().toFloat() / cropRect.height()
+    val previewViewAspectRatio = previewView.width.toFloat() / previewView.height
+
+    val scaledWidth: Float
+    val scaledHeight: Float
+
+    if(cameraAspectRatio > previewViewAspectRatio) {
+        scaledWidth = previewView.width.toFloat()
+        scaledHeight = scaledWidth / cameraAspectRatio
+    }else {
+        scaledHeight = previewView.height.toFloat()
+        scaledWidth = scaledHeight * cameraAspectRatio
     }
+
+    offsetX = (previewView.width - scaledWidth) / 2
+    offsetY = (previewView.height - scaledHeight) / 2
+
+    scaleX = scaledWidth / cropRect.width()
+    scaleY = scaledHeight / cropRect.height()
+}
+
+private suspend fun getCameraProvider(context: Context): ProcessCameraProvider {
+    return withContext(Dispatchers.IO) {
+        ProcessCameraProvider.getInstance(context).get()
+    }
+}
