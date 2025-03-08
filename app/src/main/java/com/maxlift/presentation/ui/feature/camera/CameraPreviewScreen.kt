@@ -43,8 +43,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 enum class CameraAction{
     CAPTURE_IMAGE,
@@ -67,7 +67,7 @@ fun CameraPreviewScreen() {
     val currentIcon = remember { mutableStateOf(Icons.Filled.CameraAlt) }
 
     LaunchedEffect(lensFacing.intValue, currentAction.value) {
-        val cameraProvider = context.getCameraProvider()
+        val cameraProvider = getCameraProvider(context)
         val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing.intValue).build()
         cameraProvider.unbindAll()
 
@@ -175,14 +175,11 @@ fun CameraPreviewScreen() {
     }
 }
 
-private suspend fun Context.getCameraProvider(): ProcessCameraProvider =
-    suspendCoroutine { continuation ->
-        ProcessCameraProvider.getInstance(this).also { cameraProvider ->
-            cameraProvider.addListener({
-                continuation.resume(cameraProvider.get())
-            }, ContextCompat.getMainExecutor(this))
-        }
+private suspend fun getCameraProvider(context: Context): ProcessCameraProvider {
+    return withContext(Dispatchers.IO) {
+        ProcessCameraProvider.getInstance(context).get()
     }
+}
 
 private fun captureImage(imageCapture: ImageCapture, context: Context) {
     val name = "Image_${System.currentTimeMillis()}.jpeg"
