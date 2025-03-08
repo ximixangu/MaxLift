@@ -44,7 +44,7 @@ import kotlinx.coroutines.delay
 fun MyScaffoldTopAppBar(
     navController: NavController,
     logoutUseCase: LogoutUseCase,
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable (PaddingValues) -> Unit,
 ) {
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())

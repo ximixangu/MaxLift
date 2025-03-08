@@ -117,6 +117,9 @@ fun ObjectDetectionScreen() {
     }
 }
 
+/**
+ * Draws the given [boundingBox] of the detected object on a Canvas.
+ */
 @Composable
 fun BoundingBoxOverlay(boundingBox: Rect?) {
     Canvas(Modifier.fillMaxSize()) {
@@ -143,15 +146,24 @@ fun BoundingBoxOverlay(boundingBox: Rect?) {
     }
 }
 
-private fun adjustBoundingBox(rect: Rect): RectF {
+/**
+ * Scales the given [boundingBox] to be properly sized.
+ */
+private fun adjustBoundingBox(boundingBox: Rect): RectF {
     return RectF(
-        (rect.left * scaleX),
-        (rect.top * scaleY),
-        (rect.right * scaleX),
-        (rect.bottom * scaleY)
+        (boundingBox.left * scaleX),
+        (boundingBox.top * scaleY),
+        (boundingBox.right * scaleX),
+        (boundingBox.bottom * scaleY)
     )
 }
 
+/**
+ * Computes and stores the Offset and Scale of the camera based
+ * on the aspect ratio of the given [previewView] and [cropRect].
+ * This function assumes the camera is set to FIT_CENTER.
+ * @param cropRect The rectangle defining the camera area.
+ */
 private fun setDrawingOffsetAndScale(previewView: PreviewView, cropRect: Rect) {
     val cameraAspectRatio = cropRect.width().toFloat() / cropRect.height()
     val previewViewAspectRatio = previewView.width.toFloat() / previewView.height

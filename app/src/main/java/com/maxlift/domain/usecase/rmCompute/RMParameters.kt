@@ -5,8 +5,8 @@ import android.util.Log
 data class RMParameters(
     var formula: String = "",
     var weight: String = "",
-    var repetitions: String = ""
-){
+    var repetitions: String = "",
+) {
     fun isValid(): Boolean {
         return isNotEmpty() && valueIsValidInt(weight) && valueIsValidInt(repetitions)
     }

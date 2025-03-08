@@ -9,6 +9,11 @@ class RMViewModel: ViewModel() {
     private val _rmState = MutableLiveData<Double?>()
     val rm: LiveData<Double?> get() = _rmState
 
+    /**
+     * Computes the RM with the given [rmParams] desired formula.
+     * By default Epley is used with reps <= 10. Brzycki is otherwise.
+     * @param rmParams has the weight, repetitions and desired formula.
+     */
     fun computeRM(rmParams: RMParameters) {
         val weight = rmParams.weight.toInt()
         val reps = rmParams.repetitions.toInt()

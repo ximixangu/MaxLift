@@ -40,7 +40,7 @@ class UserRepository(private val userDataSource: UserDataSource): IUserRepositor
         return User(
             uuid = uuid,
             name = name,
-            email = email
+            email = email,
         )
     }
 
@@ -48,7 +48,7 @@ class UserRepository(private val userDataSource: UserDataSource): IUserRepositor
         return UserModel(
             uuid = uuid,
             name = name,
-            email = email
+            email = email,
         )
     }
 }

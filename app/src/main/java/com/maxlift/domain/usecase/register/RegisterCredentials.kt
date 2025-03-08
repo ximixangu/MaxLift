@@ -5,8 +5,8 @@ import android.util.Patterns
 data class RegisterCredentials(
     var email: String = "",
     var name: String= "",
-    var password: String= "")
-{
+    var password: String= "",
+) {
     fun isValid(): Boolean {
         return isNotEmpty() && emailIsValid() && passwordIsValid()
     }

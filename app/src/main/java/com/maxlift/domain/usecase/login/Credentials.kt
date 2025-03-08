@@ -4,8 +4,8 @@ import android.util.Patterns
 
 data class Credentials(
     var email: String = "",
-    var password: String = ""
-){
+    var password: String = "",
+) {
     fun isValid(): Boolean {
         return isNotEmpty() && emailIsValid() && passwordIsValid()
     }
