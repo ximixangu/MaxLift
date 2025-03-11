@@ -61,6 +61,9 @@ dependencies {
     // MLKit
     implementation(libs.mlkit.obj.detection)
 
+    // TensorFlow Lite
+    implementation(libs.tensorflow.lite.task.vision)
+
     // Jetpack Compose Navigation
     implementation(libs.androidx.navigation.compose)
 

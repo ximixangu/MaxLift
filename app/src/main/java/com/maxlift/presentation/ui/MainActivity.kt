@@ -21,7 +21,7 @@ import com.maxlift.presentation.ui.common.MyScaffoldTopAppBar
 import com.maxlift.presentation.ui.feature.calculator.RMForm
 import com.maxlift.presentation.ui.feature.calculator.RMViewModel
 import com.maxlift.presentation.ui.feature.calculator.ResultScreen
-import com.maxlift.presentation.ui.feature.camera.ObjectDetectionScreen
+import com.maxlift.presentation.ui.feature.camera.TFLiteObjectDetectionScreen
 import com.maxlift.presentation.ui.feature.menu.MenuScreen
 import com.maxlift.presentation.ui.feature.user.ProfileScreen
 import com.maxlift.presentation.ui.feature.user.UserLoginForm
@@ -48,7 +48,7 @@ fun MyApp() {
             composable("menu") { MenuScreen(navController) }
             composable("login") { UserLoginForm(LoginUseCase(userRepository), navController) }
             composable("register") { UserRegisterForm(RegisterUseCase(userRepository), navController) }
-            composable("camera") { ObjectDetectionScreen() }
+            composable("camera") { TFLiteObjectDetectionScreen() }
             composable("profile") { ProfileScreen(UserViewModel(GetLoggedUserUseCase(userRepository))) }
             composable("calculator") { RMForm(RMViewModel(), navController) }
             composable("result") { ResultScreen() }

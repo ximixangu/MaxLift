@@ -14,6 +14,7 @@ materialIconsExtended = "1.7.8"
 navigationCompose = "2.8.8"
 objectDetection = "17.0.2"
 runtimeLivedata = "1.7.8"
+tensorflowLiteTaskVision = "0.4.0"
 
 [libraries]
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraxVersion" }
@@ -40,6 +41,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 mlkit-obj-detection = { module = "com.google.mlkit:object-detection", version.ref = "objectDetection" }
+tensorflow-lite-task-vision = { module = "org.tensorflow:tensorflow-lite-task-vision", version.ref = "tensorflowLiteTaskVision" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
