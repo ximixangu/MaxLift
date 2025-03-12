@@ -39,7 +39,7 @@ fun MenuScreen(navController: NavController) {
         }
 
         Button(
-            onClick = { navController.navigate("calculator") },
+            onClick = { navController.navigate("result") },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
