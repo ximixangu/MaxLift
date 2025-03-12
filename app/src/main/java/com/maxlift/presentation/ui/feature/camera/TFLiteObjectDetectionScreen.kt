@@ -14,6 +14,7 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -77,28 +78,28 @@ fun TFLiteObjectDetectionScreen() {
         ) { thisImageProxy: ImageProxy ->
             val rotationDegrees = thisImageProxy.imageInfo.rotationDegrees
             val image = TensorImage.fromBitmap(thisImageProxy.toBitmap())
-            cropRect.value = thisImageProxy.cropRect
 
             if (image != null) {
                 if(rotationDegrees % 180 != 0) {
                     cropRect.value = Rect(0, 0, image.height, image.width)
                     rotated = true
+                }else {
+                    cropRect.value = thisImageProxy.cropRect
+                    rotated = false
                 }
 
                 val imageProcessingOptions = ImageProcessingOptions.builder()
                     .setOrientation(getOrientationFromRotation(rotationDegrees))
                     .build()
-                
+
                 val results = objectDetector?.detect(image, imageProcessingOptions)
                 if (results != null) {
                     for(item in results) {
                         if(rotated) boundingBoxState.value = rotateBoundingBox(item.boundingBox)
                         else boundingBoxState.value = item.boundingBox
-                        println(item.boundingBox)
                     }
                 }
 
-                rotated = false
                 thisImageProxy.close()
             }
         }
@@ -125,15 +126,18 @@ fun TFLiteObjectDetectionScreen() {
         AndroidView( { previewView }, modifier = Modifier.fillMaxSize() )
 
         BoundingBoxOverlay2(boundingBoxState.value)
+
+        Box(){
+            Text(boundingBoxState.value.toString())
+        }
     }
 }
 
 private fun getOrientationFromRotation(rotation: Int): ImageProcessingOptions.Orientation {
-    println(rotation)
     return when(rotation) {
-        90 -> ImageProcessingOptions.Orientation.RIGHT_TOP
-        180 -> ImageProcessingOptions.Orientation.BOTTOM_RIGHT
-        270 -> ImageProcessingOptions.Orientation.LEFT_BOTTOM
+        90 -> ImageProcessingOptions.Orientation.TOP_RIGHT
+        180 -> ImageProcessingOptions.Orientation.LEFT_BOTTOM
+        270 -> ImageProcessingOptions.Orientation.RIGHT_TOP
         else -> ImageProcessingOptions.Orientation.TOP_LEFT
     }
 }
