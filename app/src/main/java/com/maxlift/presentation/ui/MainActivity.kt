@@ -1,5 +1,6 @@
 package com.maxlift.presentation.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,12 +22,15 @@ import com.maxlift.presentation.ui.common.MyScaffoldTopAppBar
 import com.maxlift.presentation.ui.feature.calculator.RMForm
 import com.maxlift.presentation.ui.feature.calculator.RMViewModel
 import com.maxlift.presentation.ui.feature.calculator.ResultScreen
+import com.maxlift.presentation.ui.feature.camera.CameraViewModel
+import com.maxlift.presentation.ui.feature.camera.MLKitObjectDetectionScreen
 import com.maxlift.presentation.ui.feature.camera.TFLiteObjectDetectionScreen
 import com.maxlift.presentation.ui.feature.menu.MenuScreen
 import com.maxlift.presentation.ui.feature.user.ProfileScreen
 import com.maxlift.presentation.ui.feature.user.UserLoginForm
 import com.maxlift.presentation.ui.feature.user.UserRegisterForm
 import com.maxlift.presentation.ui.feature.user.UserViewModel
+import org.tensorflow.lite.task.vision.detector.ObjectDetector
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,16 +47,17 @@ fun MyApp() {
     val userRepository = UserRepository(UserDataSource.getInstance(LocalContext.current))
     val navController = rememberNavController()
 
-    MyScaffoldTopAppBar(navController, LogoutUseCase(userRepository)) { innerPadding ->
-        NavHost(navController = navController, startDestination = "menu", Modifier.padding(innerPadding)) {
-            composable("menu") { MenuScreen(navController) }
-            composable("login") { UserLoginForm(LoginUseCase(userRepository), navController) }
-            composable("register") { UserRegisterForm(RegisterUseCase(userRepository), navController) }
-            composable("camera") { TFLiteObjectDetectionScreen() }
-            composable("profile") { ProfileScreen(UserViewModel(GetLoggedUserUseCase(userRepository))) }
-            composable("calculator") { RMForm(RMViewModel(), navController) }
-            composable("result") { ResultScreen() }
-        }
+//    MyScaffoldTopAppBar(navController, LogoutUseCase(userRepository)) { innerPadding ->
+    NavHost(navController = navController, startDestination = "menu", Modifier.padding(/*innerPadding*/)) {
+        composable("menu") { MenuScreen(navController) }
+        composable("login") { UserLoginForm(LoginUseCase(userRepository), navController) }
+        composable("register") { UserRegisterForm(RegisterUseCase(userRepository), navController) }
+        composable("camera") { TFLiteObjectDetectionScreen() }
+        composable("profile") { ProfileScreen(UserViewModel(GetLoggedUserUseCase(userRepository))) }
+        composable("calculator") { RMForm(RMViewModel(), navController) }
+        composable("result") { ResultScreen() }
+        composable("mlkit") { MLKitObjectDetectionScreen(CameraViewModel()) }
     }
+//    }
 }
 

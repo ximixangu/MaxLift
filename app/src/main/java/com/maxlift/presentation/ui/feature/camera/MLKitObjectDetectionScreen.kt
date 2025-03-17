@@ -15,6 +15,7 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -25,12 +26,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
+import com.maxlift.presentation.ui.common.RecordButton
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private var offsetX: Float = 0f
@@ -41,9 +46,10 @@ private var scaleY: Float = 0f
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
-fun MLKitObjectDetectionScreen() {
+fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    val isProcessingMovement = remember { mutableStateOf(false) }
 
     val boundingBoxState = remember { mutableStateOf<RectF?>(null) }
     val cropRect = remember { mutableStateOf<Rect?>(null) }
@@ -82,6 +88,10 @@ fun MLKitObjectDetectionScreen() {
                         for (obj in detectedObjects) {
                             boundingBoxState.value = RectF(obj.boundingBox)
                         }
+
+                        if(isProcessingMovement.value) {
+                            sendToBackgroundProcessing(boundingBoxState.value, viewModel)
+                        }
                     }
                     .addOnFailureListener { e ->
                         Log.e("Analyzer Error", e.message ?: "...")
@@ -114,6 +124,16 @@ fun MLKitObjectDetectionScreen() {
         AndroidView( { previewView }, modifier = Modifier.fillMaxSize() )
 
         BoundingBoxOverlay(boundingBoxState.value)
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+        ) {
+            RecordButton(size = 80) {
+                isProcessingMovement.value = !isProcessingMovement.value
+            }
+        }
     }
 }
 
@@ -184,6 +204,12 @@ private fun setDrawingOffsetAndScale(previewView: PreviewView, cropRect: Rect) {
 
     scaleX = scaledWidth / cropRect.width()
     scaleY = scaledHeight / cropRect.height()
+}
+
+private fun sendToBackgroundProcessing(boundingBox: RectF?, viewModel: CameraViewModel) {
+    CoroutineScope(Dispatchers.Default).launch {
+        viewModel.processBoundingBox(boundingBox!!)
+    }
 }
 
 private suspend fun getCameraProvider(context: Context): ProcessCameraProvider {

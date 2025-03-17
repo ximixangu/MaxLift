@@ -35,11 +35,11 @@ fun MenuScreen(navController: NavController) {
             shape = RectangleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffbf87c0))
         ) {
-            Text(text = "Camera", fontSize = 32.sp)
+            Text(text = "TFLite", fontSize = 32.sp)
         }
 
         Button(
-            onClick = { navController.navigate("result") },
+            onClick = { navController.navigate("mlkit") },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
@@ -48,11 +48,11 @@ fun MenuScreen(navController: NavController) {
             shape = RectangleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffbf87f0))
         ) {
-            Text(text = "RM Calculator", fontSize = 32.sp)
+            Text(text = "MLKit", fontSize = 32.sp)
         }
 
         Button(
-            onClick = { navController.navigate("login") },
+            onClick = { navController.navigate("result") },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
@@ -60,7 +60,7 @@ fun MenuScreen(navController: NavController) {
             shape = RectangleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffb8b7c0))
         ) {
-            Text(text = "Login", fontSize = 32.sp)
+            Text(text = "Result", fontSize = 32.sp)
         }
     }
 }

@@ -14,7 +14,6 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +37,7 @@ private var offsetY: Float = 0f
 
 private var scaleX: Float = 0f
 private var scaleY: Float = 0f
+private var cRect: RectF? = null
 
 private var objectDetector: ObjectDetector? = null
 private var rotated: Boolean = false
@@ -57,7 +57,7 @@ fun TFLiteObjectDetectionScreen() {
 
     val options = ObjectDetector.ObjectDetectorOptions.builder()
         .setMaxResults(1)
-        .setScoreThreshold(0.1f)
+        .setScoreThreshold(0.2f)
         .build()
 
     try {
@@ -74,17 +74,19 @@ fun TFLiteObjectDetectionScreen() {
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
 
-        imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(context)
-        ) { thisImageProxy: ImageProxy ->
+        imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(context))
+        { thisImageProxy: ImageProxy ->
             val rotationDegrees = thisImageProxy.imageInfo.rotationDegrees
             val image = TensorImage.fromBitmap(thisImageProxy.toBitmap())
 
             if (image != null) {
                 if(rotationDegrees % 180 != 0) {
                     cropRect.value = Rect(0, 0, image.height, image.width)
+                    cRect = RectF(cropRect.value)
                     rotated = true
                 }else {
                     cropRect.value = thisImageProxy.cropRect
+                    cRect = RectF(cropRect.value)
                     rotated = false
                 }
 
@@ -125,11 +127,7 @@ fun TFLiteObjectDetectionScreen() {
     ) {
         AndroidView( { previewView }, modifier = Modifier.fillMaxSize() )
 
-        BoundingBoxOverlay2(boundingBoxState.value)
-
-        Box(){
-            Text(boundingBoxState.value.toString())
-        }
+        BoundingBoxOverlay2(boundingBoxState.value, Modifier.fillMaxSize())
     }
 }
 
@@ -155,10 +153,10 @@ private fun rotateBoundingBox(boundingBox: RectF): RectF {
  * Draws the given [boundingBox] of the detected object on a Canvas.
  */
 @Composable
-fun BoundingBoxOverlay2(boundingBox: RectF?) {
-    Canvas(Modifier.fillMaxSize()) {
-        if(boundingBox != null) {
-            val box = adjustBoundingBox(boundingBox)
+fun BoundingBoxOverlay2(boundingBox: RectF?, modifier: Modifier) {
+    Canvas(modifier = modifier) {
+        if(boundingBox != null && cRect != null) {
+            val box: RectF = adjustBoundingBox(boundingBox)
 
             withTransform({
                 translate(offsetX, offsetY)
@@ -191,6 +189,17 @@ private fun adjustBoundingBox(boundingBox: RectF): RectF {
         (boundingBox.bottom * scaleY)
     )
 }
+
+//private fun flipBoundingBox(boundingBox: RectF, cropRect: RectF?): RectF{
+//    val imageWidth = cropRect!!.width()
+//
+//    return RectF(
+//        imageWidth - boundingBox.left,
+//        boundingBox.top,
+//        imageWidth - boundingBox.right,
+//        boundingBox.bottom
+//    )
+//}
 
 private fun setDrawingOffsetAndScale(previewView: PreviewView, cropRect: Rect) {
     val cameraAspectRatio = cropRect.width().toFloat() / cropRect.height()
