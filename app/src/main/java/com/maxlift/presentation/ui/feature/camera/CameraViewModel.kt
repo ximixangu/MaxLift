@@ -19,6 +19,9 @@ class CameraViewModel: ViewModel() {
     private var initialPosition: RectF? = null
     private var lastPosition: RectF? = null
 
+    private var counter: Int = 0
+    private var wentDown: Boolean = false
+
     suspend fun processBoundingBox(boundingBox: RectF) {
         if(initialPosition == null) {
             initialPosition = boundingBox
@@ -28,7 +31,9 @@ class CameraViewModel: ViewModel() {
         if(initialTime == null) {
             if(boundingBox.top >= lastPosition!!.top - 5) {
                 lastPosition = boundingBox
-            }else{
+                counter++
+                if(counter >= 10) wentDown = true
+            }else if(wentDown){
                 initialTime = timeSource.markNow()
             }
         }else {
@@ -39,9 +44,17 @@ class CameraViewModel: ViewModel() {
                     println("Elapsed Rep Time: ${elapsedTime.inWholeMilliseconds}")
                     println("--------------------")
                 }
-                initialPosition = null
-                initialTime = null
+                lastPosition = initialPosition
+                setupBoundingBoxProcessing()
+                initialPosition = lastPosition
             }
         }
+    }
+
+    fun setupBoundingBoxProcessing() {
+        initialPosition = null
+        initialTime = null
+        wentDown = false
+        counter = 0
     }
 }

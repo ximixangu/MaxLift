@@ -1,6 +1,5 @@
 package com.maxlift.presentation.ui
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,9 +15,7 @@ import com.maxlift.data.datasource.UserDataSource
 import com.maxlift.data.repository.UserRepository
 import com.maxlift.domain.usecase.GetLoggedUserUseCase
 import com.maxlift.domain.usecase.login.LoginUseCase
-import com.maxlift.domain.usecase.login.LogoutUseCase
 import com.maxlift.domain.usecase.register.RegisterUseCase
-import com.maxlift.presentation.ui.common.MyScaffoldTopAppBar
 import com.maxlift.presentation.ui.feature.calculator.RMForm
 import com.maxlift.presentation.ui.feature.calculator.RMViewModel
 import com.maxlift.presentation.ui.feature.calculator.ResultScreen
@@ -30,7 +27,6 @@ import com.maxlift.presentation.ui.feature.user.ProfileScreen
 import com.maxlift.presentation.ui.feature.user.UserLoginForm
 import com.maxlift.presentation.ui.feature.user.UserRegisterForm
 import com.maxlift.presentation.ui.feature.user.UserViewModel
-import org.tensorflow.lite.task.vision.detector.ObjectDetector
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -18,8 +18,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -49,10 +51,10 @@ private var scaleY: Float = 0f
 fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-    val isProcessingMovement = remember { mutableStateOf(false) }
+    var isProcessingMovement by remember { mutableStateOf(false) }
 
     val boundingBoxState = remember { mutableStateOf<RectF?>(null) }
-    val cropRect = remember { mutableStateOf<Rect?>(null) }
+    var cropRect by remember { mutableStateOf<Rect?>(null) }
 
     val previewView = remember { PreviewView(context).apply {
         this.scaleType = PreviewView.ScaleType.FIT_CENTER
@@ -75,12 +77,12 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
         ) { thisImageProxy: ImageProxy ->
             val rotationDegrees = thisImageProxy.imageInfo.rotationDegrees
             val mediaImage = thisImageProxy.image
-            cropRect.value = thisImageProxy.cropRect
+            cropRect = thisImageProxy.cropRect
 
             if (mediaImage != null) {
                 val image = InputImage.fromMediaImage(mediaImage, rotationDegrees)
                 if(rotationDegrees % 180 != 0) {
-                    cropRect.value = Rect(0, 0, image.height, image.width)
+                    cropRect = Rect(0, 0, image.height, image.width)
                 }
 
                 objectDetector.process(image)
@@ -89,8 +91,8 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
                             boundingBoxState.value = RectF(obj.boundingBox)
                         }
 
-                        if(isProcessingMovement.value) {
-                            sendToBackgroundProcessing(boundingBoxState.value, viewModel)
+                        if(isProcessingMovement && boundingBoxState.value != null) {
+                            sendToBackgroundProcessing(boundingBoxState.value!!, viewModel)
                         }
                     }
                     .addOnFailureListener { e ->
@@ -111,9 +113,9 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
         )
     }
 
-    LaunchedEffect(cropRect.value) {
-        cropRect.value?.let{
-            setDrawingOffsetAndScale(previewView, cropRect.value!!)
+    LaunchedEffect(cropRect) {
+        cropRect?.let{
+            setDrawingOffsetAndScale(previewView, cropRect!!)
         }
     }
 
@@ -123,7 +125,9 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
     ) {
         AndroidView( { previewView }, modifier = Modifier.fillMaxSize() )
 
-        BoundingBoxOverlay(boundingBoxState.value)
+        if(boundingBoxState.value != null) {
+            BoundingBoxOverlay(boundingBoxState.value)
+        }
 
         Box(
             modifier = Modifier
@@ -131,7 +135,10 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
                 .padding(16.dp)
         ) {
             RecordButton(size = 80) {
-                isProcessingMovement.value = !isProcessingMovement.value
+                isProcessingMovement = !isProcessingMovement
+                if(isProcessingMovement) {
+                    viewModel.setupBoundingBoxProcessing()
+                }
             }
         }
     }
@@ -206,9 +213,9 @@ private fun setDrawingOffsetAndScale(previewView: PreviewView, cropRect: Rect) {
     scaleY = scaledHeight / cropRect.height()
 }
 
-private fun sendToBackgroundProcessing(boundingBox: RectF?, viewModel: CameraViewModel) {
+private fun sendToBackgroundProcessing(boundingBox: RectF, viewModel: CameraViewModel) {
     CoroutineScope(Dispatchers.Default).launch {
-        viewModel.processBoundingBox(boundingBox!!)
+        viewModel.processBoundingBox(boundingBox)
     }
 }
 

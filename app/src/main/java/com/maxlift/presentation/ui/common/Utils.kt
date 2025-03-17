@@ -65,10 +65,15 @@ fun PasswordTextField(
 
 @Composable
 fun RecordButton(size: Int, onClick: () -> Unit) {
+    var isClicked by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .size(size.dp)
-            .clickable(onClick = onClick),
+            .clickable {
+                onClick()
+                isClicked = !isClicked
+            },
         contentAlignment = Alignment.Center
     ) {
 
@@ -84,7 +89,7 @@ fun RecordButton(size: Int, onClick: () -> Unit) {
                 .size((size*0.94).dp)
                 .clip(CircleShape)
                 .border((size*0.02).dp, Color.Black, CircleShape)
-                .background(Color.White)
+                .background(if(isClicked) Color.Red else Color.White)
         )
     }
 }
