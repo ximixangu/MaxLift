@@ -4,14 +4,15 @@ import android.graphics.RectF
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.maxlift.domain.model.Measurement
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.time.TimeSource
 
 class CameraViewModel: ViewModel() {
-    private val _measureState = MutableLiveData<Measurement?>()
-    val measurement: LiveData<Measurement?> get() = _measureState
+    private val _lastTime = MutableLiveData<Int?>()
+    val lastTime: LiveData<Int?> = _lastTime
 
     private val timeSource = TimeSource.Monotonic
     private var initialTime: TimeSource.Monotonic.ValueTimeMark? = null
@@ -22,31 +23,36 @@ class CameraViewModel: ViewModel() {
     private var counter: Int = 0
     private var wentDown: Boolean = false
 
-    suspend fun processBoundingBox(boundingBox: RectF) {
-        if(initialPosition == null) {
-            initialPosition = boundingBox
-            lastPosition = boundingBox
-        }
-
-        if(initialTime == null) {
-            if(boundingBox.top >= lastPosition!!.top - 5) {
+    fun processBoundingBox(boundingBox: RectF) {
+        viewModelScope.launch {
+            if (initialPosition == null) {
+                initialPosition = boundingBox
                 lastPosition = boundingBox
-                counter++
-                if(counter >= 10) wentDown = true
-            }else if(wentDown){
-                initialTime = timeSource.markNow()
             }
-        }else {
-            if(boundingBox.top <= initialPosition!!.top) {
-                val elapsedTime = timeSource.markNow() - initialTime!!
-                withContext(Dispatchers.Main) {
-                    println("--------------------")
-                    println("Elapsed Rep Time: ${elapsedTime.inWholeMilliseconds}")
-                    println("--------------------")
+
+            if (initialTime == null) {
+                if (boundingBox.top >= lastPosition!!.top - 5) {
+                    lastPosition = boundingBox
+                    counter++
+                    if (counter >= 10) wentDown = true
+                } else if (wentDown) {
+                    initialTime = timeSource.markNow()
                 }
-                lastPosition = initialPosition
-                setupBoundingBoxProcessing()
-                initialPosition = lastPosition
+            } else {
+                if (boundingBox.top <= initialPosition!!.top) {
+                    val elapsedTime = timeSource.markNow() - initialTime!!
+                    val elapsedToInt = elapsedTime.inWholeMilliseconds.toInt()
+                    _lastTime.value = elapsedToInt
+
+                    withContext(Dispatchers.Main) {
+                        println("--------------------")
+                        println("Elapsed Rep Time: ${elapsedTime.inWholeMilliseconds}")
+                        println("--------------------")
+                    }
+                    lastPosition = initialPosition
+                    setupBoundingBoxProcessing()
+                    initialPosition = lastPosition
+                }
             }
         }
     }

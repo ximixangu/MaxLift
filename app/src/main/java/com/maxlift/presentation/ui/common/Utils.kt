@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -74,22 +75,22 @@ fun RecordButton(size: Int, onClick: () -> Unit) {
                 onClick()
                 isClicked = !isClicked
             },
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
 
         Box(
             modifier = Modifier
                 .size(size.dp)
                 .clip(CircleShape)
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.primaryContainer)
         )
 
         Box(
             modifier = Modifier
-                .size((size*0.94).dp)
+                .size((size*0.90).dp)
                 .clip(CircleShape)
-                .border((size*0.02).dp, Color.Black, CircleShape)
-                .background(if(isClicked) Color.Red else Color.White)
+                .border((size*0.03).dp, Color.Black, CircleShape)
+                .background(if(isClicked) Color.Red else MaterialTheme.colorScheme.primaryContainer)
         )
     }
 }

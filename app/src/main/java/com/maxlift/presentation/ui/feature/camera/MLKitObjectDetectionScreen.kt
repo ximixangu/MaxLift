@@ -13,12 +13,20 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -52,7 +60,9 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     var isProcessingMovement by remember { mutableStateOf(false) }
+    val lastTime by viewModel.lastTime.observeAsState(null)
 
+    val boundingBoxesStates = remember { mutableStateOf<List<RectF>>(emptyList()) }
     val boundingBoxState = remember { mutableStateOf<RectF?>(null) }
     var cropRect by remember { mutableStateOf<Rect?>(null) }
 
@@ -62,6 +72,7 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
 
     val options = ObjectDetectorOptions.Builder()
         .setDetectorMode(ObjectDetectorOptions.STREAM_MODE)
+        .enableMultipleObjects()
         .build()
     val objectDetector = ObjectDetection.getClient(options)
 
@@ -87,12 +98,15 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
 
                 objectDetector.process(image)
                     .addOnSuccessListener { detectedObjects ->
-                        for (obj in detectedObjects) {
-                            boundingBoxState.value = RectF(obj.boundingBox)
-                        }
-
-                        if(isProcessingMovement && boundingBoxState.value != null) {
-                            sendToBackgroundProcessing(boundingBoxState.value!!, viewModel)
+//                        boundingBoxesStates.value = detectedObjects.map{ obj ->
+//                            RectF(obj.boundingBox)
+//                        }
+                        for (obj in detectedObjects.asReversed()) {
+//                            boundingBoxesStates.value
+                            val ratio = obj.boundingBox.height().toFloat() / obj.boundingBox.width()
+                            if(0.8 < ratio && ratio < 1.2) {
+                                boundingBoxState.value = RectF(obj.boundingBox)
+                            }
                         }
                     }
                     .addOnFailureListener { e ->
@@ -113,6 +127,12 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
         )
     }
 
+    LaunchedEffect(boundingBoxState.value) {
+        if(isProcessingMovement && boundingBoxState.value != null) {
+            sendToBackgroundProcessing(boundingBoxState.value!!, viewModel)
+        }
+    }
+
     LaunchedEffect(cropRect) {
         cropRect?.let{
             setDrawingOffsetAndScale(previewView, cropRect!!)
@@ -123,21 +143,45 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        AndroidView( { previewView }, modifier = Modifier.fillMaxSize() )
+        AndroidView( { previewView } , Modifier.fillMaxSize())
 
         if(boundingBoxState.value != null) {
             BoundingBoxOverlay(boundingBoxState.value)
         }
 
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp)
+        Column(
+            Modifier.fillMaxSize(),
         ) {
-            RecordButton(size = 80) {
-                isProcessingMovement = !isProcessingMovement
-                if(isProcessingMovement) {
-                    viewModel.setupBoundingBoxProcessing()
+            Box(
+                modifier = Modifier
+                    .background(Color.Black.copy(alpha = 0.2f))
+                    .fillMaxWidth()
+                    .padding(20.dp)
+                    .weight(2f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    if (lastTime != null) "$lastTime ms" else "",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.Green
+                )
+            }
+
+            Spacer(Modifier.fillMaxSize().weight(7f))
+
+            Box(
+                modifier = Modifier
+                    .background(Color.Black.copy(alpha = 0.2f))
+                    .fillMaxWidth()
+                    .padding(20.dp)
+                    .weight(2f),
+                contentAlignment = Alignment.Center
+            ) {
+                RecordButton(size = 80) {
+                    isProcessingMovement = !isProcessingMovement
+                    if(isProcessingMovement) {
+                        viewModel.setupBoundingBoxProcessing()
+                    }
                 }
             }
         }
@@ -169,6 +213,41 @@ fun BoundingBoxOverlay(boundingBox: RectF?) {
                 drawLine(color = Color.Red, bottomRight, Offset(box.right, box.top))
                 drawLine(color = Color.Red, bottomRight, Offset(box.left, box.bottom))
             }
+        }
+    }
+}
+
+@Composable
+fun MultipleBoundingBoxOverlay(boundingBoxes: List<RectF>) {
+    Canvas(Modifier.fillMaxSize()) {
+        for (boundingBox in boundingBoxes) {
+            val box = adjustBoundingBox(boundingBox)
+
+            withTransform({
+                translate(offsetX, offsetY)
+            }) {
+                val topLeft = Offset(box.left, box.top)
+                val bottomRight = Offset(box.right, box.bottom)
+
+                drawCircle(center = topLeft, radius = 10f, color = Color.Blue)
+                drawCircle(center = Offset(box.right, box.top), radius = 10f,  color = Color.Blue)
+                drawCircle(center = Offset(box.left, box.bottom), radius = 10f,  color = Color.Blue)
+                drawCircle(center = bottomRight, radius = 10f,  color = Color.Blue)
+
+                drawLine(color = Color.Red, topLeft, Offset(box.right, box.top))
+                drawLine(color = Color.Red, topLeft, Offset(box.left, box.bottom))
+                drawLine(color = Color.Red, bottomRight, Offset(box.right, box.top))
+                drawLine(color = Color.Red, bottomRight, Offset(box.left, box.bottom))
+            }
+        }
+    }
+    for ((index, boundingBox) in boundingBoxes.withIndex()) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Text(
+                text = "$index",
+                modifier = Modifier.offset(x = (boundingBox.centerX()).dp, y = (boundingBox.centerY()).dp),
+                color = Color.Cyan
+            )
         }
     }
 }
@@ -214,7 +293,7 @@ private fun setDrawingOffsetAndScale(previewView: PreviewView, cropRect: Rect) {
 }
 
 private fun sendToBackgroundProcessing(boundingBox: RectF, viewModel: CameraViewModel) {
-    CoroutineScope(Dispatchers.Default).launch {
+    CoroutineScope(Dispatchers.IO).launch {
         viewModel.processBoundingBox(boundingBox)
     }
 }
