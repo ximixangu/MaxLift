@@ -180,7 +180,7 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
                 RecordButton(size = 80) {
                     isProcessingMovement = !isProcessingMovement
                     if(isProcessingMovement) {
-                        viewModel.setupBoundingBoxProcessing()
+                        viewModel.resetBoundingBoxProcessing()
                     }
                 }
             }
