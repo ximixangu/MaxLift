@@ -294,7 +294,7 @@ private fun setDrawingOffsetAndScale(previewView: PreviewView, cropRect: Rect) {
 
 private fun sendToBackgroundProcessing(boundingBox: RectF, viewModel: CameraViewModel) {
     CoroutineScope(Dispatchers.IO).launch {
-        viewModel.processBoundingBox(boundingBox)
+        viewModel.processBoundingBoxPlus(boundingBox)
     }
 }
 
