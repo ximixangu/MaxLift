@@ -73,7 +73,9 @@ class CameraViewModel: ViewModel() {
     }
 
     private fun storeElapsedTime() {
-        val elapsedTime: Duration = stopTime!! - initialTime!!
+        val elapsedTime: Duration =
+            if(stopTime != null) stopTime!! - initialTime!!
+            else timeSource.markNow() - initialTime!!
         _lastTime.value = elapsedTime.inWholeMilliseconds.toInt()
     }
 
