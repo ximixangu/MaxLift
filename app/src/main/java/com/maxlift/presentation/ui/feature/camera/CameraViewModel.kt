@@ -10,8 +10,8 @@ import kotlin.time.Duration
 import kotlin.time.TimeSource
 
 class CameraViewModel: ViewModel() {
-    private val _lastTime = MutableLiveData<Int?>()
-    val lastTime: LiveData<Int?> = _lastTime
+    private val _times = MutableLiveData<MutableList<Int>?>()
+    val times: LiveData<MutableList<Int>?> = _times
 
     private val timeSource = TimeSource.Monotonic
     private var initialTime: TimeSource.Monotonic.ValueTimeMark? = null
@@ -76,7 +76,14 @@ class CameraViewModel: ViewModel() {
         val elapsedTime: Duration =
             if(stopTime != null) stopTime!! - initialTime!!
             else timeSource.markNow() - initialTime!!
-        _lastTime.value = elapsedTime.inWholeMilliseconds.toInt()
+
+        if (elapsedTime.inWholeMilliseconds.toInt() != 0)
+            addTime(elapsedTime.inWholeMilliseconds.toInt())
+    }
+
+    private fun addTime(time: Int){
+        if(_times.value == null) _times.value = mutableListOf()
+        _times.value?.add(time)
     }
 
     fun resetBoundingBoxProcessing() {

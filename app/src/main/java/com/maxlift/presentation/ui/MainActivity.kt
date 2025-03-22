@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -44,6 +46,10 @@ class MainActivity : ComponentActivity() {
 fun MyApp() {
     val userRepository = UserRepository(UserDataSource.getInstance(LocalContext.current))
     val navController = rememberNavController()
+    val sharedViewModel: CameraViewModel = viewModel(
+        viewModelStoreOwner = LocalViewModelStoreOwner.current ?:
+        error("No ViewModelStoreOwner found")
+    )
 
     MyScaffoldTopAppBar(navController, LogoutUseCase(userRepository)) { innerPadding ->
         NavHost(navController = navController, startDestination = "menu", Modifier.padding(innerPadding)) {
@@ -53,8 +59,8 @@ fun MyApp() {
             composable("camera") { TFLiteObjectDetectionScreen() }
             composable("profile") { ProfileScreen(UserViewModel(GetLoggedUserUseCase(userRepository))) }
             composable("calculator") { RMForm(RMViewModel(), navController) }
-            composable("result") { ResultScreen() }
-            composable("mlkit") { MLKitObjectDetectionScreen(CameraViewModel()) }
+            composable("result") { ResultScreen(sharedViewModel) }
+            composable("mlkit") { MLKitObjectDetectionScreen(sharedViewModel) }
         }
     }
 }

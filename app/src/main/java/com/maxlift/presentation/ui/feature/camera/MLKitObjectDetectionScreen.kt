@@ -42,6 +42,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.maxlift.presentation.ui.common.RecordButton
+import com.maxlift.presentation.ui.feature.calculator.blendColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -59,7 +60,9 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     var isProcessingMovement by remember { mutableStateOf(false) }
-    val lastTime by viewModel.lastTime.observeAsState(null)
+
+    var timeColor by remember { mutableStateOf(Color.Green) }
+    val times by viewModel.times.observeAsState(null)
 
     val boundingBoxesStates = remember { mutableStateOf<List<RectF>>(emptyList()) }
     var cropRect by remember { mutableStateOf<Rect?>(null) }
@@ -135,6 +138,13 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
         }
     }
 
+    LaunchedEffect(times?.last()) {
+        if(times != null && times?.size!! > 1) {
+            timeColor = generateColor(times?.last()!!, times?.get(times?.size!! - 2)!!)
+        }
+        times?.let { println(times.toString()) }
+    }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -156,11 +166,13 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
                     .weight(2f),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    if (lastTime != null) "$lastTime ms" else "",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Color.Green
-                )
+                if (times?.isNotEmpty() == true) {
+                    Text(
+                        "${times?.last()} ms",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = timeColor
+                    )
+                }
             }
 
             Spacer(Modifier.fillMaxSize().weight(7f))
@@ -191,7 +203,7 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
 fun MultipleBoundingBoxOverlay(boundingBoxes: List<RectF>) {
     Canvas(Modifier.fillMaxSize()) {
         for (boundingBox in boundingBoxes) {
-            val box = adjustBoundingBox(boundingBox)
+            val box = scaleBoundingBox(boundingBox)
 
             withTransform({
                 translate(offsetX, offsetY)
@@ -216,7 +228,7 @@ fun MultipleBoundingBoxOverlay(boundingBoxes: List<RectF>) {
 /**
  * Scales the given [boundingBox] to be properly sized.
  */
-private fun adjustBoundingBox(boundingBox: RectF): RectF {
+private fun scaleBoundingBox(boundingBox: RectF): RectF {
     return RectF(
         (boundingBox.left * scaleX),
         (boundingBox.top * scaleY),
@@ -251,6 +263,10 @@ private fun setDrawingOffsetAndScale(previewView: PreviewView, cropRect: Rect) {
 
     scaleX = scaledWidth / cropRect.width()
     scaleY = scaledHeight / cropRect.height()
+}
+
+private fun generateColor(newTime: Int, previousTime: Int): Color {
+    return blendColors(Color.Green, Color.Red, (newTime - previousTime).toFloat() * 2 / newTime)
 }
 
 private fun sendToBackgroundProcessing(boundingBox: RectF, viewModel: CameraViewModel) {
