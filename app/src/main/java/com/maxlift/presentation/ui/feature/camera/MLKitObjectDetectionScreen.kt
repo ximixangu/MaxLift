@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
@@ -56,7 +57,7 @@ private var scaleY: Float = 0f
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
-fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
+fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavController) {
     val context = LocalContext.current
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     var isProcessingMovement by remember { mutableStateOf(false) }
@@ -142,7 +143,6 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
         if(times != null && times?.size!! > 1) {
             timeColor = generateColor(times?.last()!!, times?.get(times?.size!! - 2)!!)
         }
-        times?.let { println(times.toString()) }
     }
 
     Box(
@@ -189,6 +189,8 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel) {
                     isProcessingMovement = !isProcessingMovement
                     if(isProcessingMovement) {
                         viewModel.resetBoundingBoxProcessing()
+                    } else {
+                        navController.navigate("result")
                     }
                 }
             }

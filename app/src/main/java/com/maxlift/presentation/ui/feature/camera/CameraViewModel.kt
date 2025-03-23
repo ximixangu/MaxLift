@@ -77,7 +77,7 @@ class CameraViewModel: ViewModel() {
             if(stopTime != null) stopTime!! - initialTime!!
             else timeSource.markNow() - initialTime!!
 
-        if (elapsedTime.inWholeMilliseconds.toInt() != 0)
+        if (elapsedTime.inWholeMilliseconds.toInt() > 0)
             addTime(elapsedTime.inWholeMilliseconds.toInt())
     }
 
@@ -87,6 +87,7 @@ class CameraViewModel: ViewModel() {
     }
 
     fun resetBoundingBoxProcessing() {
+        _times.value = null
         initialPosition = null
         initialTime = null
         currentMovement = 0

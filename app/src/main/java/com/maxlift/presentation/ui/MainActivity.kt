@@ -60,7 +60,7 @@ fun MyApp() {
             composable("profile") { ProfileScreen(UserViewModel(GetLoggedUserUseCase(userRepository))) }
             composable("calculator") { RMForm(RMViewModel(), navController) }
             composable("result") { ResultScreen(sharedViewModel) }
-            composable("mlkit") { MLKitObjectDetectionScreen(sharedViewModel) }
+            composable("mlkit") { MLKitObjectDetectionScreen(sharedViewModel, navController) }
         }
     }
 }

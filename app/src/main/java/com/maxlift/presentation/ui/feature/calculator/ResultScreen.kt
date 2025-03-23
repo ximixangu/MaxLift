@@ -1,28 +1,38 @@
 package com.maxlift.presentation.ui.feature.calculator
 
+import android.graphics.Rect
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.maxlift.presentation.ui.feature.camera.CameraViewModel
+import kotlin.math.abs
 
 @Composable
 fun ResultScreen(viewModel: CameraViewModel) {
@@ -58,8 +68,11 @@ fun CustomBarChart(
 ) {
     val colors = generateBarColors(values)
     val maxValue = values.max()
-    val barWidth = 300f / values.size
-    val barPadding = 30f
+    val barWidth = minOf(270.dp / values.size)
+    val barPadding = minOf(30.dp / values.size)
+    val rectBounds = mutableListOf<Rect>()
+    var pressedBarIndex by remember { mutableStateOf<Int?>(null) }
+    var textOffset by remember { mutableStateOf(IntOffset.Zero) }
 
 
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -72,14 +85,32 @@ fun CustomBarChart(
         Box(
             modifier = Modifier
                 .size(300.dp, 200.dp)
-                .border(width = 1.dp, color = Color(0xFFA7FF8C))
+                // .border(width = 1.dp, color = Color(0xFFA7FF8C))
         ) {
+
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(vertical = 10.dp)
-            ) {
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onPress = { offset ->
+                                rectBounds.forEachIndexed { index, rect ->
+                                    if (offset.x >= rect.left && offset.x <= rect.right) {
+                                        pressedBarIndex = index
+                                        textOffset = IntOffset(rect.left, rect.top - 30)
 
+                                        try {
+                                            awaitRelease()
+                                        } finally {
+                                            pressedBarIndex = null
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    }
+            ) {
                 val referenceLineCount = 5
                 val step = size.height / referenceLineCount
 
@@ -107,14 +138,43 @@ fun CustomBarChart(
                     end = Offset(0f, size.height)
                 ) // Y Axis
 
+                val initialPadding = minOf(barPadding)
+                rectBounds.clear()
+
                 values.forEachIndexed { index, value ->
-                    val left = index * (barWidth + barPadding) + barPadding
+                    val left = index * (barWidth + barPadding).toPx() + initialPadding.toPx()
                     val top = size.height - (value.toFloat() / maxValue) * size.height
 
                     drawRect(
                         color = colors[index],
                         topLeft = Offset(left, top),
-                        size = Size(barWidth, size.height - top)
+                        size = Size(barWidth.toPx(), size.height - top)
+                    )
+
+                    rectBounds.add(
+                        Rect(
+                            left.toInt(),
+                            top.toInt(),
+                            (left + barWidth.toPx()).toInt(),
+                            (size.height).toInt() + 20
+                        )
+                    )
+                }
+            }
+
+            if (pressedBarIndex != null) {
+                Box(modifier = Modifier
+                        .offset { textOffset }
+                        .width(barWidth),
+                    contentAlignment = Alignment.Center
+                ){
+                    Text(
+                        text = values[pressedBarIndex!!].toString() + " ms",
+                        color = Color.Black,
+                        style = MaterialTheme.typography.bodyMedium,
+                        overflow = TextOverflow.Visible,
+                        maxLines = 1,
+                        softWrap = false
                     )
                 }
             }
@@ -133,7 +193,7 @@ fun generateBarColors(values: List<Int>): List<Color> {
             blendColors(
                 Color.Green,
                 Color.Red,
-                weight = ((currentValue - previousValue)).toFloat() / currentValue
+                weight = abs(previousValue - currentValue).toFloat() / previousValue
             )
         }
         colors.add(currentColor)
