@@ -42,6 +42,7 @@ import androidx.navigation.NavController
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
+import com.maxlift.presentation.ui.common.DisabledRecordButton
 import com.maxlift.presentation.ui.common.RecordButton
 import com.maxlift.presentation.ui.feature.calculator.blendColors
 import kotlinx.coroutines.CoroutineScope
@@ -185,13 +186,17 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
                     .weight(2f),
                 contentAlignment = Alignment.Center
             ) {
-                RecordButton(size = 80) {
-                    isProcessingMovement = !isProcessingMovement
-                    if(isProcessingMovement) {
-                        viewModel.resetBoundingBoxProcessing()
-                    } else {
-                        navController.navigate("result")
+                if (isProcessingMovement || boundingBoxesStates.value.isNotEmpty()) {
+                    RecordButton(size = 80) {
+                        isProcessingMovement = !isProcessingMovement
+                        if (isProcessingMovement) {
+                            viewModel.resetBoundingBoxProcessing()
+                        } else {
+                            navController.navigate("result")
+                        }
                     }
+                } else {
+                    DisabledRecordButton(size = 80)
                 }
             }
         }

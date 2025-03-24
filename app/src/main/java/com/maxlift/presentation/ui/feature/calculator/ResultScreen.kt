@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -47,16 +48,24 @@ fun ResultScreen(viewModel: CameraViewModel) {
             Text(
                 "Sample Exercise",
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(vertical = 30.dp)
+            )
+
+            Text(
+                "24/03/2024",
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(bottom = 20.dp)
             )
 
             CustomBarChart(it)
 
             Text(
-                "# of repetitions: ${it.size}" +
-                    "\nAverage time: ${it.average().toInt()} ms",
+                "# of repetitions: ${it.size}",
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(vertical = 20.dp)
+                modifier = Modifier.padding(top = 20.dp)
+            )
+            Text(
+                "Average time: ${it.average().toInt()} ms",
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
     }
@@ -68,18 +77,25 @@ fun CustomBarChart(
 ) {
     val colors = generateBarColors(values)
     val maxValue = values.max()
-    val barWidth = minOf(270.dp / values.size)
-    val barPadding = minOf(30.dp / values.size)
+    val barWidth = minOf(280.dp / values.size, 70.dp)
+    val barPadding = minOf(20.dp / values.size)
     val rectBounds = mutableListOf<Rect>()
     var pressedBarIndex by remember { mutableStateOf<Int?>(null) }
     var textOffset by remember { mutableStateOf(IntOffset.Zero) }
 
 
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Text(
-            text = "Time(ms)",
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.rotate(270f)
+            text = "Time (ms)",
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.rotate(270f).width(1.dp).height(50.dp).offset((-25).dp),
+            maxLines = 1,
+            overflow = TextOverflow.Visible,
+            softWrap = false,
         )
 
         Box(
@@ -138,11 +154,10 @@ fun CustomBarChart(
                     end = Offset(0f, size.height)
                 ) // Y Axis
 
-                val initialPadding = minOf(barPadding)
                 rectBounds.clear()
 
                 values.forEachIndexed { index, value ->
-                    val left = index * (barWidth + barPadding).toPx() + initialPadding.toPx()
+                    val left = index * (barWidth + barPadding).toPx() + 1
                     val top = size.height - (value.toFloat() / maxValue) * size.height
 
                     drawRect(

@@ -79,3 +79,35 @@ fun RecordButton(size: Int, onClick: () -> Unit) {
         )
     }
 }
+
+@Composable
+fun DisabledRecordButton(size: Int) {
+    Box(
+        modifier = Modifier
+            .size(size.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+
+        Box(
+            modifier = Modifier
+                .size(size.dp)
+                .clip(CircleShape)
+                .background(Color.Gray.copy(0.6f))
+        )
+
+        Box(
+            modifier = Modifier
+                .size((size*0.90).dp)
+                .clip(CircleShape)
+                .background(Color.Black)
+        )
+
+        Box(
+            modifier = Modifier
+                .size((size*0.90).dp)
+                .clip(CircleShape)
+                .border((size*0.03).dp, Color.Black, CircleShape)
+                .background(Color.Gray.copy (0.6f))
+        )
+    }
+}
