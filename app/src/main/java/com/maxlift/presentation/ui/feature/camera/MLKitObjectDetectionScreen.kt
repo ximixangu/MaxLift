@@ -12,6 +12,7 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -184,19 +185,21 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
                     .weight(2f),
                 contentAlignment = Alignment.Center
             ) {
-                if (isProcessingMovement || boundingBoxesStates.value.isNotEmpty()) {
-                    RecordButton(size = 80) {
-                        isProcessingMovement = !isProcessingMovement
-                        if (isProcessingMovement) {
-                            viewModel.resetBoundingBoxProcessing()
-                        } else {
-                            if (times?.isNotEmpty() == true) {
-                                navController.navigate("result")
+                Crossfade(targetState = isProcessingMovement || boundingBoxesStates.value.isNotEmpty()) { active ->
+                    if (active) {
+                        RecordButton(size = 80) {
+                            isProcessingMovement = !isProcessingMovement
+                            if (isProcessingMovement) {
+                                viewModel.resetBoundingBoxProcessing()
+                            } else {
+                                if (times?.isNotEmpty() == true) {
+                                    navController.navigate("result")
+                                }
                             }
                         }
+                    } else {
+                        DisabledRecordButton(size = 80)
                     }
-                } else {
-                    DisabledRecordButton(size = 80)
                 }
             }
         }
