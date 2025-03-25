@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.maxlift.domain.usecase.register.RegisterCredentials
 import com.maxlift.domain.usecase.register.RegisterUseCase
-import com.maxlift.presentation.ui.common.PasswordTextField
 
 @Composable
 fun UserRegisterForm(registerUseCase: RegisterUseCase?, navController: NavController) {

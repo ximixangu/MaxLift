@@ -42,8 +42,6 @@ import androidx.navigation.NavController
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
-import com.maxlift.presentation.ui.common.DisabledRecordButton
-import com.maxlift.presentation.ui.common.RecordButton
 import com.maxlift.presentation.ui.feature.calculator.blendColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -192,7 +190,9 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
                         if (isProcessingMovement) {
                             viewModel.resetBoundingBoxProcessing()
                         } else {
-                            navController.navigate("result")
+                            if (times?.isNotEmpty() == true) {
+                                navController.navigate("result")
+                            }
                         }
                     }
                 } else {

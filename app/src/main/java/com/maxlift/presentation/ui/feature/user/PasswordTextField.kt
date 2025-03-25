@@ -1,10 +1,5 @@
-package com.maxlift.presentation.ui.common
+package com.maxlift.presentation.ui.feature.user
 
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.widget.Toast
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -50,16 +45,4 @@ fun PasswordTextField(
             onDone = { keyboardController?.hide() }
         )
     )
-}
-
-fun openWebPage(context: Context, url: String) {
-    val intent = Intent(Intent.ACTION_VIEW).apply {
-        data = Uri.parse(url)
-    }
-
-    try {
-        context.startActivity(intent)
-    } catch (e: ActivityNotFoundException) {
-        Toast.makeText(context, "No App to open link", Toast.LENGTH_SHORT).show()
-    }
 }

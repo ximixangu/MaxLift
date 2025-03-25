@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.maxlift.domain.model.User
-import com.maxlift.domain.usecase.GetLoggedUserUseCase
+import com.maxlift.domain.usecase.login.GetLoggedUserUseCase
 
 class UserViewModel(private val getUserUseCase: GetLoggedUserUseCase) : ViewModel() {
     private val _userState = MutableLiveData<User?>()

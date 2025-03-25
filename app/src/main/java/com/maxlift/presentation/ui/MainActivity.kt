@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,7 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.maxlift.data.datasource.UserDataSource
 import com.maxlift.data.repository.UserRepository
-import com.maxlift.domain.usecase.GetLoggedUserUseCase
+import com.maxlift.domain.usecase.login.GetLoggedUserUseCase
 import com.maxlift.domain.usecase.login.LoginUseCase
 import com.maxlift.domain.usecase.login.LogoutUseCase
 import com.maxlift.domain.usecase.register.RegisterUseCase
@@ -52,7 +54,15 @@ fun MyApp() {
     )
 
     MyScaffoldTopAppBar(navController, LogoutUseCase(userRepository)) { innerPadding ->
-        NavHost(navController = navController, startDestination = "menu", Modifier.padding(innerPadding)) {
+        NavHost(
+            navController = navController,
+            startDestination = "menu",
+            Modifier.padding(innerPadding),
+            enterTransition = { slideInHorizontally { it } },
+            exitTransition = { slideOutHorizontally { -it } },
+            popEnterTransition = { slideInHorizontally { -it } },
+            popExitTransition = { slideOutHorizontally { it } },
+        ) {
             composable("menu") { MenuScreen(navController) }
             composable("login") { UserLoginForm(LoginUseCase(userRepository), navController) }
             composable("register") { UserRegisterForm(RegisterUseCase(userRepository), navController) }

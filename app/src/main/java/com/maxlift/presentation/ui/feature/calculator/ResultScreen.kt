@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,6 +30,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
@@ -77,12 +80,12 @@ fun CustomBarChart(
 ) {
     val colors = generateBarColors(values)
     val maxValue = values.max()
-    val barWidth = minOf(280.dp / values.size, 70.dp)
-    val barPadding = minOf(20.dp / values.size)
+    val barWidth = minOf(275.dp / values.size, 70.dp)
+    val barPadding = minOf(25.dp / values.size)
     val rectBounds = mutableListOf<Rect>()
     var pressedBarIndex by remember { mutableStateOf<Int?>(null) }
     var textOffset by remember { mutableStateOf(IntOffset.Zero) }
-
+    var lineHeight by remember { mutableIntStateOf(0) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -114,7 +117,12 @@ fun CustomBarChart(
                                 rectBounds.forEachIndexed { index, rect ->
                                     if (offset.x >= rect.left && offset.x <= rect.right) {
                                         pressedBarIndex = index
-                                        textOffset = IntOffset(rect.left, rect.top - 30)
+                                        textOffset =
+                                            IntOffset(
+                                                x = (rect.left - 40.dp.toPx()).toInt() + rect.width() / 2,
+                                                y = (-10.dp.toPx()).toInt()
+                                            )
+                                        lineHeight = rect.top
 
                                         try {
                                             awaitRelease()
@@ -180,17 +188,35 @@ fun CustomBarChart(
             if (pressedBarIndex != null) {
                 Box(modifier = Modifier
                         .offset { textOffset }
-                        .width(barWidth),
-                    contentAlignment = Alignment.Center
+                        .width(80.dp),
+                    contentAlignment = Alignment.TopCenter
                 ){
-                    Text(
-                        text = values[pressedBarIndex!!].toString() + " ms",
-                        color = Color.Black,
-                        style = MaterialTheme.typography.bodyMedium,
-                        overflow = TextOverflow.Visible,
-                        maxLines = 1,
-                        softWrap = false
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        Text(
+                            text = values[pressedBarIndex!!].toString() + " ms",
+                            color = Color.Black,
+                            style = MaterialTheme.typography.bodyMedium,
+                            overflow = TextOverflow.Visible,
+                            maxLines = 1,
+                            softWrap = false
+                        )
+
+                        Canvas(modifier = Modifier.fillMaxHeight()) {
+                            drawLine(
+                                color = Color.Black,
+                                start = Offset(0f, 0f),
+                                end = Offset(0f, lineHeight.toFloat()),
+                                strokeWidth = 2f,
+                                pathEffect = PathEffect.dashPathEffect(
+                                    floatArrayOf(20f, 10f),
+                                    0f
+                                )
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -202,15 +228,12 @@ fun generateBarColors(values: List<Int>): List<Color> {
     var previousValue: Int = Int.MIN_VALUE
 
     values.forEach { currentValue ->
-        val currentColor = if (currentValue <= previousValue) {
-            Color.Green
-        } else {
+        val currentColor =
             blendColors(
                 Color.Green,
                 Color.Red,
                 weight = abs(previousValue - currentValue).toFloat() / previousValue
             )
-        }
         colors.add(currentColor)
         previousValue = currentValue
     }

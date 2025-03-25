@@ -16,10 +16,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 
 @Composable
 fun MenuScreen(navController: NavController) {
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -27,7 +30,10 @@ fun MenuScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(
-            onClick = { navController.navigate("camera") },
+            onClick = {
+                if(lifecycleOwner.lifecycle.currentState == Lifecycle.State.RESUMED)
+                    navController.navigate("camera")
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
@@ -39,7 +45,10 @@ fun MenuScreen(navController: NavController) {
         }
 
         Button(
-            onClick = { navController.navigate("mlkit") },
+            onClick = {
+                if(lifecycleOwner.lifecycle.currentState == Lifecycle.State.RESUMED)
+                    navController.navigate("mlkit")
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
@@ -52,7 +61,10 @@ fun MenuScreen(navController: NavController) {
         }
 
         Button(
-            onClick = { navController.navigate("result") },
+            onClick = {
+                if(lifecycleOwner.lifecycle.currentState == Lifecycle.State.RESUMED)
+                    navController.navigate("result")
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)

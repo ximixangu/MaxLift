@@ -1,4 +1,4 @@
-package com.maxlift.domain.usecase
+package com.maxlift.domain.usecase.login
 
 import com.maxlift.data.repository.UserRepository
 import com.maxlift.domain.model.User

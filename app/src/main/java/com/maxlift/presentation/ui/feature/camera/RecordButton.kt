@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.common
+package com.maxlift.presentation.ui.feature.camera
 
 import android.content.Context
 import android.media.AudioManager
