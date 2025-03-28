@@ -166,13 +166,11 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
                     .weight(2f),
                 contentAlignment = Alignment.Center
             ) {
-                if (times?.isNotEmpty() == true) {
-                    Text(
-                        "${times?.last()} ms",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = timeColor
-                    )
-                }
+                Text(
+                    text = if(times?.isNotEmpty() == true)"${times?.last()} ms" else "",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = timeColor
+                )
             }
 
             Spacer(Modifier.fillMaxSize().weight(7f))
