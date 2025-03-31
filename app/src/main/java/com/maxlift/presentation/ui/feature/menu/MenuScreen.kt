@@ -63,7 +63,7 @@ fun MenuScreen(navController: NavController) {
         Button(
             onClick = {
                 if(lifecycleOwner.lifecycle.currentState == Lifecycle.State.RESUMED)
-                    navController.navigate("result")
+                    navController.navigate("persons")
             },
             modifier = Modifier
                 .fillMaxWidth()

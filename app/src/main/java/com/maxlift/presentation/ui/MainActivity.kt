@@ -1,5 +1,8 @@
 package com.maxlift.presentation.ui
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,14 +13,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.maxlift.data.datasource.UserDataSource
-import com.maxlift.data.datasource.database.AppDatabase
-import com.maxlift.data.repository.MyRepository
 import com.maxlift.data.repository.UserRepository
 import com.maxlift.domain.usecase.login.GetLoggedUserUseCase
 import com.maxlift.domain.usecase.login.LoginUseCase
@@ -31,6 +34,8 @@ import com.maxlift.presentation.ui.feature.camera.CameraViewModel
 import com.maxlift.presentation.ui.feature.camera.MLKitObjectDetectionScreen
 import com.maxlift.presentation.ui.feature.camera.TFLiteObjectDetectionScreen
 import com.maxlift.presentation.ui.feature.menu.MenuScreen
+import com.maxlift.presentation.ui.feature.tracker.PersonListScreen
+import com.maxlift.presentation.ui.feature.tracker.PersonViewModel
 import com.maxlift.presentation.ui.feature.user.ProfileScreen
 import com.maxlift.presentation.ui.feature.user.UserLoginForm
 import com.maxlift.presentation.ui.feature.user.UserRegisterForm
@@ -40,20 +45,23 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        if(!checkPermissions(this)) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf("Manifest.permissions.CAMERA"), 0
+            )
+        }
+
         setContent {
             MyApp()
         }
-
-
     }
 }
 
 @Composable
 fun MyApp() {
-    val myDatabase = AppDatabase.getDatabase(LocalContext.current)
-    val myRepository = MyRepository(myDatabase.exerciseDataSource(), myDatabase.personDataSource())
-
     val userRepository = UserRepository(UserDataSource.getInstance(LocalContext.current))
+
     val navController = rememberNavController()
     val sharedViewModel: CameraViewModel = viewModel(
         viewModelStoreOwner = LocalViewModelStoreOwner.current ?:
@@ -64,7 +72,7 @@ fun MyApp() {
         NavHost(
             navController = navController,
             startDestination = "menu",
-            Modifier.padding(innerPadding),
+            modifier = Modifier.padding(innerPadding),
             enterTransition = { slideInHorizontally { it } },
             exitTransition = { slideOutHorizontally { -it } },
             popEnterTransition = { slideInHorizontally { -it } },
@@ -78,7 +86,13 @@ fun MyApp() {
             composable("calculator") { RMForm(RMViewModel(), navController) }
             composable("result") { ResultScreen(sharedViewModel) }
             composable("mlkit") { MLKitObjectDetectionScreen(sharedViewModel, navController) }
+            composable("persons") { PersonListScreen(PersonViewModel()) }
         }
     }
+}
+
+private fun checkPermissions(context: Context): Boolean {
+    return (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+        == PackageManager.PERMISSION_DENIED)
 }
 
