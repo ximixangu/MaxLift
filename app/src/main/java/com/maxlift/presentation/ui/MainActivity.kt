@@ -16,6 +16,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.maxlift.data.datasource.UserDataSource
+import com.maxlift.data.datasource.database.AppDatabase
+import com.maxlift.data.repository.MyRepository
 import com.maxlift.data.repository.UserRepository
 import com.maxlift.domain.usecase.login.GetLoggedUserUseCase
 import com.maxlift.domain.usecase.login.LoginUseCase
@@ -41,11 +43,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApp()
         }
+
+
     }
 }
 
 @Composable
 fun MyApp() {
+    val myDatabase = AppDatabase.getDatabase(LocalContext.current)
+    val myRepository = MyRepository(myDatabase.exerciseDataSource(), myDatabase.personDataSource())
+
     val userRepository = UserRepository(UserDataSource.getInstance(LocalContext.current))
     val navController = rememberNavController()
     val sharedViewModel: CameraViewModel = viewModel(

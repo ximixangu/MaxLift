@@ -4,6 +4,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.maxlift.domain.model.Exercise
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Entity(
     tableName = "exercise",
@@ -25,4 +28,34 @@ data class ExerciseEntity(
     @ColumnInfo(name = "numberOfReps") val numberOfRepetitions: Int,
     @ColumnInfo(name = "date") val date: String,
     @ColumnInfo(name = "description") val description: String?,
-)
+){
+    companion object {
+        private val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
+        fun fromExerciseDomain(exercise: Exercise): ExerciseEntity {
+            return ExerciseEntity(
+                exercise.id,
+                exercise.personId,
+                exercise.type,
+                exercise.weight,
+                exercise.times,
+                exercise.numberOfRepetitions,
+                formatter.format(exercise.date),
+                exercise.description
+            )
+        }
+    }
+}
+
+fun ExerciseEntity.toExerciseDomain(): Exercise {
+    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
+    return Exercise(
+        id,
+        personId,
+        type,
+        weight,
+        times,
+        numberOfRepetitions,
+        formatter.parse(date)!!,
+        description
+    )
+}
