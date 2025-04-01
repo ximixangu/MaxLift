@@ -12,18 +12,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.maxlift.domain.model.Person
+import com.maxlift.domain.usecase.tracker.SavePersonUseCase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun PersonListScreen(personViewModel: PersonViewModel) {
+    val coroutineScope = rememberCoroutineScope()
     val personList by personViewModel.personListState.observeAsState(null)
+    var shouldUpdate by remember { mutableStateOf(true) }
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(shouldUpdate) {
         personViewModel.fetchAllPersons(context)
+        shouldUpdate = false
     }
 
     Surface(
@@ -43,6 +55,19 @@ fun PersonListScreen(personViewModel: PersonViewModel) {
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        item {
+                            AddPersonCardItem(
+                                onSave = { name ->
+                                    coroutineScope.launch {
+                                        withContext(Dispatchers.IO) {
+                                            SavePersonUseCase.execute(context, Person(0, name))
+                                        }
+                                    }
+                                    shouldUpdate = true
+                                }
+                            )
+                        }
+
                         items(personList!!.size) { index ->
                             PersonCardItem(
                                 person = personList!![index],

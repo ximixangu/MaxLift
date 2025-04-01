@@ -72,7 +72,7 @@ fun MenuScreen(navController: NavController) {
             shape = RectangleShape,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffb8b7c0))
         ) {
-            Text(text = "Result", fontSize = 32.sp)
+            Text(text = "People", fontSize = 32.sp)
         }
     }
 }
