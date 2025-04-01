@@ -40,7 +40,6 @@ fun PersonListScreen(personViewModel: PersonViewModel) {
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             when {

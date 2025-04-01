@@ -185,7 +185,7 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
             ) {
                 Crossfade(targetState = isProcessingMovement || boundingBoxesStates.value.isNotEmpty()) { active ->
                     if (active) {
-                        RecordButton(size = 80) {
+                        RecordButton() {
                             isProcessingMovement = !isProcessingMovement
                             if (isProcessingMovement) {
                                 viewModel.resetBoundingBoxProcessing()
@@ -196,7 +196,7 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
                             }
                         }
                     } else {
-                        DisabledRecordButton(size = 80)
+                        DisabledRecordButton()
                     }
                 }
             }

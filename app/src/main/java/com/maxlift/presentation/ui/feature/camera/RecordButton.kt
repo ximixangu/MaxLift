@@ -27,8 +27,10 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.core.view.HapticFeedbackConstantsCompat
 
+const val size = 80
+
 @Composable
-fun RecordButton(size: Int, onClick: () -> Unit) {
+fun RecordButton(onClick: () -> Unit) {
     var isClicked by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val audioManager = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
@@ -81,7 +83,7 @@ fun RecordButton(size: Int, onClick: () -> Unit) {
 }
 
 @Composable
-fun DisabledRecordButton(size: Int) {
+fun DisabledRecordButton() {
     Box(
         modifier = Modifier
             .size(size.dp),

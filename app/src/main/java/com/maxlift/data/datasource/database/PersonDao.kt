@@ -17,7 +17,7 @@ interface PersonDao {
     @Query("DELETE FROM person WHERE id = :id")
     fun delete(id: Int)
 
-    @Query("SELECT * FROM person ORDER by name ASC")
+    @Query("SELECT * FROM person ORDER by name COLLATE NOCASE ASC")
     fun getAll(): List<PersonEntity>
 
     @Query("SELECT * FROM person WHERE id = :id")
