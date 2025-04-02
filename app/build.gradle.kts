@@ -65,11 +65,10 @@ dependencies {
     // TensorFlow Lite
     implementation(libs.tensorflow.lite.task.vision)
 
+    implementation(libs.androidx.material.icons.extended)
+
     // Jetpack Compose Navigation
     implementation(libs.androidx.navigation.compose)
-
-    // Material Icons
-    implementation(libs.androidx.material.icons.extended)
 
     // Room & Kotlin Symbol Processing (KSP)
     implementation(libs.androidx.room.runtime)

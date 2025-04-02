@@ -3,6 +3,7 @@ package com.maxlift.presentation.ui.feature.camera
 import android.content.Context
 import android.graphics.Rect
 import android.graphics.RectF
+import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
@@ -17,11 +18,12 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -49,11 +50,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private var offsetX: Float = 0f
-private var offsetY: Float = 0f
-
 private var scaleX: Float = 0f
 private var scaleY: Float = 0f
+private var offsetX: Float = 0f
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
@@ -69,7 +68,8 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
     var cropRect by remember { mutableStateOf<Rect?>(null) }
 
     val previewView = remember { PreviewView(context).apply {
-        this.scaleType = PreviewView.ScaleType.FIT_CENTER
+        this.scaleType = PreviewView.ScaleType.FILL_CENTER
+        this.background = ColorDrawable(0)
     } }
 
     val options = ObjectDetectorOptions.Builder()
@@ -102,10 +102,11 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
                     .addOnSuccessListener { detectedObjects ->
                         val boxList = mutableListOf<RectF>()
                         for (obj in detectedObjects.asReversed()) {
-                            val ratio = obj.boundingBox.height().toFloat() / obj.boundingBox.width()
-                            if(0.8 < ratio && ratio < 1.2) {
-                                boxList.add(RectF(obj.boundingBox))
-                            }
+                            // To detect only square-like objects ->
+//                            val ratio = obj.boundingBox.height().toFloat() / obj.boundingBox.width()
+//                            if(0.8 < ratio && ratio < 1.2) {
+                            boxList.add(RectF(obj.boundingBox))
+//                            }
                         }
                         boundingBoxesStates.value = boxList
                     }
@@ -134,7 +135,7 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
     }
 
     LaunchedEffect(cropRect) {
-        cropRect?.let{
+        cropRect?.let {
             setDrawingOffsetAndScale(previewView, cropRect!!)
         }
     }
@@ -145,58 +146,47 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        AndroidView( { previewView } , Modifier.fillMaxSize())
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxWidth().weight(1f)) {
+                AndroidView( { previewView } , Modifier.fillMaxWidth())
 
-        if(boundingBoxesStates.value.isNotEmpty()) {
-            MultipleBoundingBoxOverlay(boundingBoxesStates.value)
-        }
+                if(boundingBoxesStates.value.isNotEmpty()) {
+                    MultipleBoundingBoxOverlay(boundingBoxesStates.value)
+                }
 
-        Column(
-            Modifier.fillMaxSize(),
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(Color.Black.copy(alpha = 0.2f))
-                    .fillMaxWidth()
-                    .padding(20.dp)
-                    .weight(2f),
-                contentAlignment = Alignment.Center
-            ) {
                 Text(
                     text = if(times?.isNotEmpty() == true)"${times?.last()} ms" else "",
                     style = MaterialTheme.typography.titleLarge,
-                    color = timeColor
+                    color = timeColor,
+                    modifier = Modifier.align(Alignment.TopCenter).padding(10.dp)
                 )
             }
 
-            Spacer(Modifier.fillMaxSize().weight(7f))
-
-            Box(
-                modifier = Modifier
-                    .background(Color.Black.copy(alpha = 0.2f))
-                    .fillMaxWidth()
-                    .padding(20.dp)
-                    .weight(2f),
-                contentAlignment = Alignment.Center
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .background(color = MaterialTheme.colorScheme.primaryContainer)
             ) {
-                Crossfade(targetState = isProcessingMovement || boundingBoxesStates.value.isNotEmpty()) { active ->
-                    if (active) {
-                        RecordButton() {
-                            isProcessingMovement = !isProcessingMovement
-                            if (isProcessingMovement) {
-                                viewModel.resetBoundingBoxProcessing()
-                            } else {
-                                if (times?.isNotEmpty() == true) {
-                                    navController.navigate("result")
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Crossfade(targetState = isProcessingMovement || boundingBoxesStates.value.isNotEmpty()) { active ->
+                        if (active) {
+                            RecordButton() {
+                                isProcessingMovement = !isProcessingMovement
+                                if (isProcessingMovement) {
+                                    viewModel.resetBoundingBoxProcessing()
+                                } else {
+                                    if (times?.isNotEmpty() == true) {
+                                        navController.navigate("result")
+                                    }
                                 }
                             }
+                        } else {
+                            DisabledRecordButton()
                         }
-                    } else {
-                        DisabledRecordButton()
                     }
                 }
             }
@@ -212,23 +202,21 @@ fun MultipleBoundingBoxOverlay(boundingBoxes: List<RectF>) {
     Canvas(Modifier.fillMaxSize()) {
         for (boundingBox in boundingBoxes) {
             val box = scaleBoundingBox(boundingBox)
+            val left = maxOf(box.left - offsetX, 0f)
+            val right = maxOf(box.right - offsetX, box.width())
 
-            withTransform({
-                translate(offsetX, offsetY)
-            }) {
-                val topLeft = Offset(box.left, box.top)
-                val bottomRight = Offset(box.right, box.bottom)
+            val topLeft = Offset(left, box.top)
+            val bottomRight = Offset(right, box.bottom)
 
-                drawCircle(center = topLeft, radius = 10f, color = Color.Blue)
-                drawCircle(center = Offset(box.right, box.top), radius = 10f,  color = Color.Blue)
-                drawCircle(center = Offset(box.left, box.bottom), radius = 10f,  color = Color.Blue)
-                drawCircle(center = bottomRight, radius = 10f,  color = Color.Blue)
+            drawCircle(center = topLeft, radius = 10f, color = Color.Blue)
+            drawCircle(center = Offset(right, box.top), radius = 10f,  color = Color.Blue)
+            drawCircle(center = Offset(left, box.bottom), radius = 10f,  color = Color.Blue)
+            drawCircle(center = bottomRight, radius = 10f,  color = Color.Blue)
 
-                drawLine(color = Color.Red, topLeft, Offset(box.right, box.top))
-                drawLine(color = Color.Red, topLeft, Offset(box.left, box.bottom))
-                drawLine(color = Color.Red, bottomRight, Offset(box.right, box.top))
-                drawLine(color = Color.Red, bottomRight, Offset(box.left, box.bottom))
-            }
+            drawLine(color = Color.Red, topLeft, Offset(right, box.top))
+            drawLine(color = Color.Red, topLeft, Offset(left, box.bottom))
+            drawLine(color = Color.Red, bottomRight, Offset(right, box.top))
+            drawLine(color = Color.Red, bottomRight, Offset(left, box.bottom))
         }
     }
 }
@@ -253,24 +241,11 @@ private fun scaleBoundingBox(boundingBox: RectF): RectF {
  */
 private fun setDrawingOffsetAndScale(previewView: PreviewView, cropRect: Rect) {
     val cameraAspectRatio = cropRect.width().toFloat() / cropRect.height()
-    val previewViewAspectRatio = previewView.width.toFloat() / previewView.height
+    val realWidth = (previewView.height.toFloat() / cropRect.height()) * cropRect.width()
 
-    val scaledWidth: Float
-    val scaledHeight: Float
-
-    if(cameraAspectRatio > previewViewAspectRatio) {
-        scaledWidth = previewView.width.toFloat()
-        scaledHeight = scaledWidth / cameraAspectRatio
-    }else {
-        scaledHeight = previewView.height.toFloat()
-        scaledWidth = scaledHeight * cameraAspectRatio
-    }
-
-    offsetX = (previewView.width - scaledWidth) / 2
-    offsetY = (previewView.height - scaledHeight) / 2
-
-    scaleX = scaledWidth / cropRect.width()
-    scaleY = scaledHeight / cropRect.height()
+    offsetX = (realWidth - previewView.width) / 2
+    scaleX = previewView.height.toFloat() * cameraAspectRatio / cropRect.width()
+    scaleY = previewView.height.toFloat() / cropRect.height()
 }
 
 private fun generateColor(newTime: Int, previousTime: Int): Color {

@@ -12,8 +12,8 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -61,14 +61,18 @@ fun MyApp() {
             navController = navController,
             startDestination = "persons",
             modifier = Modifier.padding(innerPadding),
-            enterTransition = { slideInHorizontally { it } },
-            exitTransition = { slideOutHorizontally { -it } },
-            popEnterTransition = { slideInHorizontally { -it } },
-            popExitTransition = { slideOutHorizontally { it } },
         ) {
             composable("result") { ResultScreen(sharedViewModel) }
-            composable("mlkit") { MLKitObjectDetectionScreen(sharedViewModel, navController) }
-            composable("persons") { PersonListScreen(PersonViewModel()) }
+            composable(
+                route = "mlkit",
+                enterTransition = { slideInVertically { it } },
+                exitTransition = { slideOutVertically { -it } },
+                popEnterTransition = { slideInVertically { -it } },
+                popExitTransition = { slideOutVertically { it } },
+            ) {
+                MLKitObjectDetectionScreen(sharedViewModel, navController)
+            }
+            composable("persons") { PersonListScreen(PersonViewModel(), navController) }
         }
     }
 }
