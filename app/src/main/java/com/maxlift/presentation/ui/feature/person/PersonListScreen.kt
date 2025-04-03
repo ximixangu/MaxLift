@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.maxlift.domain.model.Person
 import com.maxlift.domain.usecase.person.SavePersonUseCase
 import com.maxlift.presentation.ui.common.IconTextButton
@@ -38,6 +39,8 @@ import kotlinx.coroutines.withContext
 @Composable
 fun PersonListScreen(personViewModel: PersonViewModel, navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
+    val currentBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentDestination = currentBackStackEntry.value?.destination?.route
     val personList by personViewModel.personListState.observeAsState(null)
     var shouldUpdate by remember { mutableStateOf(true) }
     val context = LocalContext.current
@@ -82,7 +85,9 @@ fun PersonListScreen(personViewModel: PersonViewModel, navController: NavControl
                                 PersonCardItem(
                                     person = person,
                                     onClick = {
-                                        navController.navigate(route = "personInfo/${person.id}")
+                                        if (currentDestination == "persons") {
+                                            navController.navigate(route = "personInfo/${person.id}")
+                                        }
                                     }
                                 )
                             }

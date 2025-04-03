@@ -1,5 +1,6 @@
 package com.maxlift.presentation.ui.common
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -21,7 +22,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +35,6 @@ fun MyScaffold(
     var showNavUpIcon by remember { mutableStateOf(false) }
 
     LaunchedEffect(currentDestination) {
-        delay(200)
         showNavUpIcon = currentDestination != "persons"
     }
 
@@ -48,31 +47,37 @@ fun MyScaffold(
                 ),
                 title = {
                     Text(
-                        text = when(currentDestination){
-                            "mlkit" -> "Register"
-                            else -> "MaxLift"
-                        },
+                        text = getTitleForDestination(currentDestination),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                navigationIcon = { if (showNavUpIcon) {
-                    IconButton(
-                        onClick = {
-                            keyboardController?.hide()
-                            navController.navigateUp()
-                        }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                navigationIcon = {
+                    AnimatedVisibility(showNavUpIcon) {
+                        IconButton(
+                            onClick = {
+                                keyboardController?.hide()
+                                navController.navigateUp()
+                            }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
+                        }
                     }
                 }
-                },
             )
         },
         content = { innerPadding ->
             content(innerPadding)
         }
     )
+}
+
+fun getTitleForDestination(currentDestination: String?): String {
+    return when (currentDestination) {
+        "mlkit" -> "Register"
+        else -> "MaxLift"
+    }
 }

@@ -51,13 +51,7 @@ fun RecordButton(onClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
-                .size(size.dp)
-                .clickable(interactionSource = interactionSource, indication = null) {
-                    onClick()
-                    isClicked = !isClicked
-                    audioManager.playSoundEffect(AudioManager.FX_KEY_CLICK, 0.6f)
-                    view.performHapticFeedback(HapticFeedbackConstantsCompat.VIRTUAL_KEY)
-                },
+                .size(size.dp),
             contentAlignment = Alignment.Center,
         ) {
             Box(
@@ -65,6 +59,12 @@ fun RecordButton(onClick: () -> Unit) {
                     .size(size.dp)
                     .clip(CircleShape)
                     .background(color = MaterialTheme.colorScheme.primary)
+                    .clickable(interactionSource = interactionSource, indication = null) {
+                        onClick()
+                        isClicked = !isClicked
+                        audioManager.playSoundEffect(AudioManager.FX_KEY_CLICK, 0.6f)
+                        view.performHapticFeedback(HapticFeedbackConstantsCompat.VIRTUAL_KEY)
+                    }
             )
 
             Box(

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.maxlift.domain.model.Exercise
 import com.maxlift.domain.model.Person
 import com.maxlift.domain.usecase.exercise.FetchExercisesByPersonUseCase
+import com.maxlift.domain.usecase.person.DeletePersonUseCase
 import com.maxlift.domain.usecase.person.FetchPersonUseCase
 import kotlinx.coroutines.launch
 
@@ -40,6 +41,16 @@ class PersonInfoViewModel: ViewModel() {
             }
         } catch (e: Exception) {
             println("Error fetching person exercises: ${e.message}")
+        }
+    }
+
+    fun deletePerson(context: Context, id: Int) {
+        viewModelScope.launch {
+            try {
+                DeletePersonUseCase.execute(context, id)
+            } catch (e: Exception) {
+                println("Error deleting person: ${e.message}")
+            }
         }
     }
 }

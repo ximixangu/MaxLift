@@ -12,7 +12,9 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -78,9 +80,13 @@ fun MyApp() {
             }
             composable(
                 route = "personInfo/{id}",
-                arguments = listOf(navArgument("id") { type = NavType.IntType })
+                arguments = listOf(navArgument("id") { type = NavType.IntType }),
+                enterTransition = { slideInHorizontally { it } },
+                exitTransition = { slideOutHorizontally { -it } },
+                popEnterTransition = { slideInHorizontally { -it } },
+                popExitTransition = { slideOutHorizontally { it } },
             ) { entry ->
-                PersonInfoScreen(personId = entry.arguments?.getInt("id") ?: 0)
+                PersonInfoScreen(personId = entry.arguments?.getInt("id") ?: 0, navController)
             }
         }
     }

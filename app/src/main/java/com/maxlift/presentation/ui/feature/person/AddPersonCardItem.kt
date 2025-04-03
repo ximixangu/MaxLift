@@ -74,11 +74,9 @@ fun AddPersonCardItem(onSave: (String) -> Unit) {
     }
 
     if (showAddPersonPopup) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            AddPersonPopup(
-                onSave = onSave,
-                onDismiss = { showAddPersonPopup = false }
-            )
-        }
+        AddPersonPopup(
+            onSave = onSave,
+            onDismiss = { showAddPersonPopup = false }
+        )
     }
 }
