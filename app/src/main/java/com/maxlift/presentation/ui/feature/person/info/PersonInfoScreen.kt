@@ -3,6 +3,7 @@ package com.maxlift.presentation.ui.feature.person.info
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.maxlift.domain.model.Exercise
+import com.maxlift.presentation.ui.feature.exercise.ExerciseCardItem
 import java.time.Instant
 import java.util.Date
 
@@ -58,19 +63,27 @@ fun PersonInfoScreen(personId: Int, navController: NavController) {
 
                 Spacer(Modifier.size(7.dp))
 
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
                         .wrapContentHeight()
-                        .background(color = Color.Gray.copy(0.3f), shape = RoundedCornerShape(5.dp))
-                        .padding(10.dp)
+                        .background(color = Color.Gray.copy(0.2f), shape = RoundedCornerShape(10.dp))
+                        .padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.Search, "",
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
                     Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = "Search...",
-                        style = MaterialTheme.typography.labelSmall,
+                        text = "Search by keyword...",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
+
+                Spacer(Modifier.size(15.dp))
 
                 val exerciseSample = Exercise(
                     id = 0,
@@ -83,7 +96,12 @@ fun PersonInfoScreen(personId: Int, navController: NavController) {
                     description = "Exercici d'exemple per la card item"
                 )
 
-                //ExerciseCardItem(exercise = exerciseSample, person = person!!)
+                Box(
+                    Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ){
+                    ExerciseCardItem(exercise = exerciseSample, person = person!!)
+                }
             }
         }
     }
