@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.feature.tracker
+package com.maxlift.presentation.ui.feature.person
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.maxlift.domain.model.Person
-import com.maxlift.domain.usecase.tracker.SavePersonUseCase
+import com.maxlift.domain.usecase.person.SavePersonUseCase
 import com.maxlift.presentation.ui.common.IconTextButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -78,8 +78,12 @@ fun PersonListScreen(personViewModel: PersonViewModel, navController: NavControl
                             }
 
                             items(personList!!.size) { index ->
+                                val person = personList!![index]
                                 PersonCardItem(
-                                    person = personList!![index],
+                                    person = person,
+                                    onClick = {
+                                        navController.navigate(route = "personInfo/${person.id}")
+                                    }
                                 )
                             }
                         }

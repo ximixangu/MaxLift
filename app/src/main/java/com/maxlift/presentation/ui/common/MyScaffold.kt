@@ -49,9 +49,8 @@ fun MyScaffold(
                 title = {
                     Text(
                         text = when(currentDestination){
-                            "persons" -> "MaxLift"
                             "mlkit" -> "Register"
-                            else -> ""
+                            else -> "MaxLift"
                         },
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -72,22 +71,6 @@ fun MyScaffold(
                 },
             )
         },
-//        bottomBar = {
-////            if(currentDestination != "mlkit") {
-//                BottomAppBar(
-//                    contentColor = MaterialTheme.colorScheme.primary,
-//                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-//                ) {
-//                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                        IconTextButton(
-//                            onClick = { navController.navigate("mlkit") },
-//                            text = "Register",
-//                            icon = { Icon(imageVector = Icons.Default.Camera, contentDescription = "", Modifier.size(45.dp)) }
-//                        )
-//                    }
-//                }
-////            }
-//        },
         content = { innerPadding ->
             content(innerPadding)
         }

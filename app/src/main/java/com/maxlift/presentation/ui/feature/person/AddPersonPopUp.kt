@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.feature.tracker
+package com.maxlift.presentation.ui.feature.person
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

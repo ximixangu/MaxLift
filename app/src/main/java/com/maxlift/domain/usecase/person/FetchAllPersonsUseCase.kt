@@ -1,4 +1,4 @@
-package com.maxlift.domain.usecase.tracker
+package com.maxlift.domain.usecase.person
 
 import android.content.Context
 import com.maxlift.data.datasource.database.AppDatabase

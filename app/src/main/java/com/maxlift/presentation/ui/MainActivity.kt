@@ -21,15 +21,18 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.maxlift.presentation.ui.common.MyScaffold
-import com.maxlift.presentation.ui.feature.calculator.ResultScreen
+import com.maxlift.presentation.ui.feature.exercise.ResultScreen
 import com.maxlift.presentation.ui.feature.camera.CameraViewModel
 import com.maxlift.presentation.ui.feature.camera.MLKitObjectDetectionScreen
-import com.maxlift.presentation.ui.feature.tracker.PersonListScreen
-import com.maxlift.presentation.ui.feature.tracker.PersonViewModel
+import com.maxlift.presentation.ui.feature.person.PersonListScreen
+import com.maxlift.presentation.ui.feature.person.PersonViewModel
+import com.maxlift.presentation.ui.feature.person.info.PersonInfoScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +65,7 @@ fun MyApp() {
             startDestination = "persons",
             modifier = Modifier.padding(innerPadding),
         ) {
+            composable("persons") { PersonListScreen(PersonViewModel(), navController) }
             composable("result") { ResultScreen(sharedViewModel) }
             composable(
                 route = "mlkit",
@@ -72,7 +76,12 @@ fun MyApp() {
             ) {
                 MLKitObjectDetectionScreen(sharedViewModel, navController)
             }
-            composable("persons") { PersonListScreen(PersonViewModel(), navController) }
+            composable(
+                route = "personInfo/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.IntType })
+            ) { entry ->
+                PersonInfoScreen(personId = entry.arguments?.getInt("id") ?: 0)
+            }
         }
     }
 }

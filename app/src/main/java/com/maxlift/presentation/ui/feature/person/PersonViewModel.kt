@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.feature.tracker
+package com.maxlift.presentation.ui.feature.person
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.maxlift.domain.model.Person
-import com.maxlift.domain.usecase.tracker.FetchAllPersonsUseCase
+import com.maxlift.domain.usecase.person.FetchAllPersonsUseCase
 import kotlinx.coroutines.launch
 
 class PersonViewModel: ViewModel() {

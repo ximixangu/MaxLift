@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.feature.calculator
+package com.maxlift.presentation.ui.feature.exercise
 
 import android.graphics.Rect
 import androidx.compose.foundation.Canvas
@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,44 +34,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.maxlift.presentation.ui.feature.camera.CameraViewModel
 import kotlin.math.abs
 
-@Composable
-fun ResultScreen(viewModel: CameraViewModel) {
-    val times by viewModel.times.observeAsState()
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        times?.let {
-            Text(
-                "Sample Exercise",
-                style = MaterialTheme.typography.titleLarge,
-            )
-
-            Text(
-                "24/03/2024",
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(bottom = 20.dp)
-            )
-
-            CustomBarChart(it)
-
-            Text(
-                "# of repetitions: ${it.size}",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 20.dp)
-            )
-            Text(
-                "Average time: ${it.average().toInt()} ms",
-                style = MaterialTheme.typography.bodyLarge,
-            )
-        }
-    }
-}
 
 @Composable
 fun CustomBarChart(
@@ -104,7 +67,7 @@ fun CustomBarChart(
         Box(
             modifier = Modifier
                 .size(300.dp, 200.dp)
-                // .border(width = 1.dp, color = Color(0xFFA7FF8C))
+            // .border(width = 1.dp, color = Color(0xFFA7FF8C))
         ) {
 
             Canvas(
@@ -187,8 +150,8 @@ fun CustomBarChart(
 
             if (pressedBarIndex != null) {
                 Box(modifier = Modifier
-                        .offset { textOffset }
-                        .width(80.dp),
+                    .offset { textOffset }
+                    .width(80.dp),
                     contentAlignment = Alignment.TopCenter
                 ){
                     Column(
