@@ -16,12 +16,21 @@ import androidx.camera.view.PreviewView
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Scale
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -170,22 +179,37 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Crossfade(targetState = isProcessingMovement || boundingBoxesStates.value.isNotEmpty()) { active ->
-                        if (active) {
-                            RecordButton() {
-                                isProcessingMovement = !isProcessingMovement
-                                if (isProcessingMovement) {
-                                    viewModel.resetBoundingBoxProcessing()
-                                } else {
-                                    if (times?.isNotEmpty() == true) {
-                                        navController.navigate("result")
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Box {}
+                        Icon(imageVector = Icons.Default.FitnessCenter, contentDescription = "", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
+                        Icon(imageVector = Icons.Default.Person, contentDescription = "", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(30.dp))
+                        Icon(imageVector = Icons.Default.Scale, contentDescription = "", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(26.dp))
+                        Box {}
+                    }
+
+                    Box(Modifier.wrapContentSize().padding(vertical = 10.dp)) {
+                        Crossfade(targetState = isProcessingMovement || boundingBoxesStates.value.isNotEmpty()) { active ->
+                            if (active) {
+                                RecordButton() {
+                                    isProcessingMovement = !isProcessingMovement
+                                    if (isProcessingMovement) {
+                                        viewModel.resetBoundingBoxProcessing()
+                                    } else {
+                                        if (times?.isNotEmpty() == true) {
+                                            navController.navigate("result")
+                                        }
                                     }
                                 }
+                            } else {
+                                DisabledRecordButton()
                             }
-                        } else {
-                            DisabledRecordButton()
                         }
                     }
                 }
