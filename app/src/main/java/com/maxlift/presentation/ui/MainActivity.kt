@@ -29,9 +29,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.maxlift.presentation.ui.common.MyScaffold
-import com.maxlift.presentation.ui.feature.exercise.ResultScreen
 import com.maxlift.presentation.ui.feature.camera.CameraViewModel
 import com.maxlift.presentation.ui.feature.camera.MLKitObjectDetectionScreen
+import com.maxlift.presentation.ui.feature.exercise.ExerciseEditScreen
 import com.maxlift.presentation.ui.feature.person.PersonListScreen
 import com.maxlift.presentation.ui.feature.person.PersonViewModel
 import com.maxlift.presentation.ui.feature.person.info.PersonInfoScreen
@@ -68,7 +68,7 @@ fun MyApp() {
             modifier = Modifier.padding(innerPadding),
         ) {
             composable("persons") { PersonListScreen(PersonViewModel(), navController) }
-            composable("result") { ResultScreen(sharedViewModel) }
+            composable("result") { ExerciseEditScreen(sharedViewModel) }
             composable(
                 route = "mlkit",
                 enterTransition = { slideInVertically { it } },

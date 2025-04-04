@@ -61,7 +61,7 @@ fun PersonInfoScreen(personId: Int, navController: NavController) {
                     }
                 )
 
-                Spacer(Modifier.size(7.dp))
+                Spacer(Modifier.size(8.dp))
 
                 Row(
                     modifier = Modifier
@@ -83,7 +83,7 @@ fun PersonInfoScreen(personId: Int, navController: NavController) {
                     )
                 }
 
-                Spacer(Modifier.size(15.dp))
+                Spacer(Modifier.size(8.dp))
 
                 val exerciseSample = Exercise(
                     id = 0,
@@ -93,6 +93,7 @@ fun PersonInfoScreen(personId: Int, navController: NavController) {
                     times = listOf(100f, 110f, 110f, 100f),
                     date = Date.from(Instant.now()),
                     numberOfRepetitions = 4,
+                    title = null,
                     description = "Exercici d'exemple per la card item"
                 )
 

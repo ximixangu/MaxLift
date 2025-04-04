@@ -11,10 +11,10 @@ class FetchExercisesByPersonUseCase {
     companion object {
         suspend fun execute(context: Context, id: Int): List<Exercise> {
             return withContext(Dispatchers.IO) {
-                val myAppDatabase = AppDatabase.getDatabase(context)
+                val database = AppDatabase.getDatabase(context)
                 MyRepository(
-                    myAppDatabase.exerciseDataSource(),
-                    myAppDatabase.personDataSource()
+                    database.exerciseDataSource(),
+                    database.personDataSource()
                 ).fetchExercisesByPersonId(id)
             }
         }

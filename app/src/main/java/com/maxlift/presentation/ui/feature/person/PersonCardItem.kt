@@ -37,7 +37,7 @@ fun PersonCardItem(person: Person, onClick: () -> Unit) {
         shape = RoundedCornerShape(8.dp),
         color = MaterialTheme.colorScheme.surface,
         shadowElevation = 10.dp,
-        onClick = { onClick() }
+        onClick = { onClick() },
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),

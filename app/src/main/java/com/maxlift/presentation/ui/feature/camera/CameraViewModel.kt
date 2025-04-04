@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.maxlift.domain.model.Exercise
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.TimeSource
@@ -12,6 +13,9 @@ import kotlin.time.TimeSource
 class CameraViewModel: ViewModel() {
     private val _times = MutableLiveData<MutableList<Int>?>()
     val times: LiveData<MutableList<Int>?> = _times
+
+    private val _exercise = MutableLiveData(Exercise())
+    val exercise: LiveData<Exercise> = _exercise
 
     private val timeSource = TimeSource.Monotonic
     private var initialTime: TimeSource.Monotonic.ValueTimeMark? = null
@@ -84,6 +88,14 @@ class CameraViewModel: ViewModel() {
     private fun addTime(time: Int){
         if(_times.value == null) _times.value = mutableListOf()
         _times.value?.add(time)
+    }
+
+    fun setExerciseTitle(title: String) {
+        _exercise.value?.title = title
+    }
+
+    fun setExerciseDescription(description: String) {
+        _exercise.value?.description = description
     }
 
     fun resetBoundingBoxProcessing() {

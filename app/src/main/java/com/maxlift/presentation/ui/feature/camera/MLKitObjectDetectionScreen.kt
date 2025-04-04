@@ -83,7 +83,7 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
 
     val options = ObjectDetectorOptions.Builder()
         .setDetectorMode(ObjectDetectorOptions.STREAM_MODE)
-        .enableMultipleObjects()
+//        .enableMultipleObjects()
         .build()
     val objectDetector = ObjectDetection.getClient(options)
 

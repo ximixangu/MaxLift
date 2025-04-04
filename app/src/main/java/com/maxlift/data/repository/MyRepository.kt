@@ -29,11 +29,11 @@ class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: 
     }
 
     override fun fetchAllPersons(): List<Person> {
-        val personList = personDao.getAll().map { personEntity ->
+        val personList = personDao.getAll()
+
+        return personList.map { personEntity ->
             personEntity.toPersonDomain()
         }
-
-        return personList
     }
 
     override fun savePerson(person: Person) {

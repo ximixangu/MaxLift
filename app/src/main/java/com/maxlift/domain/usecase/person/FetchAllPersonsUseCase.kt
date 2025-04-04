@@ -11,10 +11,10 @@ class FetchAllPersonsUseCase {
     companion object {
         suspend fun execute(context: Context): List<Person> {
             return withContext(Dispatchers.IO){
-                val appDatabase = AppDatabase.getDatabase(context)
+                val database = AppDatabase.getDatabase(context)
                  MyRepository(
-                    appDatabase.exerciseDataSource(),
-                    appDatabase.personDataSource()
+                     database.exerciseDataSource(),
+                     database.personDataSource()
                 ).fetchAllPersons()
             }
         }

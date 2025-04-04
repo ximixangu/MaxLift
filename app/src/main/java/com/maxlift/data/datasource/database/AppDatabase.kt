@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 import com.maxlift.data.model.database.ExerciseEntity
 import com.maxlift.data.model.database.PersonEntity
 
-@Database(entities = [PersonEntity::class, ExerciseEntity::class], version = 1)
+@Database(entities = [PersonEntity::class, ExerciseEntity::class], version = 2)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun personDataSource(): PersonDao
@@ -22,8 +22,9 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "maxLift_database:1.0"
-                ).build()
+                    "maxLift_database:2.0"
+                )
+                .build()
                 INSTANCE = instance
                 instance
             }

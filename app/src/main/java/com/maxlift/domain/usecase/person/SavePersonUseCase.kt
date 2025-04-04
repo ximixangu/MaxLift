@@ -11,9 +11,11 @@ class SavePersonUseCase {
     companion object {
         suspend fun execute(context: Context, person: Person) {
             withContext(Dispatchers.IO) {
-                val appDatabase = AppDatabase.getDatabase(context)
-                val myRepository = MyRepository(appDatabase.exerciseDataSource(), appDatabase.personDataSource())
-                myRepository.savePerson(person)
+                val database = AppDatabase.getDatabase(context)
+                MyRepository(
+                    database.exerciseDataSource(),
+                    database.personDataSource()
+                ).savePerson(person)
             }
         }
     }

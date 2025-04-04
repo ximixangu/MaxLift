@@ -27,6 +27,7 @@ data class ExerciseEntity(
     @ColumnInfo(name = "times") val times: List<Float>,
     @ColumnInfo(name = "numberOfReps") val numberOfRepetitions: Int,
     @ColumnInfo(name = "date") val date: String,
+    @ColumnInfo(name = "title") val title: String?,
     @ColumnInfo(name = "description") val description: String?,
 ){
     companion object {
@@ -40,6 +41,7 @@ data class ExerciseEntity(
                 exercise.times,
                 exercise.numberOfRepetitions,
                 formatter.format(exercise.date),
+                exercise.title,
                 exercise.description
             )
         }
@@ -56,6 +58,7 @@ fun ExerciseEntity.toExerciseDomain(): Exercise {
         times,
         numberOfRepetitions,
         formatter.parse(date)!!,
+        title,
         description
     )
 }
