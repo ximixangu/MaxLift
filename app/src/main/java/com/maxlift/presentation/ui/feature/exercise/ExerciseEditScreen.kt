@@ -6,14 +6,21 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -58,75 +65,110 @@ fun ExerciseEditScreen(viewModel: CameraViewModel) {
 
 
     Column(
-        modifier = Modifier.fillMaxSize()
-            .pointerInput(Unit) {
-                detectTapGestures(onTap = {
-                    focusManager.clearFocus()
-                })
-            },
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(1),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.fillMaxWidth(0.9f).weight(1f)
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        focusManager.clearFocus()
+                    })
+                },
+            horizontalArrangement = Arrangement.Center
+        ) {
+            item { Spacer(Modifier.size(16.dp)) }
 
-        EditableTextField(
-            value = title,
-            onValueChange = {
-                title = it
-                viewModel.setExerciseTitle(it)
-            },
-            label = "Title",
-            keyboardType = KeyboardType.Text,
-            focusManager = focusManager,
-            keyboardController = keyboardController
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        NonEditableTextFieldWithPopup(
-            value = "$weight kg",
-            onSelect = { newValue ->
-                weight = newValue
-                sharedPreferences.edit().putInt("weight", weight).apply()
-            },
-            label = "Weight",
-            popupContent = { onDismiss, onSelect ->
-                SelectWeightPopUp(onDismiss = onDismiss, onSelect = onSelect)
+            item{
+                EditableTextField(
+                    value = title,
+                    onValueChange = {
+                        title = it
+                        viewModel.setExerciseTitle(it)
+                    },
+                    label = "Title",
+                    keyboardType = KeyboardType.Text,
+                    focusManager = focusManager,
+                    keyboardController = keyboardController
+                )
             }
-        )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        NonEditableTextFieldWithPopup(
-            value = "Nº${personId}",
-            onSelect = { newValue ->
-                personId = newValue
-                sharedPreferences.edit().putInt("personId", personId).apply()
-            },
-            label = "Person",
-            popupContent = { onDismiss, onSelect ->
-                SelectPersonPopUp(onDismiss = onDismiss, onSelect = onSelect)
+            item {
+                NonEditableTextFieldWithPopup(
+                    value = "$weight kg",
+                    onSelect = { newValue ->
+                        weight = newValue
+                        sharedPreferences.edit().putInt("weight", weight).apply()
+                    },
+                    label = "Weight",
+                    popupContent = { onDismiss, onSelect ->
+                        SelectWeightPopUp(onDismiss = onDismiss, onSelect = onSelect)
+                    }
+                )
             }
-        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            item {
+                NonEditableTextFieldWithPopup(
+                    value = "Nº${personId}",
+                    onSelect = { newValue ->
+                        personId = newValue
+                        sharedPreferences.edit().putInt("personId", personId).apply()
+                    },
+                    label = "Person",
+                    popupContent = { onDismiss, onSelect ->
+                        SelectPersonPopUp(onDismiss = onDismiss, onSelect = onSelect)
+                    }
+                )
+            }
 
-        EditableTextField(
-            value = description,
-            onValueChange = {
-                description = it
-                viewModel.setExerciseDescription(it)
-            },
-            label = "Description",
-            keyboardType = KeyboardType.Text,
-            maxLines = 4,
-            focusManager = focusManager,
-            keyboardController = keyboardController
-        )
+            item {
+                EditableTextField(
+                    value = description,
+                    onValueChange = {
+                        description = it
+                        viewModel.setExerciseDescription(it)
+                    },
+                    label = "Description",
+                    keyboardType = KeyboardType.Text,
+                    maxLines = 4,
+                    focusManager = focusManager,
+                    keyboardController = keyboardController
+                )
+            }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            item {
+                times?.let {
+                    CustomBarChart(it)
+                }
+            }
+        }
 
-        times?.let {
-            CustomBarChart(it)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(72.dp)
+                .background(color = MaterialTheme.colorScheme.primaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Button(
+                modifier = Modifier.fillMaxSize(0.7f),
+                colors = ButtonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    disabledContentColor = MaterialTheme.colorScheme.secondary,
+                    disabledContainerColor = Color.Transparent
+                ),
+                onClick = {}
+            ) {
+                Text(
+                    text = "SAVE EXERCISE",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }
@@ -146,7 +188,7 @@ fun EditableTextField(
         onValueChange = onValueChange,
         label = { Text(label) },
         modifier = Modifier
-            .fillMaxWidth(0.9f)
+            .fillMaxWidth(0.8f)
             .border(
                 width = 2.dp,
                 color = MaterialTheme.colorScheme.primaryContainer,

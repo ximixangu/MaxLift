@@ -75,7 +75,7 @@ fun SelectPersonPopUp(
                         }
                     }
                 } else {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
 
                 Row(
