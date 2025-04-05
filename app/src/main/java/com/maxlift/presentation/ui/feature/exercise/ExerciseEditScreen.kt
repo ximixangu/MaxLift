@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.maxlift.presentation.ui.feature.camera.CameraViewModel
+import com.maxlift.presentation.ui.feature.person.SelectPersonPopUp
 
 @Composable
 fun ExerciseEditScreen(viewModel: CameraViewModel) {
@@ -46,7 +47,9 @@ fun ExerciseEditScreen(viewModel: CameraViewModel) {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+    sharedPreferences.edit().putInt("personId", 0).apply()
 
+    var personId by remember { mutableIntStateOf(sharedPreferences.getInt("personId", 0)) }
     val times by viewModel.times.observeAsState()
     val exercise by viewModel.exercise.observeAsState()
     var weight by remember { mutableIntStateOf(sharedPreferences.getInt("weight", 0)) }
@@ -88,6 +91,20 @@ fun ExerciseEditScreen(viewModel: CameraViewModel) {
             label = "Weight",
             popupContent = { onDismiss, onSelect ->
                 SelectWeightPopUp(onDismiss = onDismiss, onSelect = onSelect)
+            }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        NonEditableTextFieldWithPopup(
+            value = "Nº${personId}",
+            onSelect = { newValue ->
+                personId = newValue
+                sharedPreferences.edit().putInt("personId", personId).apply()
+            },
+            label = "Person",
+            popupContent = { onDismiss, onSelect ->
+                SelectPersonPopUp(onDismiss = onDismiss, onSelect = onSelect)
             }
         )
 
