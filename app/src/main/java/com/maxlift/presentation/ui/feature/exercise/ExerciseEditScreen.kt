@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.maxlift.presentation.ui.feature.camera.CameraViewModel
+import com.maxlift.presentation.ui.feature.person.PersonViewModel
 import com.maxlift.presentation.ui.feature.person.SelectPersonPopUp
 
 @Composable
@@ -53,15 +55,21 @@ fun ExerciseEditScreen(viewModel: CameraViewModel) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val personViewModel = PersonViewModel()
     val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
     sharedPreferences.edit().putInt("personId", 0).apply()
 
     var personId by remember { mutableIntStateOf(sharedPreferences.getInt("personId", 0)) }
+    val person by personViewModel.personState.observeAsState()
     val times by viewModel.times.observeAsState()
     val exercise by viewModel.exercise.observeAsState()
     var weight by remember { mutableIntStateOf(sharedPreferences.getInt("weight", 0)) }
     var title by remember { mutableStateOf(exercise?.title ?: "") }
     var description by remember { mutableStateOf(exercise?.title ?: "") }
+
+    LaunchedEffect(personId) {
+        personViewModel.fetchPersonById(context, personId)
+    }
 
 
     Column(
@@ -112,7 +120,7 @@ fun ExerciseEditScreen(viewModel: CameraViewModel) {
 
             item {
                 NonEditableTextFieldWithPopup(
-                    value = "Nº${personId}",
+                    value = person?.name ?: "",
                     onSelect = { newValue ->
                         personId = newValue
                         sharedPreferences.edit().putInt("personId", personId).apply()
