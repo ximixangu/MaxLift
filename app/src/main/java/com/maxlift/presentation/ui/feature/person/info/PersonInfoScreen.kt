@@ -1,5 +1,6 @@
 package com.maxlift.presentation.ui.feature.person.info
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,8 @@ fun PersonInfoScreen(personId: Int, navController: NavController) {
     val personInfoViewModel = PersonInfoViewModel()
     val person by personInfoViewModel.personState.observeAsState()
     val exerciseList by personInfoViewModel.exerciseListState.observeAsState()
+    val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+    sharedPreferences.edit().putInt("person", personId).apply()
 
     LaunchedEffect(Unit) {
         personInfoViewModel.fetchPersonAndExercises(context, personId)
@@ -94,8 +97,13 @@ fun PersonInfoScreen(personId: Int, navController: NavController) {
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            items(exerciseList!!.size) { index ->
-                                ExerciseCardItem(exerciseList!![index])
+                            exerciseList?.let {
+                                items(it.size) { index ->
+                                    val exercise = it[index]
+                                    ExerciseCardItem(exercise) {
+                                        navController.navigate("exerciseInfo/${exercise.id}")
+                                    }
+                                }
                             }
                         }
                     }

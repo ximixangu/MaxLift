@@ -32,6 +32,7 @@ import com.maxlift.presentation.ui.common.MyScaffold
 import com.maxlift.presentation.ui.feature.camera.CameraViewModel
 import com.maxlift.presentation.ui.feature.camera.MLKitObjectDetectionScreen
 import com.maxlift.presentation.ui.feature.exercise.ExerciseEditScreen
+import com.maxlift.presentation.ui.feature.exercise.ExerciseScreen
 import com.maxlift.presentation.ui.feature.person.PersonListScreen
 import com.maxlift.presentation.ui.feature.person.PersonViewModel
 import com.maxlift.presentation.ui.feature.person.info.PersonInfoScreen
@@ -68,7 +69,7 @@ fun MyApp() {
             modifier = Modifier.padding(innerPadding),
         ) {
             composable("persons") { PersonListScreen(PersonViewModel(), navController) }
-            composable("result") { ExerciseEditScreen(sharedViewModel) }
+            composable("result") { ExerciseEditScreen(sharedViewModel, navController) }
             composable(
                 route = "mlkit",
                 enterTransition = { slideInVertically { it } },
@@ -87,6 +88,16 @@ fun MyApp() {
                 popExitTransition = { slideOutHorizontally { it } },
             ) { entry ->
                 PersonInfoScreen(personId = entry.arguments?.getInt("id") ?: 0, navController)
+            }
+            composable(
+                route = "exerciseInfo/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.IntType }),
+                enterTransition = { slideInHorizontally { it } },
+                exitTransition = { slideOutHorizontally { -it } },
+                popEnterTransition = { slideInHorizontally { -it } },
+                popExitTransition = { slideOutHorizontally { it } },
+            ) { entry ->
+                ExerciseScreen(id = entry.arguments?.getInt("id") ?: 0, navController)
             }
         }
     }

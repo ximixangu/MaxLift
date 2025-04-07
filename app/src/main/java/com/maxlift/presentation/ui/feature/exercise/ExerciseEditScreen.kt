@@ -5,7 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,12 +46,13 @@ import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.maxlift.presentation.ui.feature.camera.CameraViewModel
 import com.maxlift.presentation.ui.feature.person.PersonViewModel
 import com.maxlift.presentation.ui.feature.person.SelectPersonPopUp
 
 @Composable
-fun ExerciseEditScreen(viewModel: CameraViewModel) {
+fun ExerciseEditScreen(viewModel: CameraViewModel, navController: NavController) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -182,7 +183,12 @@ fun ExerciseEditScreen(viewModel: CameraViewModel) {
                     disabledContentColor = MaterialTheme.colorScheme.secondary,
                     disabledContainerColor = Color.Transparent
                 ),
-                onClick = { viewModel.saveCurrentExercise(context) }
+                onClick = {
+                    viewModel.saveCurrentExercise(context)
+                    navController.navigate("personInfo/$personId") {
+                        popUpTo("persons") { inclusive = false }
+                    }
+                }
             ) {
                 Text(
                     text = "SAVE EXERCISE",
@@ -275,7 +281,16 @@ fun NonEditableTextFieldWithPopup(
         )
     )
 
-    if(interactionSource.collectIsPressedAsState().value) showPopup = true
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            when (interaction) {
+                is PressInteraction.Release -> {
+                    showPopup = true
+                }
+                else -> {}
+            }
+        }
+    }
 
     if (showPopup) {
         Surface {
@@ -283,18 +298,3 @@ fun NonEditableTextFieldWithPopup(
         }
     }
 }
-
-//            Text(
-//                "24/03/2024",
-//                style = MaterialTheme.typography.titleSmall,
-//                modifier = Modifier.padding(bottom = 20.dp)
-//            )
-//            Text(
-//                "# of repetitions: ${it.size}",
-//                style = MaterialTheme.typography.bodyLarge,
-//                modifier = Modifier.padding(top = 20.dp)
-//            )
-//            Text(
-//                "Average time: ${it.average().toInt()} ms",
-//                style = MaterialTheme.typography.bodyLarge,
-//            )

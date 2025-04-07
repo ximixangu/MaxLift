@@ -25,10 +25,11 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 @Composable
-fun ExerciseCardItem(exercise: Exercise) {
+fun ExerciseCardItem(exercise: Exercise, onClick: () -> Unit) {
     Surface(
         modifier = Modifier.wrapContentSize(),
-        shadowElevation = 5.dp
+        shadowElevation = 5.dp,
+        onClick = onClick
     ) {
         Box(
             modifier = Modifier.fillMaxWidth().wrapContentHeight(),
