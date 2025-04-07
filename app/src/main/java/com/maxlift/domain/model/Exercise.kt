@@ -15,7 +15,7 @@ class Exercise(
     var description: String?,
 ) {
     constructor() : this(
-        -1,
+        0,
         -1,
         "Generic Exercise",
         50f,

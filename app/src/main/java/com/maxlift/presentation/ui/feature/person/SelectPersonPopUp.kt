@@ -30,7 +30,7 @@ import androidx.compose.ui.window.Dialog
 @Composable
 fun SelectPersonPopUp(
     onDismiss: () -> Unit,
-    onSelect: (Int) -> Unit
+    onSelect: (String) -> Unit
 ) {
     val personViewModel = PersonViewModel()
     val context = LocalContext.current
@@ -69,7 +69,7 @@ fun SelectPersonPopUp(
                         items(personList!!.size) { index ->
                             val person = personList!![index]
                             PersonCardItem(person) {
-                                onSelect(person.id)
+                                onSelect(person.id.toString())
                                 onDismiss()
                             }
                         }

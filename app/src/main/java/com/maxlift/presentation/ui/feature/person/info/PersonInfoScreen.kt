@@ -1,6 +1,7 @@
 package com.maxlift.presentation.ui.feature.person.info
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -27,10 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.maxlift.domain.model.Exercise
 import com.maxlift.presentation.ui.feature.exercise.ExerciseCardItem
-import java.time.Instant
-import java.util.Date
 
 @Composable
 fun PersonInfoScreen(personId: Int, navController: NavController) {
@@ -61,7 +60,7 @@ fun PersonInfoScreen(personId: Int, navController: NavController) {
                     }
                 )
 
-                Spacer(Modifier.size(8.dp))
+                Spacer(Modifier.size(11.dp))
 
                 Row(
                     modifier = Modifier
@@ -85,23 +84,21 @@ fun PersonInfoScreen(personId: Int, navController: NavController) {
 
                 Spacer(Modifier.size(8.dp))
 
-                val exerciseSample = Exercise(
-                    id = 0,
-                    type = "Press Banca",
-                    personId = 0,
-                    weight = 80.0f,
-                    times = listOf(100f, 110f, 110f, 100f),
-                    date = Date.from(Instant.now()),
-                    numberOfRepetitions = 4,
-                    title = null,
-                    description = "Exercici d'exemple per la card item"
-                )
-
                 Box(
-                    Modifier.fillMaxWidth(),
+                    Modifier.fillMaxSize().weight(1f),
                     contentAlignment = Alignment.Center
                 ){
-                    ExerciseCardItem(exercise = exerciseSample, person = person!!)
+                    if (exerciseList != null) {
+                        LazyColumn(
+                            Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            items(exerciseList!!.size) { index ->
+                                ExerciseCardItem(exerciseList!![index])
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -42,6 +42,7 @@ class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: 
 
     override fun saveExercise(exercise: Exercise) {
         exerciseDao.save(ExerciseEntity.fromExerciseDomain(exercise))
+        println("Saved $exercise")
     }
 
     override fun updatePerson(person: Person) {

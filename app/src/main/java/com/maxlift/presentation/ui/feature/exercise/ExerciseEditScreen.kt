@@ -57,20 +57,19 @@ fun ExerciseEditScreen(viewModel: CameraViewModel) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val personViewModel = PersonViewModel()
     val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
-    sharedPreferences.edit().putInt("personId", 0).apply()
 
-    var personId by remember { mutableIntStateOf(sharedPreferences.getInt("personId", 0)) }
+    var personId by remember { mutableIntStateOf(sharedPreferences.getInt("person", 1)) }
     val person by personViewModel.personState.observeAsState()
     val times by viewModel.times.observeAsState()
     val exercise by viewModel.exercise.observeAsState()
     var weight by remember { mutableIntStateOf(sharedPreferences.getInt("weight", 0)) }
     var title by remember { mutableStateOf(exercise?.title ?: "") }
     var description by remember { mutableStateOf(exercise?.title ?: "") }
+    var type by remember { mutableStateOf(sharedPreferences.getString("type", "No type")) }
 
     LaunchedEffect(personId) {
         personViewModel.fetchPersonById(context, personId)
     }
-
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -105,34 +104,6 @@ fun ExerciseEditScreen(viewModel: CameraViewModel) {
             }
 
             item {
-                NonEditableTextFieldWithPopup(
-                    value = "$weight kg",
-                    onSelect = { newValue ->
-                        weight = newValue
-                        sharedPreferences.edit().putInt("weight", weight).apply()
-                    },
-                    label = "Weight",
-                    popupContent = { onDismiss, onSelect ->
-                        SelectWeightPopUp(onDismiss = onDismiss, onSelect = onSelect)
-                    }
-                )
-            }
-
-            item {
-                NonEditableTextFieldWithPopup(
-                    value = person?.name ?: "",
-                    onSelect = { newValue ->
-                        personId = newValue
-                        sharedPreferences.edit().putInt("personId", personId).apply()
-                    },
-                    label = "Person",
-                    popupContent = { onDismiss, onSelect ->
-                        SelectPersonPopUp(onDismiss = onDismiss, onSelect = onSelect)
-                    }
-                )
-            }
-
-            item {
                 EditableTextField(
                     value = description,
                     onValueChange = {
@@ -144,6 +115,48 @@ fun ExerciseEditScreen(viewModel: CameraViewModel) {
                     maxLines = 4,
                     focusManager = focusManager,
                     keyboardController = keyboardController
+                )
+            }
+
+            item {
+                NonEditableTextFieldWithPopup(
+                    value = person?.name ?: "",
+                    onSelect = { newValue ->
+                        personId = newValue.toInt()
+                        sharedPreferences.edit().putInt("person", personId).apply()
+                    },
+                    label = "Person",
+                    popupContent = { onDismiss, onSelect ->
+                        SelectPersonPopUp(onDismiss = onDismiss, onSelect = onSelect)
+                    }
+                )
+            }
+
+            item {
+                NonEditableTextFieldWithPopup(
+                    value = "$type",
+                    onSelect = { newValue ->
+                        type = newValue
+                        sharedPreferences.edit().putString("type", type).apply()
+                    },
+                    label = "Type",
+                    popupContent = { onDismiss, onSelect ->
+                        SelectTypePopUp(onDismiss = onDismiss, onSelect = onSelect)
+                    }
+                )
+            }
+
+            item {
+                NonEditableTextFieldWithPopup(
+                    value = "$weight kg",
+                    onSelect = { newValue ->
+                        weight = newValue.toInt()
+                        sharedPreferences.edit().putInt("weight", weight).apply()
+                    },
+                    label = "Weight",
+                    popupContent = { onDismiss, onSelect ->
+                        SelectWeightPopUp(onDismiss = onDismiss, onSelect = onSelect)
+                    }
                 )
             }
 
@@ -169,7 +182,7 @@ fun ExerciseEditScreen(viewModel: CameraViewModel) {
                     disabledContentColor = MaterialTheme.colorScheme.secondary,
                     disabledContainerColor = Color.Transparent
                 ),
-                onClick = {}
+                onClick = { viewModel.saveCurrentExercise(context) }
             ) {
                 Text(
                     text = "SAVE EXERCISE",
@@ -231,8 +244,8 @@ fun EditableTextField(
 fun NonEditableTextFieldWithPopup(
     value: String,
     label: String,
-    onSelect: (Int) -> Unit,
-    popupContent: @Composable (onDismiss: () -> Unit, onSelect: (Int) -> Unit) -> Unit
+    onSelect: (String) -> Unit,
+    popupContent: @Composable (onDismiss: () -> Unit, onSelect: (String) -> Unit) -> Unit
 ) {
     var showPopup by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }

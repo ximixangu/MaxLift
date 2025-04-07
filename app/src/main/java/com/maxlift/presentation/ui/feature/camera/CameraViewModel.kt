@@ -1,11 +1,13 @@
 package com.maxlift.presentation.ui.feature.camera
 
+import android.content.Context
 import android.graphics.RectF
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.maxlift.domain.model.Exercise
+import com.maxlift.domain.usecase.exercise.SaveExerciseUseCase
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.TimeSource
@@ -103,5 +105,26 @@ class CameraViewModel: ViewModel() {
         initialPosition = null
         initialTime = null
         currentMovement = 0
+    }
+
+    fun saveCurrentExercise(context: Context) {
+        viewModelScope.launch {
+            val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+
+            _exercise.value?.personId = sharedPreferences.getInt("person", 1)
+            println(_exercise.value?.personId)
+            _exercise.value?.type = sharedPreferences.getString("type", "No Type")!!
+            _exercise.value?.weight = sharedPreferences.getInt("weight", 50).toFloat()
+            _exercise.value?.times = _times.value?.map { it.toFloat() }!!
+            _exercise.value?.numberOfRepetitions = _times.value?.size!!
+
+            try {
+                _exercise.value?.let {
+                    SaveExerciseUseCase.execute(context, it)
+                }
+            } catch (e: Exception) {
+                println("Error saving current exercise: ${e.message}")
+            }
+        }
     }
 }

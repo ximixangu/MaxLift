@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
 @Composable
-fun SelectWeightPopUp(
+fun SelectTypePopUp(
     onDismiss: () -> Unit,
     onSelect: (String) -> Unit
 ) {
@@ -43,11 +43,11 @@ fun SelectWeightPopUp(
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
-                Row(
+                Column (
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    listOf("20", "40", "60", "80", "100").forEach { option ->
+                    listOf("Bench Press", "Half Squat", "Dead Lift", "Other").forEach { option ->
                         Text(
                             text = option,
                             modifier = Modifier

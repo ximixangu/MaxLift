@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.maxlift.domain.model.Person
 import com.maxlift.domain.usecase.person.FetchAllPersonsUseCase
 import com.maxlift.domain.usecase.person.FetchPersonUseCase
+import com.maxlift.domain.usecase.person.SavePersonUseCase
 import kotlinx.coroutines.launch
 
 class PersonViewModel: ViewModel() {
@@ -31,6 +32,16 @@ class PersonViewModel: ViewModel() {
         viewModelScope.launch {
             try {
                 _person.value = FetchPersonUseCase.execute(context, id)
+            } catch (e: Exception) {
+                println("Error fetching person: ${e.message}")
+            }
+        }
+    }
+
+    fun savePerson(context: Context, person: Person) {
+        viewModelScope.launch {
+            try {
+                SavePersonUseCase.execute(context, person)
             } catch (e: Exception) {
                 println("Error fetching person: ${e.message}")
             }

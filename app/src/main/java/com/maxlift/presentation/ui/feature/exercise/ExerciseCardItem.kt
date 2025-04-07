@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -20,22 +19,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.maxlift.domain.model.Exercise
-import com.maxlift.domain.model.Person
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
 
 @Composable
-fun ExerciseCardItem(exercise: Exercise, person: Person) {
+fun ExerciseCardItem(exercise: Exercise) {
     Surface(
         modifier = Modifier.wrapContentSize(),
-        shadowElevation = 10.dp
+        shadowElevation = 5.dp
     ) {
         Box(
             modifier = Modifier.fillMaxWidth().wrapContentHeight(),
         ) {
-            Column(Modifier.fillMaxWidth().wrapContentHeight().padding(start = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                Modifier.fillMaxWidth().wrapContentHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = exercise.type,
                     style = MaterialTheme.typography.titleMedium
