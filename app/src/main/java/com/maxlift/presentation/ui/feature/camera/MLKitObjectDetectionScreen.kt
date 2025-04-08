@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,7 +31,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Scale
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -50,10 +50,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
+import com.maxlift.presentation.ui.common.IconTextButton
+import com.maxlift.presentation.ui.feature.exercise.SelectTypePopUp
+import com.maxlift.presentation.ui.feature.exercise.SelectWeightPopUp
 import com.maxlift.presentation.ui.feature.exercise.blendColors
+import com.maxlift.presentation.ui.feature.person.SelectPersonPopUp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,6 +72,9 @@ private var offsetX: Float = 0f
 @Composable
 fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavController) {
     val context = LocalContext.current
+    val currentBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentDestination = currentBackStackEntry.value?.destination?.route
+    val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     var isProcessingMovement by remember { mutableStateOf(false) }
 
@@ -80,6 +88,10 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
         this.scaleType = PreviewView.ScaleType.FILL_CENTER
         this.background = ColorDrawable(0)
     } }
+
+    var showWeightPopUp by remember { mutableStateOf(false) }
+    var showPersonPopUp by remember { mutableStateOf(false) }
+    var showTypePopUp by remember { mutableStateOf(false) }
 
     val options = ObjectDetectorOptions.Builder()
         .setDetectorMode(ObjectDetectorOptions.STREAM_MODE)
@@ -187,23 +199,31 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.Top
                     ) {
-                        Box {}
-                        Icon(imageVector = Icons.Default.FitnessCenter, contentDescription = "", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
-                        Icon(imageVector = Icons.Default.Person, contentDescription = "", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(30.dp))
-                        Icon(imageVector = Icons.Default.Scale, contentDescription = "", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(26.dp))
-                        Box {}
+                        Spacer(Modifier.size(0.dp))
+                        IconTextButton(icon = Icons.Default.FitnessCenter, "", 28.dp) {
+                            if (!isProcessingMovement) showTypePopUp = true
+                        }
+                        IconTextButton(icon = Icons.Default.Person, "", 30.dp) {
+                            if (!isProcessingMovement) showPersonPopUp = true
+                        }
+                        IconTextButton(icon = Icons.Default.Scale, "", 26.dp) {
+                            if (!isProcessingMovement) showWeightPopUp = true
+                        }
+                        Spacer(Modifier.size(0.dp))
                     }
 
                     Box(Modifier.wrapContentSize().padding(vertical = 10.dp)) {
                         Crossfade(targetState = isProcessingMovement || boundingBoxesStates.value.isNotEmpty()) { active ->
                             if (active) {
-                                RecordButton() {
+                                RecordButton {
                                     isProcessingMovement = !isProcessingMovement
                                     if (isProcessingMovement) {
                                         viewModel.resetBoundingBoxProcessing()
                                     } else {
                                         if (times?.isNotEmpty() == true) {
-                                            navController.navigate("result")
+                                            if (currentDestination == "mlkit") {
+                                                navController.navigate("result")
+                                            }
                                         }
                                     }
                                 }
@@ -212,6 +232,24 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
                             }
                         }
                     }
+                }
+            }
+
+            if (showWeightPopUp) {
+                SelectWeightPopUp(onDismiss = { showWeightPopUp = false }) { weight ->
+                    sharedPreferences.edit().putInt("weight", weight.toInt()).apply()
+                }
+            }
+
+            if (showPersonPopUp) {
+                SelectPersonPopUp(onDismiss = { showPersonPopUp = false }) { person ->
+                    sharedPreferences.edit().putInt("person", person.toInt()).apply()
+                }
+            }
+
+            if (showTypePopUp) {
+                SelectTypePopUp(onDismiss = { showTypePopUp = false }) { type ->
+                    sharedPreferences.edit().putString("type", type).apply()
                 }
             }
         }

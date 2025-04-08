@@ -9,6 +9,7 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -164,6 +165,24 @@ fun ExerciseEditScreen(viewModel: CameraViewModel, navController: NavController)
             item {
                 times?.let {
                     CustomBarChart(it)
+                }
+            }
+
+            item {
+                times?.let {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Text(
+                            "# of repetitions: ${it.size}",
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        Text(
+                            "Average time: ${it.average().toInt()} ms",
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
                 }
             }
         }

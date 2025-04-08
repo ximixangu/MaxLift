@@ -94,9 +94,14 @@ fun PersonListScreen(personViewModel: PersonViewModel, navController: NavControl
                 contentAlignment = Alignment.TopCenter,
             ) {
                 IconTextButton(
-                    onClick = { navController.navigate("mlkit") },
+                    onClick = {
+                        if (currentDestination == "persons"){
+                            navController.navigate("mlkit")
+                        }
+                    },
                     text = "Register",
-                    icon = Icons.Filled.RadioButtonChecked
+                    icon = Icons.Filled.RadioButtonChecked,
+                    size = 35.dp
                 )
             }
         }

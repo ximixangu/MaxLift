@@ -64,11 +64,7 @@ fun CustomBarChart(
             softWrap = false,
         )
 
-        Box(
-            modifier = Modifier
-                .size(300.dp, 200.dp)
-            // .border(width = 1.dp, color = Color(0xFFA7FF8C))
-        ) {
+        Box(modifier = Modifier.size(300.dp, 200.dp)) {
 
             Canvas(
                 modifier = Modifier

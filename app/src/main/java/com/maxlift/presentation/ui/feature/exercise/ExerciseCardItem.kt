@@ -17,6 +17,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.maxlift.domain.model.Exercise
 import java.text.SimpleDateFormat
@@ -38,10 +40,19 @@ fun ExerciseCardItem(exercise: Exercise, onClick: () -> Unit) {
                 Modifier.fillMaxWidth().wrapContentHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = exercise.type,
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    var title = ""
+                    exercise.title?.let {
+                        title = "$it - "
+                    }
+                    Text(
+                        text = title + exercise.type,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center
+                    )
+                }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.FitnessCenter, "",

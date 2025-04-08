@@ -15,12 +15,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun IconTextButton(
     icon: ImageVector,
     text: String,
+    size: Dp,
     onClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -41,14 +43,16 @@ fun IconTextButton(
             Icon(
                 imageVector = icon,
                 contentDescription = "",
-                Modifier.size(35.dp),
+                Modifier.size(size),
                 tint = MaterialTheme.colorScheme.primary
             )
-            Text(
-                text = text,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.primary
-            )
+            if(text.isNotEmpty()){
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,7 +49,7 @@ fun SelectPersonPopUp(
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = MaterialTheme.colorScheme.background,
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(16.dp),
             shadowElevation = 10.dp
         ) {
             Column(
@@ -68,7 +69,7 @@ fun SelectPersonPopUp(
                         rows = GridCells.Fixed(1),
                         contentPadding = PaddingValues(8.dp),
                         horizontalArrangement = Arrangement.spacedBy(2.dp),
-                        modifier = Modifier.height(120.dp).fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().height(140.dp)
                     ) {
                         items(personList!!.size) { index ->
                             val person = personList!![index]

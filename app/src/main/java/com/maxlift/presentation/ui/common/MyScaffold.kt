@@ -78,6 +78,7 @@ fun MyScaffold(
 fun getTitleForDestination(currentDestination: String?): String {
     return when (currentDestination) {
         "mlkit" -> "Register"
+        "result" -> "Register"
         else -> "MaxLift"
     }
 }

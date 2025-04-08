@@ -38,7 +38,7 @@ fun SelectTypePopUp(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Select Weight",
+                    text = "Select Exercise Type",
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
