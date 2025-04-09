@@ -38,7 +38,7 @@ fun SelectPersonPopUp(
     val context = LocalContext.current
     val personList by personViewModel.personListState.observeAsState(null)
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(personList) {
         personViewModel.fetchAllPersons(context)
     }
 
