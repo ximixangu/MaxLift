@@ -32,7 +32,7 @@ fun PersonInfoScreen(personId: Int, navController: NavController) {
 
     sharedPreferences.edit().putInt("person", personId).apply()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(person) {
         personInfoViewModel.fetchPersonAndExercises(context, personId)
     }
 
@@ -42,12 +42,12 @@ fun PersonInfoScreen(personId: Int, navController: NavController) {
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val name = person!!.name.split(" ").joinToString(" ") { word ->
-                    word.replaceFirstChar { it.uppercase() }
-                }
-
                 PersonTitle(
-                    name = name,
+                    person = person!!,
+                    onEdit = {
+                        personInfoViewModel.editPerson(context, it)
+                        personInfoViewModel.fetchPersonAndExercises(context, it.id)
+                    },
                     onClickDelete = {
                         personInfoViewModel.deletePerson(context, personId)
                         navController.navigateUp()

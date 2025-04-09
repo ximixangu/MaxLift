@@ -10,6 +10,7 @@ import com.maxlift.domain.model.Person
 import com.maxlift.domain.usecase.exercise.FetchExerciseByPersonAndTitleUseCase
 import com.maxlift.domain.usecase.exercise.FetchExercisesByPersonUseCase
 import com.maxlift.domain.usecase.person.DeletePersonUseCase
+import com.maxlift.domain.usecase.person.EditPersonUseCase
 import com.maxlift.domain.usecase.person.FetchPersonUseCase
 import kotlinx.coroutines.launch
 
@@ -57,6 +58,16 @@ class PersonInfoViewModel: ViewModel() {
             }
         } catch (e: Exception) {
             println("Error fetching exercises by person and title: ${e.message}")
+        }
+    }
+
+    fun editPerson(context: Context, person: Person) {
+        try {
+            viewModelScope.launch {
+                EditPersonUseCase.execute(context, person)
+            }
+        } catch (e: Exception) {
+            println("Error editing person: ${e.message}")
         }
     }
 

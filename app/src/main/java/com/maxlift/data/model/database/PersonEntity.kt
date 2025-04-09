@@ -12,7 +12,7 @@ data class PersonEntity(
 ) {
   companion object {
       fun fromPersonDomain(person: Person): PersonEntity {
-          return PersonEntity(name = person.name)
+          return PersonEntity(id = person.id, name = person.name)
       }
   }
 }
