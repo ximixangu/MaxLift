@@ -61,15 +61,6 @@ fun PersonListScreen(personViewModel: PersonViewModel, navController: NavControl
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            item {
-                                AddPersonCardItem(
-                                    onSave = { name ->
-                                        personViewModel.savePerson(context, Person(0, name))
-                                        shouldUpdate = true
-                                    }
-                                )
-                            }
-
                             items(personList!!.size) { index ->
                                 val person = personList!![index]
                                 PersonCardItem(
@@ -78,6 +69,15 @@ fun PersonListScreen(personViewModel: PersonViewModel, navController: NavControl
                                         if (currentDestination == "persons") {
                                             navController.navigate(route = "personInfo/${person.id}")
                                         }
+                                    }
+                                )
+                            }
+
+                            item {
+                                AddPersonCardItem(
+                                    onSave = { name ->
+                                        personViewModel.savePerson(context, Person(0, name))
+                                        shouldUpdate = true
                                     }
                                 )
                             }

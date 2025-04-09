@@ -44,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -173,7 +174,7 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
                 AndroidView( { previewView } , Modifier.fillMaxWidth())
 
                 if(boundingBoxesStates.value.isNotEmpty()) {
-                    MultipleBoundingBoxOverlay(boundingBoxesStates.value)
+                    AltMultipleBoundingBoxOverlay(boundingBoxesStates.value, MaterialTheme.colorScheme.primary)
                 }
 
                 Text(
@@ -256,11 +257,8 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
     }
 }
 
-/**
- * Draws the given [boundingBoxes] of the detected object on a Canvas.
- */
 @Composable
-fun MultipleBoundingBoxOverlay(boundingBoxes: List<RectF>) {
+fun AltMultipleBoundingBoxOverlay(boundingBoxes: List<RectF>, color: Color) {
     Canvas(Modifier.fillMaxSize()) {
         for (boundingBox in boundingBoxes) {
             val box = scaleBoundingBox(boundingBox)
@@ -270,15 +268,15 @@ fun MultipleBoundingBoxOverlay(boundingBoxes: List<RectF>) {
             val topLeft = Offset(left, box.top)
             val bottomRight = Offset(right, box.bottom)
 
-            drawCircle(center = topLeft, radius = 10f, color = Color.Blue)
-            drawCircle(center = Offset(right, box.top), radius = 10f,  color = Color.Blue)
-            drawCircle(center = Offset(left, box.bottom), radius = 10f,  color = Color.Blue)
-            drawCircle(center = bottomRight, radius = 10f,  color = Color.Blue)
-
-            drawLine(color = Color.Red, topLeft, Offset(right, box.top))
-            drawLine(color = Color.Red, topLeft, Offset(left, box.bottom))
-            drawLine(color = Color.Red, bottomRight, Offset(right, box.top))
-            drawLine(color = Color.Red, bottomRight, Offset(left, box.bottom))
+            drawRect(
+                color = color,
+                topLeft = topLeft,
+                size = Size(
+                    width = bottomRight.x - topLeft.x,
+                    height = bottomRight.y - topLeft.y
+                ),
+                alpha = 0.35f,
+            )
         }
     }
 }
