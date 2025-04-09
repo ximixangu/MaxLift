@@ -17,8 +17,15 @@ class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: 
     }
 
     override fun fetchExercisesByPersonId(personId: Int): List<Exercise> {
-        val exerciseList = exerciseDao.getExercisesByPerson(personId).map { entity ->
-            entity.toExerciseDomain()
+        val exerciseList = exerciseDao.getExercisesByPerson(personId).map {
+            it.toExerciseDomain()
+        }
+        return exerciseList
+    }
+
+    override fun fetchExercisesByPersonIdAndTitle(personId: Int, title: String): List<Exercise> {
+        val exerciseList = exerciseDao.getExercisesByPersonAndTitle(personId, title).map {
+            it.toExerciseDomain()
         }
         return exerciseList
     }
@@ -31,8 +38,8 @@ class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: 
     override fun fetchAllPersons(): List<Person> {
         val personList = personDao.getAll()
 
-        return personList.map { personEntity ->
-            personEntity.toPersonDomain()
+        return personList.map {
+            it.toPersonDomain()
         }
     }
 

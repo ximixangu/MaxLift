@@ -127,6 +127,22 @@ fun ExerciseScreen(id: Int, navController: NavController) {
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     }
+
+                    Spacer(Modifier.size(8.dp))
+
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Text(
+                            "Fastest: ${exercise!!.times.min().toInt()} ms",
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        Text(
+                            "Slowest: ${exercise!!.times.max().toInt()} ms",
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
                 }
             }
         }

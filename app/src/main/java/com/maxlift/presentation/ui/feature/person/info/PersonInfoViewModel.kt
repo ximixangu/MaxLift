@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.maxlift.domain.model.Exercise
 import com.maxlift.domain.model.Person
+import com.maxlift.domain.usecase.exercise.FetchExerciseByPersonAndTitleUseCase
 import com.maxlift.domain.usecase.exercise.FetchExercisesByPersonUseCase
 import com.maxlift.domain.usecase.person.DeletePersonUseCase
 import com.maxlift.domain.usecase.person.FetchPersonUseCase
@@ -41,6 +42,21 @@ class PersonInfoViewModel: ViewModel() {
             }
         } catch (e: Exception) {
             println("Error fetching person exercises: ${e.message}")
+        }
+    }
+
+    fun fetchExercisesByPersonAndTitle(context: Context, id: Int, title: String) {
+        try {
+            viewModelScope.launch {
+                _exerciseList.value = if (title.isEmpty()) {
+                    FetchExercisesByPersonUseCase.execute(context, id)
+                } else {
+                    FetchExerciseByPersonAndTitleUseCase.execute(context, id, title)
+                }
+
+            }
+        } catch (e: Exception) {
+            println("Error fetching exercises by person and title: ${e.message}")
         }
     }
 

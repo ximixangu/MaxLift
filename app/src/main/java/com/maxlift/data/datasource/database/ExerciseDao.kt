@@ -23,6 +23,13 @@ interface ExerciseDao {
     @Query("SELECT * FROM exercise WHERE personId = :personId ORDER BY id DESC")
     fun getExercisesByPerson(personId: Int): List<ExerciseEntity>
 
+    @Query(
+        "SELECT * FROM exercise WHERE personId = :personId " +
+        "AND (title LIKE '%' || :title || '%' OR type LIKE '%' || :title || '%') " +
+        "ORDER BY id DESC"
+    )
+    fun getExercisesByPersonAndTitle(personId: Int, title: String): List<ExerciseEntity>
+
     @Query("SELECT * FROM exercise ORDER BY date DESC")
     fun getAllExercises(): List<ExerciseEntity>
 }

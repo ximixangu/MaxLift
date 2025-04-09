@@ -1,33 +1,22 @@
 package com.maxlift.presentation.ui.feature.person.info
 
 import android.content.Context
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.maxlift.presentation.ui.feature.exercise.ExerciseCardItem
@@ -35,10 +24,12 @@ import com.maxlift.presentation.ui.feature.exercise.ExerciseCardItem
 @Composable
 fun PersonInfoScreen(personId: Int, navController: NavController) {
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     val personInfoViewModel = PersonInfoViewModel()
     val person by personInfoViewModel.personState.observeAsState()
     val exerciseList by personInfoViewModel.exerciseListState.observeAsState()
     val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+
     sharedPreferences.edit().putInt("person", personId).apply()
 
     LaunchedEffect(Unit) {
@@ -65,27 +56,9 @@ fun PersonInfoScreen(personId: Int, navController: NavController) {
 
                 Spacer(Modifier.size(11.dp))
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .wrapContentHeight()
-                        .background(color = Color.Gray.copy(0.2f), shape = RoundedCornerShape(10.dp))
-                        .padding(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Search, "",
-                        modifier = Modifier.size(20.dp),
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                    Text(
-                        text = "Search by keyword...",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+                SearchBar {
+                    personInfoViewModel.fetchExercisesByPersonAndTitle(context, personId, it)
                 }
-
-                Spacer(Modifier.size(8.dp))
 
                 Box(
                     Modifier.fillMaxSize().weight(1f),
@@ -97,11 +70,15 @@ fun PersonInfoScreen(personId: Int, navController: NavController) {
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            item { Spacer(Modifier.size(3.dp)) }
                             exerciseList?.let {
                                 items(it.size) { index ->
                                     val exercise = it[index]
                                     ExerciseCardItem(exercise) {
-                                        navController.navigate("exerciseInfo/${exercise.id}")
+                                        if (navController.currentDestination?.route?.contains("personInfo") == true) {
+                                            keyboardController?.hide()
+                                            navController.navigate("exerciseInfo/${exercise.id}")
+                                        }
                                     }
                                 }
                             }
