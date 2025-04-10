@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.feature.person
+package com.maxlift.presentation.ui.feature.exercise.info
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,15 +17,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.maxlift.domain.model.Exercise
+import com.maxlift.presentation.ui.feature.exercise.EditableTextField
 
 @Composable
-fun AddPersonPopup(
+fun EditExercisePopUp(
+    exercise: Exercise,
     onDismiss: () -> Unit,
-    onSave: (String) -> Unit
+    onEdit: (Exercise) -> Unit,
 ) {
-    var personName by remember { mutableStateOf("") }
+    var title by remember { mutableStateOf(exercise.title) }
+    var description by remember { mutableStateOf(exercise.description) }
+
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Surface(
@@ -42,17 +51,35 @@ fun AddPersonPopup(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Add Person",
+                    text = "Edit Exercise",
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
-                OutlinedTextField(
-                    value = personName,
-                    onValueChange = { personName = it },
-                    label = { Text("Name") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                EditableTextField(
+                    value = title ?: "",
+                    onValueChange = {
+                        title = it
+                        exercise.title = it
+                    },
+                    label = "Title",
+                    keyboardType = KeyboardType.Text,
+                    maxLines = 1,
+                    focusManager = focusManager,
+                    keyboardController = keyboardController
+                )
+
+                EditableTextField(
+                    value = description ?: "",
+                    onValueChange = {
+                        description = it
+                        exercise.description = it
+                    },
+                    label = "Description",
+                    keyboardType = KeyboardType.Text,
+                    maxLines = 1,
+                    focusManager = focusManager,
+                    keyboardController = keyboardController
                 )
 
                 Row(
@@ -65,10 +92,8 @@ fun AddPersonPopup(
 
                     Button(
                         onClick = {
-                            if (personName.isNotBlank()) {
-                                onSave(personName)
-                                onDismiss()
-                            }
+                            onEdit(exercise)
+                            onDismiss()
                         }
                     ) {
                         Text("Save")

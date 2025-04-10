@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.maxlift.domain.model.Exercise
 import com.maxlift.domain.usecase.exercise.DeleteExerciseUseCase
 import com.maxlift.domain.usecase.exercise.FetchExerciseUseCase
+import com.maxlift.domain.usecase.exercise.UpdateExerciseUseCase
 import kotlinx.coroutines.launch
 
 class ExerciseViewModel: ViewModel() {
@@ -20,6 +21,17 @@ class ExerciseViewModel: ViewModel() {
                 _exercise.value = FetchExerciseUseCase.execute(context, id)
             } catch (e: Exception) {
                 println("Error fetching exercise: ${e.message}")
+            }
+        }
+    }
+
+    fun updateExercise(context: Context, exercise: Exercise) {
+        viewModelScope.launch {
+            try {
+                UpdateExerciseUseCase.execute(context, exercise)
+                _exercise.value = exercise
+            } catch (e: Exception) {
+                println("Error updating exercise: ${e.message}")
             }
         }
     }

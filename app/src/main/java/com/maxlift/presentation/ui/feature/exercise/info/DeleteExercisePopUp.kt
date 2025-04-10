@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.feature.exercise
+package com.maxlift.presentation.ui.feature.exercise.info
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

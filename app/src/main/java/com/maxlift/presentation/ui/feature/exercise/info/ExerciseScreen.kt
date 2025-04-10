@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.feature.exercise
+package com.maxlift.presentation.ui.feature.exercise.info
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -32,6 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.maxlift.presentation.ui.feature.exercise.CustomBarChart
+import com.maxlift.presentation.ui.feature.exercise.ExerciseViewModel
+import com.maxlift.presentation.ui.feature.exercise.formatDate
 
 @Composable
 fun ExerciseScreen(id: Int, navController: NavController) {
@@ -39,6 +43,7 @@ fun ExerciseScreen(id: Int, navController: NavController) {
     val exerciseViewModel: ExerciseViewModel = viewModel()
     val exercise by exerciseViewModel.exercise.observeAsState()
     var showDeletePopUp by remember { mutableStateOf(false) }
+    var showEditPopUp by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
 
     LaunchedEffect(id) {
@@ -51,6 +56,18 @@ fun ExerciseScreen(id: Int, navController: NavController) {
                 modifier = Modifier.fillMaxWidth(0.9f).fillMaxHeight(),
                 horizontalAlignment = Alignment.Start,
             ) {
+                exercise?.let {
+                    if(showEditPopUp) {
+                        EditExercisePopUp (
+                            exercise = it,
+                            onEdit = {
+                                exerciseViewModel.updateExercise(context, exercise!!)
+                            },
+                            onDismiss = { showEditPopUp = false }
+                        )
+                    }
+                }
+
                 if(showDeletePopUp) {
                     DeleteExercisePopUp(
                         onDelete = {
@@ -80,16 +97,29 @@ fun ExerciseScreen(id: Int, navController: NavController) {
                             )
                         }
 
-                        Icon(
-                            imageVector = Icons.Default.Delete, "",
-                            modifier = Modifier
-                                .padding(5.dp)
-                                .clickable(
-                                    interactionSource = interactionSource,
-                                    indication = null
-                                ) { showDeletePopUp = true },
-                            tint = MaterialTheme.colorScheme.secondary
-                        )
+                        Row {
+                            Icon(
+                                imageVector = Icons.Default.Edit, "",
+                                modifier = Modifier
+                                    .padding(top = 5.dp)
+                                    .clickable(
+                                        interactionSource = interactionSource,
+                                        indication = null
+                                    ) { showEditPopUp = true },
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
+
+                            Icon(
+                                imageVector = Icons.Default.Delete, "",
+                                modifier = Modifier
+                                    .padding(5.dp)
+                                    .clickable(
+                                        interactionSource = interactionSource,
+                                        indication = null
+                                    ) { showDeletePopUp = true },
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
+                        }
                     }
 
                     Text(

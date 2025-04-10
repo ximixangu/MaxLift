@@ -49,7 +49,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.maxlift.presentation.ui.feature.camera.CameraViewModel
-import com.maxlift.presentation.ui.feature.person.PersonViewModel
+import com.maxlift.presentation.ui.feature.person.list.PersonViewModel
 import com.maxlift.presentation.ui.feature.person.SelectPersonPopUp
 
 @Composable
@@ -203,9 +203,11 @@ fun ExerciseEditScreen(viewModel: CameraViewModel, navController: NavController)
                     disabledContainerColor = Color.Transparent
                 ),
                 onClick = {
-                    viewModel.saveCurrentExercise(context)
-                    navController.navigate("personInfo/$personId") {
-                        popUpTo("persons") { inclusive = false }
+                    if (navController.currentDestination?.route == "result") {
+                        viewModel.saveCurrentExercise(context)
+                        navController.navigate("personInfo/$personId") {
+                            popUpTo("persons") { inclusive = false }
+                        }
                     }
                 }
             ) {

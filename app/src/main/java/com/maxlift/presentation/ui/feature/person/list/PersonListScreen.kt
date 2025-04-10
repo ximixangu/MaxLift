@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.feature.person
+package com.maxlift.presentation.ui.feature.person.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.maxlift.domain.model.Person
 import com.maxlift.presentation.ui.common.IconTextButton
+import com.maxlift.presentation.ui.feature.person.PersonCardItem
 
 @Composable
 fun PersonListScreen(personViewModel: PersonViewModel, navController: NavController) {

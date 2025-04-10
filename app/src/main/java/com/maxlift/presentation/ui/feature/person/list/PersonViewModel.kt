@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.feature.person
+package com.maxlift.presentation.ui.feature.person.list
 
 import android.content.Context
 import androidx.lifecycle.LiveData

@@ -32,9 +32,9 @@ import com.maxlift.presentation.ui.common.MyScaffold
 import com.maxlift.presentation.ui.feature.camera.CameraViewModel
 import com.maxlift.presentation.ui.feature.camera.MLKitObjectDetectionScreen
 import com.maxlift.presentation.ui.feature.exercise.ExerciseEditScreen
-import com.maxlift.presentation.ui.feature.exercise.ExerciseScreen
-import com.maxlift.presentation.ui.feature.person.PersonListScreen
-import com.maxlift.presentation.ui.feature.person.PersonViewModel
+import com.maxlift.presentation.ui.feature.exercise.info.ExerciseScreen
+import com.maxlift.presentation.ui.feature.person.list.PersonListScreen
+import com.maxlift.presentation.ui.feature.person.list.PersonViewModel
 import com.maxlift.presentation.ui.feature.person.info.PersonInfoScreen
 
 class MainActivity : ComponentActivity() {

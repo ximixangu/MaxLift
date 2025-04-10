@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.maxlift.presentation.ui.feature.person.list.PersonViewModel
 
 @Composable
 fun SelectPersonPopUp(

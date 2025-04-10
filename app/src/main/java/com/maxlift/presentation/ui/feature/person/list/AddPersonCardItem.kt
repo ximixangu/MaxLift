@@ -1,4 +1,4 @@
-package com.maxlift.presentation.ui.feature.person
+package com.maxlift.presentation.ui.feature.person.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
