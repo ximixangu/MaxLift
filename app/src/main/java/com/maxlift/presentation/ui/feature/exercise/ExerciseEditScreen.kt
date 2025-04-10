@@ -236,7 +236,7 @@ fun EditableTextField(
         onValueChange = onValueChange,
         label = { Text(label) },
         modifier = Modifier
-            .fillMaxWidth(0.8f)
+            .fillMaxWidth()
             .border(
                 width = 2.dp,
                 color = MaterialTheme.colorScheme.primaryContainer,

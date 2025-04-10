@@ -41,7 +41,7 @@ fun EditExercisePopUp(
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = MaterialTheme.colorScheme.background,
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(8.dp),
             shadowElevation = 10.dp
         ) {
             Column(
@@ -60,11 +60,10 @@ fun EditExercisePopUp(
                     value = title ?: "",
                     onValueChange = {
                         title = it
-                        exercise.title = it
                     },
                     label = "Title",
                     keyboardType = KeyboardType.Text,
-                    maxLines = 1,
+                    maxLines = 2,
                     focusManager = focusManager,
                     keyboardController = keyboardController
                 )
@@ -73,11 +72,10 @@ fun EditExercisePopUp(
                     value = description ?: "",
                     onValueChange = {
                         description = it
-                        exercise.description = it
                     },
                     label = "Description",
                     keyboardType = KeyboardType.Text,
-                    maxLines = 1,
+                    maxLines = 5,
                     focusManager = focusManager,
                     keyboardController = keyboardController
                 )
@@ -92,6 +90,8 @@ fun EditExercisePopUp(
 
                     Button(
                         onClick = {
+                            exercise.title = title
+                            exercise.description = description
                             onEdit(exercise)
                             onDismiss()
                         }

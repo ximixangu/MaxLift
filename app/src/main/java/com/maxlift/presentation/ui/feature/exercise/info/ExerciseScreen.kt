@@ -83,17 +83,22 @@ fun ExerciseScreen(id: Int, navController: NavController) {
 
                     Row(
                         Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         if (exercise!!.title != null && exercise!!.title!!.isNotBlank()) {
                             Text(
                                 text = exercise!!.title!!,
                                 style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.weight(1f).padding(end = 1.dp),
+                                maxLines = 2
                             )
                         } else {
                             Text(
                                 text = exercise!!.type,
                                 style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.weight(1f),
+                                maxLines = 2
                             )
                         }
 
@@ -101,7 +106,7 @@ fun ExerciseScreen(id: Int, navController: NavController) {
                             Icon(
                                 imageVector = Icons.Default.Edit, "",
                                 modifier = Modifier
-                                    .padding(top = 5.dp)
+                                    .padding()
                                     .clickable(
                                         interactionSource = interactionSource,
                                         indication = null
@@ -112,7 +117,7 @@ fun ExerciseScreen(id: Int, navController: NavController) {
                             Icon(
                                 imageVector = Icons.Default.Delete, "",
                                 modifier = Modifier
-                                    .padding(5.dp)
+                                    .padding(start = 5.dp)
                                     .clickable(
                                         interactionSource = interactionSource,
                                         indication = null
@@ -139,6 +144,18 @@ fun ExerciseScreen(id: Int, navController: NavController) {
                     }
 
                     Spacer(Modifier.size(16.dp))
+
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "${exercise!!.type} ${exercise!!.weight.toInt()}kg x ${exercise!!.times.size}",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
+
+                    Spacer(Modifier.size(10.dp))
 
                     CustomBarChart(exercise!!.times.map { it.toInt() })
 
