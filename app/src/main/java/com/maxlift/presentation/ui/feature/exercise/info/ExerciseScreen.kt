@@ -126,7 +126,7 @@ fun ExerciseScreen(id: Int, exerciseViewModel: ExerciseViewModel, navController:
                     }
 
                     Text(
-                        text = "${exercise!!.type} " + formatDate(exercise!!.date),
+                        text = formatDate(exercise!!.date),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )

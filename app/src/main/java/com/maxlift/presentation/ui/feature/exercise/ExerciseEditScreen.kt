@@ -111,7 +111,11 @@ fun ExerciseEditScreen(viewModel: CameraViewModel, personViewModel: PersonViewMo
                     },
                     label = "Person",
                     popupContent = { onDismiss, onSelect ->
-                        SelectPersonPopUp(onDismiss = onDismiss, onSelect = onSelect)
+                        SelectPersonPopUp(
+                            onDismiss = onDismiss,
+                            personViewModel = personViewModel,
+                            onSelect = onSelect
+                        )
                     }
                 )
             }

@@ -94,7 +94,7 @@ fun MyApp() {
                 popEnterTransition = { slideInVertically { -it } },
                 popExitTransition = { slideOutVertically { it } },
             ) {
-                MLKitObjectDetectionScreen(sharedViewModel, navController)
+                MLKitObjectDetectionScreen(sharedViewModel, personViewModel, navController)
             }
             composable(
                 route = "personInfo/{id}",

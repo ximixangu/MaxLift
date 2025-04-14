@@ -60,6 +60,7 @@ import com.maxlift.presentation.ui.feature.exercise.SelectTypePopUp
 import com.maxlift.presentation.ui.feature.exercise.SelectWeightPopUp
 import com.maxlift.presentation.ui.feature.exercise.blendColors
 import com.maxlift.presentation.ui.feature.person.SelectPersonPopUp
+import com.maxlift.presentation.ui.feature.person.list.PersonViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -71,7 +72,7 @@ private var offsetX: Float = 0f
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
-fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavController) {
+fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: PersonViewModel, navController: NavController) {
     val context = LocalContext.current
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry.value?.destination?.route
@@ -243,7 +244,7 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, navController: NavCon
             }
 
             if (showPersonPopUp) {
-                SelectPersonPopUp(onDismiss = { showPersonPopUp = false }) { person ->
+                SelectPersonPopUp(personViewModel = personViewModel, onDismiss = { showPersonPopUp = false }) { person ->
                     sharedPreferences.edit().putInt("person", person.toInt()).apply()
                 }
             }

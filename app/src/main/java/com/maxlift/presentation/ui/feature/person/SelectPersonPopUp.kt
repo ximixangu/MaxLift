@@ -32,14 +32,14 @@ import com.maxlift.presentation.ui.feature.person.list.PersonViewModel
 
 @Composable
 fun SelectPersonPopUp(
+    personViewModel: PersonViewModel,
     onDismiss: () -> Unit,
     onSelect: (String) -> Unit
 ) {
-    val personViewModel = PersonViewModel()
     val context = LocalContext.current
     val personList by personViewModel.personListState.observeAsState(null)
 
-    LaunchedEffect(personList) {
+    LaunchedEffect(Unit) {
         personViewModel.fetchAllPersons(context)
     }
 
