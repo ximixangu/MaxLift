@@ -4,15 +4,15 @@ import com.maxlift.domain.model.Exercise
 import com.maxlift.domain.model.Person
 
 interface IMyRepository {
-    fun fetchExerciseById(id: Int): Exercise?
-    fun fetchExercisesByPersonId(personId: Int): List<Exercise>?
-    fun fetchExercisesByPersonIdAndTitle(personId: Int, title: String): List<Exercise>?
-    fun fetchPersonById(personId: Int): Person?
-    fun fetchAllPersons(): List<Person>
-    fun savePerson(person: Person)
-    fun saveExercise(exercise: Exercise)
-    fun updatePerson(person: Person)
-    fun updateExercise(exercise: Exercise)
-    fun deleteExerciseById(id: Int)
-    fun deletePersonById(id: Int)
+    suspend fun fetchExerciseById(id: Int): Exercise?
+    suspend fun fetchExercisesByPersonId(personId: Int): List<Exercise>?
+    suspend fun fetchExercisesByPersonIdAndTitle(personId: Int, title: String): List<Exercise>?
+    suspend fun fetchPersonById(personId: Int): Person?
+    suspend fun fetchAllPersons(): List<Person>
+    suspend fun savePerson(person: Person)
+    suspend fun saveExercise(exercise: Exercise)
+    suspend fun updatePerson(person: Person)
+    suspend fun updateExercise(exercise: Exercise)
+    suspend fun deleteExerciseById(id: Int)
+    suspend fun deletePersonById(id: Int)
 }

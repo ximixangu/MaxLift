@@ -9,62 +9,79 @@ import com.maxlift.data.model.database.toPersonDomain
 import com.maxlift.domain.model.Exercise
 import com.maxlift.domain.model.Person
 import com.maxlift.domain.repository.IMyRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: PersonDao): IMyRepository {
-    override fun fetchExerciseById(id: Int): Exercise? {
-        val exercise = exerciseDao.getExerciseById(id)
-        return exercise?.toExerciseDomain()
-    }
-
-    override fun fetchExercisesByPersonId(personId: Int): List<Exercise> {
-        val exerciseList = exerciseDao.getExercisesByPerson(personId).map {
-            it.toExerciseDomain()
-        }
-        return exerciseList
-    }
-
-    override fun fetchExercisesByPersonIdAndTitle(personId: Int, title: String): List<Exercise> {
-        val exerciseList = exerciseDao.getExercisesByPersonAndTitle(personId, title).map {
-            it.toExerciseDomain()
-        }
-        return exerciseList
-    }
-
-    override fun fetchPersonById(personId: Int): Person? {
-        val person = personDao.getPersonById(personId)
-        return person?.toPersonDomain()
-    }
-
-    override fun fetchAllPersons(): List<Person> {
-        val personList = personDao.getAll()
-
-        return personList.map {
-            it.toPersonDomain()
+    override suspend fun fetchExerciseById(id: Int): Exercise? {
+        return withContext(Dispatchers.IO) {
+            exerciseDao.getExerciseById(id)?.toExerciseDomain()
         }
     }
 
-    override fun savePerson(person: Person) {
-        personDao.save(PersonEntity.fromPersonDomain(person))
+    override suspend fun fetchExercisesByPersonId(personId: Int): List<Exercise> {
+        return withContext(Dispatchers.IO) {
+            exerciseDao.getExercisesByPerson(personId).map {
+                it.toExerciseDomain()
+            }
+        }
     }
 
-    override fun saveExercise(exercise: Exercise) {
-        exerciseDao.save(ExerciseEntity.fromExerciseDomain(exercise))
-        println("Saved $exercise")
+    override suspend fun fetchExercisesByPersonIdAndTitle(personId: Int, title: String): List<Exercise> {
+        return withContext(Dispatchers.IO) {
+            exerciseDao.getExercisesByPersonAndTitle(personId, title).map {
+                it.toExerciseDomain()
+            }
+        }
     }
 
-    override fun updatePerson(person: Person) {
-        personDao.update(PersonEntity.fromPersonDomain(person))
+    override suspend fun fetchPersonById(personId: Int): Person? {
+        return withContext(Dispatchers.IO) {
+            personDao.getPersonById(personId)?.toPersonDomain()
+        }
     }
 
-    override fun updateExercise(exercise: Exercise) {
-        exerciseDao.update(ExerciseEntity.fromExerciseDomain(exercise))
+    override suspend fun fetchAllPersons(): List<Person> {
+        return withContext(Dispatchers.IO) {
+            personDao.getAll().map {
+                it.toPersonDomain()
+            }
+        }
     }
 
-    override fun deleteExerciseById(id: Int) {
-        exerciseDao.delete(id)
+    override suspend fun savePerson(person: Person) {
+        withContext(Dispatchers.IO) {
+            personDao.save(PersonEntity.fromPersonDomain(person))
+        }
     }
 
-    override fun deletePersonById(id: Int) {
-        personDao.delete(id)
+    override suspend fun saveExercise(exercise: Exercise) {
+        withContext(Dispatchers.IO) {
+            exerciseDao.save(ExerciseEntity.fromExerciseDomain(exercise))
+        }
+    }
+
+    override suspend fun updatePerson(person: Person) {
+        withContext(Dispatchers.IO) {
+            personDao.update(PersonEntity.fromPersonDomain(person))
+        }
+    }
+
+    override suspend fun updateExercise(exercise: Exercise) {
+        withContext(Dispatchers.IO) {
+            exerciseDao.update(ExerciseEntity.fromExerciseDomain(exercise))
+        }
+    }
+
+    override suspend fun deleteExerciseById(id: Int) {
+        withContext(Dispatchers.IO) {
+            exerciseDao.delete(id)
+        }
+    }
+
+    override suspend fun deletePersonById(id: Int) {
+        withContext(Dispatchers.IO) {
+            personDao.delete(id)
+        }
     }
 }

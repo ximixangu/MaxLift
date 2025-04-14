@@ -4,19 +4,15 @@ import android.content.Context
 import com.maxlift.data.datasource.database.AppDatabase
 import com.maxlift.data.repository.MyRepository
 import com.maxlift.domain.model.Person
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class FetchPersonUseCase {
     companion object {
         suspend fun execute(context: Context, id: Int): Person? {
-            return withContext(Dispatchers.IO) {
-                val database = AppDatabase.getDatabase(context)
-                MyRepository(
-                    database.exerciseDataSource(),
-                    database.personDataSource()
-                ).fetchPersonById(id)
-            }
+            val database = AppDatabase.getDatabase(context)
+            return MyRepository(
+                database.exerciseDataSource(),
+                database.personDataSource()
+            ).fetchPersonById(id)
         }
     }
 }
