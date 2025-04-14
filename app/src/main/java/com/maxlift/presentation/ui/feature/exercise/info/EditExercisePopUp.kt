@@ -17,13 +17,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.maxlift.domain.model.Exercise
-import com.maxlift.presentation.ui.feature.exercise.EditableTextField
+import com.maxlift.presentation.ui.common.EditableTextField
 
 @Composable
 fun EditExercisePopUp(
@@ -33,9 +31,6 @@ fun EditExercisePopUp(
 ) {
     var title by remember { mutableStateOf(exercise.title) }
     var description by remember { mutableStateOf(exercise.description) }
-
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Surface(
@@ -63,9 +58,7 @@ fun EditExercisePopUp(
                     },
                     label = "Title",
                     keyboardType = KeyboardType.Text,
-                    maxLines = 2,
-                    focusManager = focusManager,
-                    keyboardController = keyboardController
+                    maxLines = 2
                 )
 
                 EditableTextField(
@@ -75,9 +68,7 @@ fun EditExercisePopUp(
                     },
                     label = "Description",
                     keyboardType = KeyboardType.Text,
-                    maxLines = 5,
-                    focusManager = focusManager,
-                    keyboardController = keyboardController
+                    maxLines = 5
                 )
 
                 Row(

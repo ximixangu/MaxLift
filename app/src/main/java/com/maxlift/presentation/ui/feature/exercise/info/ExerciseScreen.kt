@@ -31,16 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.maxlift.presentation.ui.feature.exercise.CustomBarChart
 import com.maxlift.presentation.ui.feature.exercise.ExerciseViewModel
 import com.maxlift.presentation.ui.feature.exercise.formatDate
 
 @Composable
-fun ExerciseScreen(id: Int, navController: NavController) {
+fun ExerciseScreen(id: Int, exerciseViewModel: ExerciseViewModel, navController: NavController) {
     val context = LocalContext.current
-    val exerciseViewModel: ExerciseViewModel = viewModel()
     val exercise by exerciseViewModel.exercise.observeAsState()
     var showDeletePopUp by remember { mutableStateOf(false) }
     var showEditPopUp by remember { mutableStateOf(false) }

@@ -22,17 +22,16 @@ import androidx.navigation.NavController
 import com.maxlift.presentation.ui.feature.exercise.ExerciseCardItem
 
 @Composable
-fun PersonInfoScreen(personId: Int, navController: NavController) {
+fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, navController: NavController) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val personInfoViewModel = PersonInfoViewModel()
     val person by personInfoViewModel.personState.observeAsState()
     val exerciseList by personInfoViewModel.exerciseListState.observeAsState()
     val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
 
     sharedPreferences.edit().putInt("person", personId).apply()
 
-    LaunchedEffect(person) {
+    LaunchedEffect(Unit) {
         personInfoViewModel.fetchPersonAndExercises(context, personId)
     }
 

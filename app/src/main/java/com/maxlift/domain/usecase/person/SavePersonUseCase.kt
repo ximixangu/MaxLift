@@ -7,7 +7,7 @@ import com.maxlift.domain.model.Person
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class SavePersonUseCase {
+class SavePersonUseCase{
     companion object {
         suspend fun execute(context: Context, person: Person) {
             withContext(Dispatchers.IO) {

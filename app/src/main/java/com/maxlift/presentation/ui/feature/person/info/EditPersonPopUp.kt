@@ -17,13 +17,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.maxlift.domain.model.Person
-import com.maxlift.presentation.ui.feature.exercise.EditableTextField
+import com.maxlift.presentation.ui.common.EditableTextField
 
 @Composable
 fun EditPeronPopUp(
@@ -32,8 +30,6 @@ fun EditPeronPopUp(
     onEdit: (Person) -> Unit,
 ) {
     var name by remember { mutableStateOf(person.name) }
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Surface(
@@ -61,9 +57,7 @@ fun EditPeronPopUp(
                     },
                     label = "Name",
                     keyboardType = KeyboardType.Text,
-                    maxLines = 1,
-                    focusManager = focusManager,
-                    keyboardController = keyboardController
+                    maxLines = 1
                 )
 
                 Row(

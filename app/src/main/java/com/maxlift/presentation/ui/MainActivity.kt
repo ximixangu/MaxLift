@@ -32,10 +32,12 @@ import com.maxlift.presentation.ui.common.MyScaffold
 import com.maxlift.presentation.ui.feature.camera.CameraViewModel
 import com.maxlift.presentation.ui.feature.camera.MLKitObjectDetectionScreen
 import com.maxlift.presentation.ui.feature.exercise.ExerciseEditScreen
+import com.maxlift.presentation.ui.feature.exercise.ExerciseViewModel
 import com.maxlift.presentation.ui.feature.exercise.info.ExerciseScreen
+import com.maxlift.presentation.ui.feature.person.info.PersonInfoScreen
+import com.maxlift.presentation.ui.feature.person.info.PersonInfoViewModel
 import com.maxlift.presentation.ui.feature.person.list.PersonListScreen
 import com.maxlift.presentation.ui.feature.person.list.PersonViewModel
-import com.maxlift.presentation.ui.feature.person.info.PersonInfoScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +45,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApp()
+        }
+        if(permissionDenied(this)) {
+            doPermissionRequest(this, packageName)
         }
     }
 
@@ -57,10 +62,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp() {
     val navController = rememberNavController()
+
     val sharedViewModel: CameraViewModel = viewModel(
         viewModelStoreOwner = LocalViewModelStoreOwner.current ?:
         error("No ViewModelStoreOwner found")
     )
+    val personViewModel: PersonViewModel = viewModel()
+    val personInfoViewModel: PersonInfoViewModel = viewModel()
+    val exerciseViewModel: ExerciseViewModel = viewModel()
 
     MyScaffold(navController) { innerPadding ->
         NavHost(
@@ -68,8 +77,16 @@ fun MyApp() {
             startDestination = "persons",
             modifier = Modifier.padding(innerPadding),
         ) {
-            composable("persons") { PersonListScreen(PersonViewModel(), navController) }
-            composable("result") { ExerciseEditScreen(sharedViewModel, navController) }
+            composable("persons") { PersonListScreen(personViewModel, navController) }
+            composable(
+                route = "result",
+                enterTransition = { slideInVertically { it } },
+                exitTransition = { slideOutVertically { -it } },
+                popEnterTransition = { slideInVertically { -it } },
+                popExitTransition = { slideOutVertically { it } },
+            ) {
+                ExerciseEditScreen(sharedViewModel, personViewModel, navController)
+            }
             composable(
                 route = "mlkit",
                 enterTransition = { slideInVertically { it } },
@@ -87,7 +104,7 @@ fun MyApp() {
                 popEnterTransition = { slideInHorizontally { -it } },
                 popExitTransition = { slideOutHorizontally { it } },
             ) { entry ->
-                PersonInfoScreen(personId = entry.arguments?.getInt("id") ?: 0, navController)
+                PersonInfoScreen(personId = entry.arguments?.getInt("id") ?: 0, personInfoViewModel, navController)
             }
             composable(
                 route = "exerciseInfo/{id}",
@@ -97,7 +114,7 @@ fun MyApp() {
                 popEnterTransition = { slideInHorizontally { -it } },
                 popExitTransition = { slideOutHorizontally { it } },
             ) { entry ->
-                ExerciseScreen(id = entry.arguments?.getInt("id") ?: 0, navController)
+                ExerciseScreen(id = entry.arguments?.getInt("id") ?: 0, exerciseViewModel, navController)
             }
         }
     }
