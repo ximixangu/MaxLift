@@ -2,7 +2,6 @@ package com.maxlift.presentation.ui.feature.exercise
 
 import android.graphics.Rect
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -71,10 +70,13 @@ fun CustomBarChart(
                     .fillMaxSize()
                     .padding(vertical = 10.dp)
                     .pointerInput(Unit) {
-                        detectTapGestures(
-                            onPress = { offset ->
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                val position = event.changes.firstOrNull()?.position ?: continue
+
                                 rectBounds.forEachIndexed { index, rect ->
-                                    if (offset.x >= rect.left && offset.x <= rect.right) {
+                                    if (position.x >= rect.left && position.x <= rect.right) {
                                         pressedBarIndex = index
                                         textOffset =
                                             IntOffset(
@@ -82,16 +84,16 @@ fun CustomBarChart(
                                                 y = (-10.dp.toPx()).toInt()
                                             )
                                         lineHeight = rect.top
-
-                                        try {
-                                            awaitRelease()
-                                        } finally {
-                                            pressedBarIndex = null
-                                        }
                                     }
                                 }
+
+                                if (rectBounds.none { rect ->
+                                        position.x >= rect.left && position.x <= rect.right
+                                    }) {
+                                    pressedBarIndex = null
+                                }
                             }
-                        )
+                        }
                     }
             ) {
                 val referenceLineCount = 5
