@@ -4,15 +4,21 @@ import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +34,9 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
     val person by personInfoViewModel.personState.observeAsState()
     val exerciseList by personInfoViewModel.exerciseListState.observeAsState()
     val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+
+    var upper by remember { mutableIntStateOf(500) }
+    var lower by remember { mutableIntStateOf(0) }
 
     sharedPreferences.edit().putInt("person", personId).apply()
 
@@ -59,24 +68,48 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
                     personInfoViewModel.fetchExercisesByPersonAndTitle(context, personId, it)
                 }
 
-                Box(
-                    Modifier.fillMaxSize().weight(1f),
-                    contentAlignment = Alignment.Center
-                ){
-                    if (exerciseList != null) {
-                        LazyColumn(
-                            Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            item { Spacer(Modifier.size(3.dp)) }
-                            exerciseList?.let {
-                                items(it.size) { index ->
-                                    val exercise = it[index]
-                                    ExerciseCardItem(exercise) {
-                                        if (navController.currentDestination?.route?.contains("personInfo") == true) {
-                                            keyboardController?.hide()
-                                            navController.navigate("exerciseInfo/${exercise.id}")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Spacer(Modifier.fillMaxWidth(0.05f))
+                    FilterButton(
+                        text = "Weight",
+                        appendableText = "kg",
+                        onFilter = { low, upp ->
+                            lower = low
+                            upper = upp
+                        }
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    FilterButton(
+                        text = "Repetitions",
+                        appendableText = "reps",
+                        onFilter = { low, upp ->
+                            lower = low
+                            upper = upp
+                        }
+                    )
+                }
+
+                Surface(modifier = Modifier.wrapContentSize(), shadowElevation = 5.dp) {
+                    Box(
+                        Modifier.fillMaxSize().weight(1f),
+                        contentAlignment = Alignment.Center,
+                    ){
+                        if (exerciseList != null) {
+                            LazyColumn(
+                                Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                exerciseList?.let {
+                                    items(it.size) { index ->
+                                        val exercise = it[index]
+                                        ExerciseCardItem(exercise) {
+                                            if (navController.currentDestination?.route?.contains("personInfo") == true) {
+                                                keyboardController?.hide()
+                                                navController.navigate("exerciseInfo/${exercise.id}")
+                                            }
                                         }
                                     }
                                 }

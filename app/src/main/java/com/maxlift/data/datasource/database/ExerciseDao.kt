@@ -23,12 +23,30 @@ interface ExerciseDao {
     @Query("SELECT * FROM exercise WHERE personId = :personId ORDER BY id DESC")
     fun getExercisesByPerson(personId: Int): List<ExerciseEntity>
 
-    @Query(
-        "SELECT * FROM exercise WHERE personId = :personId " +
-        "AND (title LIKE '%' || :title || '%' OR type LIKE '%' || :title || '%') " +
-        "ORDER BY id DESC"
-    )
+    @Query("""
+        SELECT * FROM exercise WHERE personId = :personId
+        AND (title LIKE '%' || :title || '%' OR type LIKE '%' || :title || '%')
+        ORDER BY id DESC 
+    """)
     fun getExercisesByPersonAndTitle(personId: Int, title: String): List<ExerciseEntity>
+
+    @Query("""
+        SELECT * FROM exercise WHERE
+        (:personId IS NULL OR personId = :personId) AND
+        (:title IS NULL OR title LIKE '%' || :title || '%' OR type LIKE '%' || :title || '%') AND
+        (:minWeight IS NULL OR weight >= :minWeight) AND
+        (:maxWeight IS NULL OR weight <= :maxWeight) AND
+        (:minRepetitions IS NULL OR numberOfReps >= :minRepetitions) AND
+        (:maxRepetitions IS NULL OR numberOfReps <= :maxRepetitions)
+    """)
+    fun searchQueryExercises(
+        personId: Int?,
+        title: String?,
+        minWeight: Float? = null,
+        maxWeight: Float? = null,
+        minRepetitions: Int? = null,
+        maxRepetitions: Int? = null,
+    ): List<ExerciseEntity>
 
     @Query("SELECT * FROM exercise ORDER BY date DESC")
     fun getAllExercises(): List<ExerciseEntity>
