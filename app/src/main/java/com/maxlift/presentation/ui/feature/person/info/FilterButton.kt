@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -97,14 +98,27 @@ fun FilterButton(
                             onValueChange = { currentUpper = it },
                             keyboardType = KeyboardType.Number
                         )
-                        Button(
-                            onClick = {
-                                onFilter(currentLower.toIntOrNull(), currentUpper.toIntOrNull())
-                                showDialog = false
-                            },
-                            content = { Text("OK") },
-                            modifier = Modifier.align(Alignment.End)
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ){
+                            Button(
+                                onClick = {
+                                    currentLower = ""
+                                    currentUpper = ""
+                                    onFilter(currentLower.toIntOrNull(), currentUpper.toIntOrNull())
+                                    showDialog = false
+                                },
+                                content = { Text("Reset") },
+                            )
+                            Button(
+                                onClick = {
+                                    onFilter(currentLower.toIntOrNull(), currentUpper.toIntOrNull())
+                                    showDialog = false
+                                },
+                                content = { Text("OK") },
+                            )
+                        }
                     }
                 }
             }
