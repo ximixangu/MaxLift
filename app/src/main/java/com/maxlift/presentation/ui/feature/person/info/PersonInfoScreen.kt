@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -112,7 +115,7 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
                         Modifier.fillMaxSize().weight(1f),
                         contentAlignment = Alignment.Center,
                     ){
-                        if (exerciseList != null) {
+                        if (exerciseList != null && exerciseList!!.isNotEmpty()) {
                             LazyColumn(
                                 Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -130,6 +133,15 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
                                     }
                                 }
                             }
+                        } else {
+                            Text(
+                                text = "No Exercises Registered",
+                                style = MaterialTheme.typography.labelMedium,
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .align(Alignment.TopCenter),
+                                color = MaterialTheme.colorScheme.secondary
+                            )
                         }
                     }
                 }
