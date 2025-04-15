@@ -27,11 +27,23 @@ class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: 
         }
     }
 
-    override suspend fun fetchExercisesByPersonIdAndTitle(personId: Int, title: String): List<Exercise> {
+    override suspend fun fetchExercisesByPersonWithFilters(
+        personId: Int,
+        title: String?,
+        minWeight: Int?,
+        maxWeight: Int?,
+        minReps: Int?,
+        maxReps: Int?
+    ): List<Exercise> {
         return withContext(Dispatchers.IO) {
-            exerciseDao.getExercisesByPersonAndTitle(personId, title).map {
-                it.toExerciseDomain()
-            }
+            exerciseDao.searchQueryExercises(
+                personId,
+                title,
+                minWeight?.toFloat(),
+                maxWeight?.toFloat(),
+                minReps,
+                maxReps
+            ).map { it.toExerciseDomain() }
         }
     }
 

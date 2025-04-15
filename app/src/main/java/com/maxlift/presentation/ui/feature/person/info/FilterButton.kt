@@ -29,7 +29,7 @@ import com.maxlift.presentation.ui.common.EditableTextField
 fun FilterButton(
     text: String,
     appendableText: String?,
-    onFilter: (Int, Int) -> Unit,
+    onFilter: (Int?, Int?) -> Unit,
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var currentLower: String by remember { mutableStateOf("") }
@@ -63,7 +63,10 @@ fun FilterButton(
 
         if (showDialog) {
             Dialog(
-                onDismissRequest = { showDialog = false }
+                onDismissRequest = {
+                    showDialog = false
+                    onFilter(currentLower.toIntOrNull(), currentUpper.toIntOrNull())
+                }
             ) {
                 Surface(
                     shape = RoundedCornerShape(8.dp),
@@ -95,7 +98,10 @@ fun FilterButton(
                             keyboardType = KeyboardType.Number
                         )
                         Button(
-                            onClick = { showDialog = false },
+                            onClick = {
+                                onFilter(currentLower.toIntOrNull(), currentUpper.toIntOrNull())
+                                showDialog = false
+                            },
                             content = { Text("OK") },
                             modifier = Modifier.align(Alignment.End)
                         )

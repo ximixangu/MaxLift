@@ -17,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -35,13 +36,28 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
     val exerciseList by personInfoViewModel.exerciseListState.observeAsState()
     val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
 
-    var upper by remember { mutableIntStateOf(500) }
-    var lower by remember { mutableIntStateOf(0) }
+    var minWeight by remember { mutableIntStateOf(0) }
+    var maxWeight by remember { mutableIntStateOf(Int.MAX_VALUE) }
+    var minReps by remember { mutableIntStateOf(0) }
+    var maxReps by remember { mutableIntStateOf(Int.MAX_VALUE) }
+    var title by remember { mutableStateOf("") }
 
     sharedPreferences.edit().putInt("person", personId).apply()
 
     LaunchedEffect(Unit) {
         personInfoViewModel.fetchPersonAndExercises(context, personId)
+    }
+
+    LaunchedEffect(title, minReps, maxReps, minWeight, maxWeight) {
+        personInfoViewModel.fetchExercisesSearch(
+            id = personId,
+            context = context,
+            title = title,
+            minReps = minReps,
+            maxReps = maxReps,
+            maxWeight = maxWeight,
+            minWeight = minWeight
+        )
     }
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -65,7 +81,7 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
                 Spacer(Modifier.size(11.dp))
 
                 SearchBar {
-                    personInfoViewModel.fetchExercisesByPersonAndTitle(context, personId, it)
+                    title = it
                 }
 
                 Row(
@@ -75,18 +91,18 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
                     FilterButton(
                         text = "Weight",
                         appendableText = "kg",
-                        onFilter = { low, upp ->
-                            lower = low
-                            upper = upp
+                        onFilter = { lower, upper ->
+                            minWeight = lower ?: 0
+                            maxWeight = upper ?: Int.MAX_VALUE
                         }
                     )
                     Spacer(Modifier.size(8.dp))
                     FilterButton(
                         text = "Repetitions",
                         appendableText = "reps",
-                        onFilter = { low, upp ->
-                            lower = low
-                            upper = upp
+                        onFilter = { lower, upper ->
+                            minReps = lower ?: 0
+                            maxReps = upper ?: Int.MAX_VALUE
                         }
                     )
                 }

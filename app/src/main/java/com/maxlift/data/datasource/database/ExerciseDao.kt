@@ -24,13 +24,6 @@ interface ExerciseDao {
     fun getExercisesByPerson(personId: Int): List<ExerciseEntity>
 
     @Query("""
-        SELECT * FROM exercise WHERE personId = :personId
-        AND (title LIKE '%' || :title || '%' OR type LIKE '%' || :title || '%')
-        ORDER BY id DESC 
-    """)
-    fun getExercisesByPersonAndTitle(personId: Int, title: String): List<ExerciseEntity>
-
-    @Query("""
         SELECT * FROM exercise WHERE
         (:personId IS NULL OR personId = :personId) AND
         (:title IS NULL OR title LIKE '%' || :title || '%' OR type LIKE '%' || :title || '%') AND

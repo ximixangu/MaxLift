@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.maxlift.domain.model.Exercise
 import com.maxlift.domain.model.Person
-import com.maxlift.domain.usecase.exercise.FetchExerciseByPersonAndTitleUseCase
 import com.maxlift.domain.usecase.exercise.FetchExercisesByPersonUseCase
+import com.maxlift.domain.usecase.exercise.FetchExercisesByPersonWithFiltersUseCase
 import com.maxlift.domain.usecase.person.DeletePersonUseCase
 import com.maxlift.domain.usecase.person.EditPersonUseCase
 import com.maxlift.domain.usecase.person.FetchPersonUseCase
@@ -46,18 +46,29 @@ class PersonInfoViewModel: ViewModel() {
         }
     }
 
-    fun fetchExercisesByPersonAndTitle(context: Context, id: Int, title: String) {
+    fun fetchExercisesSearch(
+        context: Context,
+        id: Int,
+        title: String?,
+        minWeight: Int?,
+        maxWeight: Int?,
+        minReps: Int?,
+        maxReps: Int?
+    ) {
         try {
             viewModelScope.launch {
-                _exerciseList.value = if (title.isEmpty()) {
-                    FetchExercisesByPersonUseCase.execute(context, id)
-                } else {
-                    FetchExerciseByPersonAndTitleUseCase.execute(context, id, title)
-                }
-
+                _exerciseList.value = FetchExercisesByPersonWithFiltersUseCase.execute(
+                    context,
+                    id,
+                    title,
+                    minWeight,
+                    maxWeight,
+                    minReps,
+                    maxReps
+                )
             }
         } catch (e: Exception) {
-            println("Error fetching exercises by person and title: ${e.message}")
+            println("Error fetching exercises with filters: ${e.message}")
         }
     }
 
