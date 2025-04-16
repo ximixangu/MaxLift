@@ -108,6 +108,8 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
                             maxReps = upper ?: Int.MAX_VALUE
                         }
                     )
+                    Spacer(Modifier.size(8.dp))
+                    DateRangeButton { l, l2 ->  }
                 }
 
                 Surface(modifier = Modifier.wrapContentSize(), shadowElevation = 5.dp) {

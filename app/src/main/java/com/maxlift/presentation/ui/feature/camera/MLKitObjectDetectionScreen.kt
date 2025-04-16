@@ -102,6 +102,7 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
     val objectDetector = ObjectDetection.getClient(options)
 
     LaunchedEffect(Unit) {
+        viewModel.resetBoundingBoxProcessing()
         val cameraProvider = getCameraProvider(context)
         val cameraSelector = CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build()
 
