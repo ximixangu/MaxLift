@@ -53,7 +53,9 @@ class PersonInfoViewModel: ViewModel() {
         minWeight: Int?,
         maxWeight: Int?,
         minReps: Int?,
-        maxReps: Int?
+        maxReps: Int?,
+        startDate: String?,
+        endDate: String?,
     ) {
         try {
             viewModelScope.launch {
@@ -64,7 +66,9 @@ class PersonInfoViewModel: ViewModel() {
                     minWeight,
                     maxWeight,
                     minReps,
-                    maxReps
+                    maxReps,
+                    if (startDate?.isEmpty() == true) null else startDate,
+                    if (endDate?.isEmpty() == true) null else endDate
                 )
             }
         } catch (e: Exception) {

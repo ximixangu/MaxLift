@@ -9,10 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -102,21 +102,21 @@ fun FilterButton(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ){
-                            Button(
+                            TextButton(
                                 onClick = {
                                     currentLower = ""
                                     currentUpper = ""
                                     onFilter(currentLower.toIntOrNull(), currentUpper.toIntOrNull())
                                     showDialog = false
                                 },
-                                content = { Text("Reset") },
+                                content = { Text("Reset", style = MaterialTheme.typography.titleMedium) },
                             )
-                            Button(
+                            TextButton(
                                 onClick = {
                                     onFilter(currentLower.toIntOrNull(), currentUpper.toIntOrNull())
                                     showDialog = false
                                 },
-                                content = { Text("OK") },
+                                content = { Text("OK", style = MaterialTheme.typography.titleMedium) },
                             )
                         }
                     }

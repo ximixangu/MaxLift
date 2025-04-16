@@ -54,7 +54,7 @@ fun DateRangeButton(
                 } else if (end == null) {
                     "${formatDate(Date(start!!))} or earlier"
                 } else {
-                    "${formatDate(Date(start!!))} to ${formatDate(Date(start!!))}"
+                    "${formatDate(Date(start!!))} to ${formatDate(Date(end!!))}"
                 },
                 style = MaterialTheme.typography.labelSmall,
             )

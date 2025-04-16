@@ -33,7 +33,9 @@ class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: 
         minWeight: Int?,
         maxWeight: Int?,
         minReps: Int?,
-        maxReps: Int?
+        maxReps: Int?,
+        startDate: String?,
+        endDate: String?,
     ): List<Exercise> {
         return withContext(Dispatchers.IO) {
             exerciseDao.searchQueryExercises(
@@ -42,7 +44,9 @@ class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: 
                 minWeight?.toFloat(),
                 maxWeight?.toFloat(),
                 minReps,
-                maxReps
+                maxReps,
+                startDate,
+                endDate,
             ).map { it.toExerciseDomain() }
         }
     }

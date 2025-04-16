@@ -15,6 +15,8 @@ class FetchExercisesByPersonWithFiltersUseCase {
             maxWeight: Int?,
             minReps: Int?,
             maxReps: Int?,
+            startDate: String?,
+            endDate: String?,
         ): List<Exercise> {
             val database = AppDatabase.getDatabase(context)
             return MyRepository(
@@ -26,7 +28,9 @@ class FetchExercisesByPersonWithFiltersUseCase {
                 minWeight,
                 maxWeight,
                 minReps,
-                maxReps
+                maxReps,
+                startDate,
+                endDate,
             )
         }
     }

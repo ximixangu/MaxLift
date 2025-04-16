@@ -30,7 +30,9 @@ interface ExerciseDao {
         (:minWeight IS NULL OR weight >= :minWeight) AND
         (:maxWeight IS NULL OR weight <= :maxWeight) AND
         (:minRepetitions IS NULL OR numberOfReps >= :minRepetitions) AND
-        (:maxRepetitions IS NULL OR numberOfReps <= :maxRepetitions)
+        (:maxRepetitions IS NULL OR numberOfReps <= :maxRepetitions) AND
+        (:startDate IS NULL OR date >= :startDate) AND
+        (:endDate IS NULL OR date <= :endDate)
     """)
     fun searchQueryExercises(
         personId: Int?,
@@ -39,6 +41,8 @@ interface ExerciseDao {
         maxWeight: Float? = null,
         minRepetitions: Int? = null,
         maxRepetitions: Int? = null,
+        startDate: String? = null,
+        endDate: String? = null,
     ): List<ExerciseEntity>
 
     @Query("SELECT * FROM exercise ORDER BY date DESC")

@@ -30,6 +30,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.maxlift.presentation.ui.feature.exercise.ExerciseCardItem
+import com.maxlift.presentation.ui.feature.exercise.formatDate
+import java.util.Date
 
 @Composable
 fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, navController: NavController) {
@@ -44,6 +46,8 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
     var minReps by remember { mutableIntStateOf(0) }
     var maxReps by remember { mutableIntStateOf(Int.MAX_VALUE) }
     var title by remember { mutableStateOf("") }
+    var startDate by remember { mutableStateOf("") }
+    var endDate by remember { mutableStateOf("") }
 
     sharedPreferences.edit().putInt("person", personId).apply()
 
@@ -51,7 +55,7 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
         personInfoViewModel.fetchPersonAndExercises(context, personId)
     }
 
-    LaunchedEffect(title, minReps, maxReps, minWeight, maxWeight) {
+    LaunchedEffect(title, minReps, maxReps, minWeight, maxWeight, startDate, endDate) {
         personInfoViewModel.fetchExercisesSearch(
             id = personId,
             context = context,
@@ -59,7 +63,9 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
             minReps = minReps,
             maxReps = maxReps,
             maxWeight = maxWeight,
-            minWeight = minWeight
+            minWeight = minWeight,
+            startDate = startDate,
+            endDate = endDate,
         )
     }
 
@@ -101,7 +107,7 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
                     )
                     Spacer(Modifier.size(8.dp))
                     FilterButton(
-                        text = "Repetitions",
+                        text = "Reps",
                         appendableText = "reps",
                         onFilter = { lower, upper ->
                             minReps = lower ?: 0
@@ -109,7 +115,10 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
                         }
                     )
                     Spacer(Modifier.size(8.dp))
-                    DateRangeButton { l, l2 ->  }
+                    DateRangeButton { start, end ->
+                        startDate = start?.let { formatDate(Date(it)) } ?: ""
+                        endDate = end?.let { formatDate(Date(it)) } ?: ""
+                    }
                 }
 
                 Surface(modifier = Modifier.wrapContentSize(), shadowElevation = 5.dp) {
