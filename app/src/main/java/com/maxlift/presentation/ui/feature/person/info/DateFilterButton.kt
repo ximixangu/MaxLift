@@ -50,9 +50,9 @@ fun DateRangeButton(
                 text = if (start == null && end == null) {
                     "Date"
                 } else if (start == null) {
-                    "${formatDate(Date(end!!))} or later"
+                    "${formatDate(Date(end!!))} or earlier"
                 } else if (end == null) {
-                    "${formatDate(Date(start!!))} or earlier"
+                    "${formatDate(Date(start!!))} or later"
                 } else {
                     "${formatDate(Date(start!!))} to ${formatDate(Date(end!!))}"
                 },
@@ -93,11 +93,21 @@ fun DateRangePickerDialog(
             },
             dismissButton = {
                 TextButton(onClick = onDismiss) { Text("Cancel") }
-            }
+            },
         ) {
             DateRangePicker(
                 state = dateRangePickerState,
                 title = { Text("Select Date Range") },
+                headline = {
+                    var text = "Start Date - End Date"
+                    dateRangePickerState.selectedStartDateMillis?.let {
+                        text = text.replace("Start Date", formatDate(Date(it)))
+                    }
+                    dateRangePickerState.selectedEndDateMillis?.let {
+                        text = text.replace("End Date", formatDate(Date(it)))
+                    }
+                    Text(text)
+                },
                 showModeToggle = false,
                 modifier = Modifier
                     .fillMaxWidth()
