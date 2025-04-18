@@ -1,6 +1,8 @@
 package com.maxlift.presentation.ui.feature.person.info
 
 import android.content.Context
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,10 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -33,6 +37,7 @@ import com.maxlift.presentation.ui.feature.exercise.ExerciseCardItem
 import com.maxlift.presentation.ui.feature.exercise.formatDate
 import java.util.Date
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, navController: NavController) {
     val context = LocalContext.current
@@ -48,6 +53,7 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
     var title by remember { mutableStateOf("") }
     var startDate by remember { mutableStateOf("") }
     var endDate by remember { mutableStateOf("") }
+    var sortField by remember { mutableStateOf("") }
 
     sharedPreferences.edit().putInt("person", personId).apply()
 
@@ -55,7 +61,7 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
         personInfoViewModel.fetchPersonAndExercises(context, personId)
     }
 
-    LaunchedEffect(title, minReps, maxReps, minWeight, maxWeight, startDate, endDate) {
+    LaunchedEffect(title, minReps, maxReps, minWeight, maxWeight, startDate, endDate, sortField) {
         personInfoViewModel.fetchExercisesSearch(
             id = personId,
             context = context,
@@ -66,6 +72,7 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
             minWeight = minWeight,
             startDate = startDate,
             endDate = endDate,
+            sortField = sortField,
         )
     }
 
@@ -95,30 +102,54 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Spacer(Modifier.fillMaxWidth(0.05f))
-                    FilterButton(
-                        text = "Weight",
-                        appendableText = "kg",
-                        onFilter = { lower, upper ->
-                            minWeight = lower ?: 0
-                            maxWeight = upper ?: Int.MAX_VALUE
+
+                    CompositionLocalProvider(
+                        LocalOverscrollConfiguration provides null
+                    ) {
+                        LazyRow(
+                            modifier = Modifier.weight(1f),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            item {
+                                FilterButton(
+                                    text = "Weight",
+                                    appendableText = "kg",
+                                    onFilter = { lower, upper ->
+                                        minWeight = lower ?: 0
+                                        maxWeight = upper ?: Int.MAX_VALUE
+                                    }
+                                )
+                                Spacer(Modifier.size(8.dp))
+                            }
+                            item {
+                                FilterButton(
+                                    text = "Reps",
+                                    appendableText = "reps",
+                                    onFilter = { lower, upper ->
+                                        minReps = lower ?: 0
+                                        maxReps = upper ?: Int.MAX_VALUE
+                                    }
+                                )
+                                Spacer(Modifier.size(8.dp))
+                            }
+                            item {
+                                DateRangeButton { start, end ->
+                                    startDate = start?.let { formatDate(Date(it)) } ?: ""
+                                    endDate = end?.let { formatDate(Date(it)) } ?: ""
+                                }
+                            }
                         }
-                    )
-                    Spacer(Modifier.size(8.dp))
-                    FilterButton(
-                        text = "Reps",
-                        appendableText = "reps",
-                        onFilter = { lower, upper ->
-                            minReps = lower ?: 0
-                            maxReps = upper ?: Int.MAX_VALUE
-                        }
-                    )
-                    Spacer(Modifier.size(8.dp))
-                    DateRangeButton { start, end ->
-                        startDate = start?.let { formatDate(Date(it)) } ?: ""
-                        endDate = end?.let { formatDate(Date(it)) } ?: ""
                     }
+
+                    Box(contentAlignment = Alignment.CenterEnd) {
+                        SortButton { value ->
+                            sortField = value ?: ""
+                        }
+                    }
+                    Spacer(Modifier.fillMaxWidth(0.02f))
                 }
 
                 Surface(modifier = Modifier.wrapContentSize(), shadowElevation = 5.dp) {

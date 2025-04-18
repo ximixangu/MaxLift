@@ -36,6 +36,7 @@ class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: 
         maxReps: Int?,
         startDate: String?,
         endDate: String?,
+        sortField: String?,
     ): List<Exercise> {
         return withContext(Dispatchers.IO) {
             exerciseDao.searchQueryExercises(
@@ -47,6 +48,7 @@ class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: 
                 maxReps,
                 startDate,
                 endDate,
+                sortField,
             ).map { it.toExerciseDomain() }
         }
     }

@@ -33,6 +33,13 @@ interface ExerciseDao {
         (:maxRepetitions IS NULL OR numberOfReps <= :maxRepetitions) AND
         (:startDate IS NULL OR date >= :startDate) AND
         (:endDate IS NULL OR date <= :endDate)
+        ORDER BY CASE :sortField
+            WHEN 'weight' THEN weight
+            WHEN 'reps' THEN numberOfReps
+            WHEN 'type' THEN type
+            ELSE id
+        END
+        DESC
     """)
     fun searchQueryExercises(
         personId: Int?,
@@ -43,6 +50,7 @@ interface ExerciseDao {
         maxRepetitions: Int? = null,
         startDate: String? = null,
         endDate: String? = null,
+        sortField: String? = "id"
     ): List<ExerciseEntity>
 
     @Query("SELECT * FROM exercise ORDER BY date DESC")

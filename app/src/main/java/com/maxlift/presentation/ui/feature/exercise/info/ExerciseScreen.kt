@@ -148,7 +148,7 @@ fun ExerciseScreen(id: Int, exerciseViewModel: ExerciseViewModel, navController:
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "${exercise!!.type} ${exercise!!.weight.toInt()}kg x ${exercise!!.times.size}",
+                            text = "${exercise!!.type} ${exercise!!.times.size} x ${exercise!!.weight.toInt()}kg",
                             style = MaterialTheme.typography.titleMedium,
                         )
                     }

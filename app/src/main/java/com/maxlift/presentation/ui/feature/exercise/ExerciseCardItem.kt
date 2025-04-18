@@ -61,7 +61,7 @@ fun ExerciseCardItem(exercise: Exercise, onClick: () -> Unit) {
                     )
                     Spacer(Modifier.size(5.dp))
                     Text(
-                        text = "${exercise.weight.roundToInt()}kg x ${exercise.numberOfRepetitions}",
+                        text = "${exercise.numberOfRepetitions} x ${exercise.weight.roundToInt()}kg",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }

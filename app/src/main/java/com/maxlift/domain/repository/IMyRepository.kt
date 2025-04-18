@@ -15,6 +15,7 @@ interface IMyRepository {
         maxReps: Int?,
         startDate: String?,
         endDate: String?,
+        sortField: String?,
     ): List<Exercise>?
     suspend fun fetchPersonById(personId: Int): Person?
     suspend fun fetchAllPersons(): List<Person>

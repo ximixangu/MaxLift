@@ -56,6 +56,7 @@ class PersonInfoViewModel: ViewModel() {
         maxReps: Int?,
         startDate: String?,
         endDate: String?,
+        sortField: String?,
     ) {
         try {
             viewModelScope.launch {
@@ -68,7 +69,8 @@ class PersonInfoViewModel: ViewModel() {
                     minReps,
                     maxReps,
                     if (startDate?.isEmpty() == true) null else startDate,
-                    if (endDate?.isEmpty() == true) null else endDate
+                    if (endDate?.isEmpty() == true) null else endDate,
+                    sortField
                 )
             }
         } catch (e: Exception) {
