@@ -16,6 +16,7 @@ import androidx.camera.view.PreviewView
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -83,7 +86,9 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
     var timeColor by remember { mutableStateOf(Color.Green) }
     val times by viewModel.times.observeAsState(null)
 
-    val boundingBoxesStates = remember { mutableStateOf<List<RectF>>(emptyList()) }
+    var myDetectedObjects by remember { mutableStateOf<List<Pair<RectF, Int>>>(emptyList()) }
+
+    var selectedBoxId by remember { mutableIntStateOf(-1) }
     var cropRect by remember { mutableStateOf<Rect?>(null) }
 
     val previewView = remember { PreviewView(context).apply {
@@ -91,13 +96,15 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
         this.background = ColorDrawable(0)
     } }
 
+    println("${previewView.width}, ${previewView.height}")
+
     var showWeightPopUp by remember { mutableStateOf(false) }
     var showPersonPopUp by remember { mutableStateOf(false) }
     var showTypePopUp by remember { mutableStateOf(false) }
 
     val options = ObjectDetectorOptions.Builder()
         .setDetectorMode(ObjectDetectorOptions.STREAM_MODE)
-//        .enableMultipleObjects()
+        .enableMultipleObjects()
         .build()
     val objectDetector = ObjectDetection.getClient(options)
 
@@ -124,15 +131,20 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
 
                 objectDetector.process(image)
                     .addOnSuccessListener { detectedObjects ->
-                        val boxList = mutableListOf<RectF>()
-                        for (obj in detectedObjects.asReversed()) {
+                        val objects = mutableListOf<Pair<RectF, Int>>()
+
+                        for (obj in detectedObjects) {
                             // To detect only square-like objects ->
-//                            val ratio = obj.boundingBox.height().toFloat() / obj.boundingBox.width()
-//                            if(0.8 < ratio && ratio < 1.2) {
-                            boxList.add(RectF(obj.boundingBox))
-//                            }
+                            val ratio = obj.boundingBox.height().toFloat() / obj.boundingBox.width()
+                            if(0.5 < ratio && ratio < 1.5) {
+                                obj.trackingId?.let {
+                                    objects.add(Pair(RectF(obj.boundingBox), it))
+                                }
+                            }
                         }
-                        boundingBoxesStates.value = boxList
+
+                        myDetectedObjects = objects
+                        println(objects)
                     }
                     .addOnFailureListener { e ->
                         Log.e("Analyzer Error", e.message ?: "...")
@@ -152,9 +164,13 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
         )
     }
 
-    LaunchedEffect(boundingBoxesStates.value) {
-        if(isProcessingMovement && boundingBoxesStates.value.size == 1) {
-            sendToBackgroundProcessing(boundingBoxesStates.value[0], viewModel)
+    LaunchedEffect(myDetectedObjects) {
+        if(isProcessingMovement) {
+            for (obj in myDetectedObjects) {
+                if (obj.second == selectedBoxId) {
+                    sendToBackgroundProcessing(obj.first, viewModel)
+                }
+            }
         }
     }
 
@@ -175,9 +191,15 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
             Box(Modifier.fillMaxWidth().weight(1f)) {
                 AndroidView( { previewView } , Modifier.fillMaxWidth())
 
-                if(boundingBoxesStates.value.isNotEmpty()) {
-                    AltMultipleBoundingBoxOverlay(boundingBoxesStates.value, MaterialTheme.colorScheme.primary)
-                }
+                MultipleBoundingBoxOverlay(
+                    detectedObjects = myDetectedObjects,
+                    boxColor = MaterialTheme.colorScheme.primary,
+                    selectedId = selectedBoxId,
+                    onSelect = {
+                        selectedBoxId = it
+                        println(it)
+                    }
+                )
 
                 Text(
                     text = if(times?.isNotEmpty() == true)"${times?.last()} ms" else "",
@@ -216,7 +238,7 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
                     }
 
                     Box(Modifier.wrapContentSize().padding(vertical = 10.dp)) {
-                        Crossfade(targetState = isProcessingMovement || boundingBoxesStates.value.isNotEmpty()) { active ->
+                        Crossfade(targetState = isProcessingMovement || myDetectedObjects.isNotEmpty()) { active ->
                             if (active) {
                                 RecordButton {
                                     isProcessingMovement = !isProcessingMovement
@@ -260,25 +282,73 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
 }
 
 @Composable
-fun AltMultipleBoundingBoxOverlay(boundingBoxes: List<RectF>, color: Color) {
-    Canvas(Modifier.fillMaxSize()) {
-        for (boundingBox in boundingBoxes) {
-            val box = scaleBoundingBox(boundingBox)
+fun MultipleBoundingBoxOverlay(
+    detectedObjects: List<Pair<RectF, Int>>,
+    selectedId: Int,
+    onSelect: (Int) -> Unit,
+    boxColor: Color
+) {
+    Canvas(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = { offset ->
+                        detectedObjects.forEach { obj ->
+                            val scaledBox = scaleBoundingBox(obj.first)
+                            val left = maxOf(scaledBox.left - offsetX, 0f)
+                            val right = maxOf(scaledBox.right - offsetX, scaledBox.width())
+                            val centerX = (left + right) / 2
+                            val rect = RectF(
+                                centerX - 45,
+                                scaledBox.centerY() - 45,
+                                centerX - 45,
+                                scaledBox.centerY() + 45
+                            )
+
+                            if (rect.contains(offset.x, offset.y)) {
+                                onSelect(obj.second)
+                            }
+                        }
+                    }
+                )
+            }
+    ) {
+        for (obj in detectedObjects) {
+            val box = scaleBoundingBox(obj.first)
             val left = maxOf(box.left - offsetX, 0f)
             val right = maxOf(box.right - offsetX, box.width())
 
             val topLeft = Offset(left, box.top)
             val bottomRight = Offset(right, box.bottom)
+            val centerX = (left + right) / 2
 
-            drawRect(
-                color = color,
-                topLeft = topLeft,
-                size = Size(
-                    width = bottomRight.x - topLeft.x,
-                    height = bottomRight.y - topLeft.y
-                ),
-                alpha = 0.35f,
-            )
+            if (obj.second == selectedId) {
+                drawRect(
+                    color = boxColor,
+                    topLeft = topLeft,
+                    size = Size(
+                        width = bottomRight.x - topLeft.x,
+                        height = bottomRight.y - topLeft.y
+                    ),
+                    alpha = 0.35f,
+                )
+            } else {
+                drawCircle(
+                    color = boxColor,
+                    radius = 40f,
+                    center = Offset(centerX, box.centerY()),
+                )
+            }
+
+//            drawContext.canvas.nativeCanvas.apply {
+//                val paint = android.graphics.Paint().apply {
+//                    color = android.graphics.Color.BLACK
+//                    textAlign = android.graphics.Paint.Align.CENTER
+//                    textSize = 40f
+//                }
+//                drawText(obj.second.toString(), centerX, centerY, paint)
+//            }
         }
     }
 }

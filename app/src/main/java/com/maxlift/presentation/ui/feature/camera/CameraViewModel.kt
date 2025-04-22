@@ -112,7 +112,6 @@ class CameraViewModel: ViewModel() {
             val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
 
             _exercise.value?.personId = sharedPreferences.getInt("person", 1)
-            println(_exercise.value?.personId)
             _exercise.value?.type = sharedPreferences.getString("type", "No Type")!!
             _exercise.value?.weight = sharedPreferences.getInt("weight", 50).toFloat()
             _exercise.value?.times = _times.value?.map { it.toFloat() }!!
