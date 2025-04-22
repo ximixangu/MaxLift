@@ -96,8 +96,6 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
         this.background = ColorDrawable(0)
     } }
 
-    println("${previewView.width}, ${previewView.height}")
-
     var showWeightPopUp by remember { mutableStateOf(false) }
     var showPersonPopUp by remember { mutableStateOf(false) }
     var showTypePopUp by remember { mutableStateOf(false) }
@@ -131,20 +129,12 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
 
                 objectDetector.process(image)
                     .addOnSuccessListener { detectedObjects ->
-                        val objects = mutableListOf<Pair<RectF, Int>>()
-
-                        for (obj in detectedObjects) {
-                            // To detect only square-like objects ->
-                            val ratio = obj.boundingBox.height().toFloat() / obj.boundingBox.width()
-                            if(0.5 < ratio && ratio < 1.5) {
-                                obj.trackingId?.let {
-                                    objects.add(Pair(RectF(obj.boundingBox), it))
-                                }
-                            }
+                        myDetectedObjects = detectedObjects.filter { obj ->
+                            obj.boundingBox.width() / obj.boundingBox.height() > 0.5 &&
+                            obj.boundingBox.width() / obj.boundingBox.height() < 1.5
+                        }.map {
+                            Pair(RectF(it.boundingBox), it.trackingId!!)
                         }
-
-                        myDetectedObjects = objects
-                        println(objects)
                     }
                     .addOnFailureListener { e ->
                         Log.e("Analyzer Error", e.message ?: "...")
@@ -197,7 +187,6 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
                     selectedId = selectedBoxId,
                     onSelect = {
                         selectedBoxId = it
-                        println(it)
                     }
                 )
 
@@ -291,22 +280,22 @@ fun MultipleBoundingBoxOverlay(
     Canvas(
         modifier = Modifier
             .fillMaxSize()
-            .pointerInput(Unit) {
+            .pointerInput(detectedObjects.map { it.second }) {
                 detectTapGestures(
                     onTap = { offset ->
                         detectedObjects.forEach { obj ->
-                            val scaledBox = scaleBoundingBox(obj.first)
-                            val left = maxOf(scaledBox.left - offsetX, 0f)
-                            val right = maxOf(scaledBox.right - offsetX, scaledBox.width())
-                            val centerX = (left + right) / 2
-                            val rect = RectF(
-                                centerX - 45,
-                                scaledBox.centerY() - 45,
-                                centerX - 45,
-                                scaledBox.centerY() + 45
+                            val box = scaleBoundingBox(obj.first)
+                            val left = maxOf(box.left - offsetX, 0f)
+                            val right = maxOf(box.right - offsetX, box.width())
+
+                            val boxCenter = RectF(
+                                left - 50,
+                                box.centerY() - 50,
+                                right + 50,
+                                box.centerY() + 50
                             )
 
-                            if (rect.contains(offset.x, offset.y)) {
+                            if (boxCenter.contains(offset.x, offset.y)) {
                                 onSelect(obj.second)
                             }
                         }
