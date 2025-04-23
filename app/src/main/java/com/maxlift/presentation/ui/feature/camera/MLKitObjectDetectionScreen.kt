@@ -42,6 +42,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -277,13 +278,14 @@ fun MultipleBoundingBoxOverlay(
     onSelect: (Int) -> Unit,
     boxColor: Color
 ) {
+    val currentBoxes by rememberUpdatedState(detectedObjects)
     Canvas(
         modifier = Modifier
             .fillMaxSize()
             .pointerInput(detectedObjects.map { it.second }) {
                 detectTapGestures(
                     onTap = { offset ->
-                        detectedObjects.forEach { obj ->
+                        currentBoxes.forEach { obj ->
                             val box = scaleBoundingBox(obj.first)
                             val left = maxOf(box.left - offsetX, 0f)
                             val right = maxOf(box.right - offsetX, box.width())
