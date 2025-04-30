@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -23,7 +24,8 @@ fun IconTextButton(
     icon: ImageVector,
     text: String,
     size: Dp,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    color: Color,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -44,13 +46,13 @@ fun IconTextButton(
                 imageVector = icon,
                 contentDescription = "",
                 Modifier.size(size),
-                tint = MaterialTheme.colorScheme.primary
+                tint = color
             )
             if(text.isNotEmpty()){
                 Text(
                     text = text,
                     style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = color
                 )
             }
         }

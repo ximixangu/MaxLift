@@ -98,7 +98,7 @@ fun SelectTypePopUp(
 
                 Button(
                     onClick = { onDismiss() },
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = Modifier.align(Alignment.Start)
                 ) {
                     Text("Cancel")
                 }

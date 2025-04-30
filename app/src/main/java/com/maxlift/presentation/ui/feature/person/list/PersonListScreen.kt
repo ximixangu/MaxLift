@@ -1,5 +1,6 @@
 package com.maxlift.presentation.ui.feature.person.list
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +32,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.maxlift.domain.model.Person
 import com.maxlift.presentation.ui.common.IconTextButton
 import com.maxlift.presentation.ui.feature.person.PersonCardItem
+import kotlinx.coroutines.delay
 
 @Composable
 fun PersonListScreen(personViewModel: PersonViewModel, navController: NavController) {
@@ -87,6 +89,12 @@ fun PersonListScreen(personViewModel: PersonViewModel, navController: NavControl
                 }
             }
 
+            var isClicked by remember { mutableStateOf(false) }
+            LaunchedEffect(isClicked) {
+                delay(2000L)
+                isClicked = false
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -96,13 +104,20 @@ fun PersonListScreen(personViewModel: PersonViewModel, navController: NavControl
             ) {
                 IconTextButton(
                     onClick = {
-                        if (currentDestination == "persons"){
+                        if (currentDestination == "persons" && !personList.isNullOrEmpty()){
                             navController.navigate("mlkit")
+                        } else if (personList.isNullOrEmpty() && !isClicked) {
+                            Toast.makeText(context, "You must first register a person", Toast.LENGTH_SHORT).show()
+                            isClicked = true
                         }
                     },
                     text = "Register",
                     icon = Icons.Filled.RadioButtonChecked,
-                    size = 35.dp
+                    size = 35.dp,
+                    color =
+                        if (personList.isNullOrEmpty()) {
+                            MaterialTheme.colorScheme.primary.copy(0.3f)
+                        } else MaterialTheme.colorScheme.primary
                 )
             }
         }

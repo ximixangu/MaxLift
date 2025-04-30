@@ -188,7 +188,8 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
                     selectedId = selectedBoxId,
                     onSelect = {
                         selectedBoxId = it
-                    }
+                    },
+                    isProcessingMovement = isProcessingMovement
                 )
 
                 Text(
@@ -212,18 +213,36 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(8.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.Top
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Spacer(Modifier.size(0.dp))
-                        IconTextButton(icon = Icons.Default.FitnessCenter, "", 28.dp) {
-                            if (!isProcessingMovement) showTypePopUp = true
-                        }
-                        IconTextButton(icon = Icons.Default.Person, "", 30.dp) {
-                            if (!isProcessingMovement) showPersonPopUp = true
-                        }
-                        IconTextButton(icon = Icons.Default.Scale, "", 26.dp) {
-                            if (!isProcessingMovement) showWeightPopUp = true
-                        }
+                        IconTextButton(
+                            icon = Icons.Default.FitnessCenter,
+                            text = "",
+                            size = 28.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            onClick = {
+                                if (!isProcessingMovement) showTypePopUp = true
+                            }
+                        )
+                        IconTextButton(
+                            icon = Icons.Default.Person,
+                            text = "",
+                            size = 33.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            onClick = {
+                                if (!isProcessingMovement) showPersonPopUp = true
+                            }
+                        )
+                        IconTextButton(
+                            icon = Icons.Default.Scale,
+                            text = "",
+                            size = 26.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            onClick = {
+                                if (!isProcessingMovement) showWeightPopUp = true
+                            }
+                        )
                         Spacer(Modifier.size(0.dp))
                     }
 
@@ -276,7 +295,8 @@ fun MultipleBoundingBoxOverlay(
     detectedObjects: List<Pair<RectF, Int>>,
     selectedId: Int,
     onSelect: (Int) -> Unit,
-    boxColor: Color
+    boxColor: Color,
+    isProcessingMovement: Boolean
 ) {
     val currentBoxes by rememberUpdatedState(detectedObjects)
     Canvas(
@@ -324,22 +344,13 @@ fun MultipleBoundingBoxOverlay(
                     ),
                     alpha = 0.35f,
                 )
-            } else {
+            } else if(!isProcessingMovement) {
                 drawCircle(
                     color = boxColor,
                     radius = 40f,
                     center = Offset(centerX, box.centerY()),
                 )
             }
-
-//            drawContext.canvas.nativeCanvas.apply {
-//                val paint = android.graphics.Paint().apply {
-//                    color = android.graphics.Color.BLACK
-//                    textAlign = android.graphics.Paint.Align.CENTER
-//                    textSize = 40f
-//                }
-//                drawText(obj.second.toString(), centerX, centerY, paint)
-//            }
         }
     }
 }
