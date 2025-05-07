@@ -40,6 +40,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -57,6 +58,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.objects.DetectedObject
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.maxlift.presentation.ui.common.IconTextButton
@@ -87,9 +89,10 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
     var timeColor by remember { mutableStateOf(Color.Green) }
     val times by viewModel.times.observeAsState(null)
 
-    var myDetectedObjects by remember { mutableStateOf<List<Pair<RectF, Int>>>(emptyList()) }
+    var myDetectedObjects by remember { mutableStateOf<List<DetectedObject>>(emptyList()) }
 
-    var selectedBoxId by remember { mutableIntStateOf(-1) }
+    var trackingId by remember { mutableIntStateOf(-1) }
+    val objectCounter = remember { mutableStateMapOf<Int, Int>() }
     var cropRect by remember { mutableStateOf<Rect?>(null) }
 
     val previewView = remember { PreviewView(context).apply {
@@ -130,12 +133,26 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
 
                 objectDetector.process(image)
                     .addOnSuccessListener { detectedObjects ->
-                        myDetectedObjects = detectedObjects.filter { obj ->
-                            obj.boundingBox.width() / obj.boundingBox.height() > 0.5 &&
-                            obj.boundingBox.width() / obj.boundingBox.height() < 1.5
-                        }.map {
-                            Pair(RectF(it.boundingBox), it.trackingId!!)
+                        val currentObjects = mutableListOf<DetectedObject>()
+                        for(obj in detectedObjects) {
+                            obj.trackingId?.let {
+                                objectCounter[it] = minOf(objectCounter.getOrDefault(it, 0) + 1, 15)
+                                currentObjects.add(obj)
+                            }
                         }
+
+                        val missingIds = objectCounter.keys - detectedObjects.map{ it.trackingId }.toSet()
+                        for (id in missingIds) {
+                            id?.let {
+                                objectCounter[it] = objectCounter.getOrDefault(it, 0) - 1
+                                if(objectCounter.getOrDefault(it, 0) <= 0) {
+                                    objectCounter.remove(id)
+                                } else {
+                                    currentObjects.add(myDetectedObjects[myDetectedObjects.map { obj -> obj.trackingId }.indexOf(id)])
+                                }
+                            }
+                        }
+                        myDetectedObjects = currentObjects
                     }
                     .addOnFailureListener { e ->
                         Log.e("Analyzer Error", e.message ?: "...")
@@ -158,8 +175,8 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
     LaunchedEffect(myDetectedObjects) {
         if(isProcessingMovement) {
             for (obj in myDetectedObjects) {
-                if (obj.second == selectedBoxId) {
-                    sendToBackgroundProcessing(obj.first, viewModel)
+                if (obj.trackingId == trackingId) {
+                    sendToBackgroundProcessing(RectF(obj.boundingBox), viewModel)
                 }
             }
         }
@@ -185,9 +202,9 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
                 MultipleBoundingBoxOverlay(
                     detectedObjects = myDetectedObjects,
                     boxColor = MaterialTheme.colorScheme.primary,
-                    selectedId = selectedBoxId,
+                    selectedId = trackingId,
                     onSelect = {
-                        selectedBoxId = it
+                        trackingId = it
                     },
                     isProcessingMovement = isProcessingMovement
                 )
@@ -247,7 +264,8 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
                     }
 
                     Box(Modifier.wrapContentSize().padding(vertical = 10.dp)) {
-                        Crossfade(targetState = isProcessingMovement || myDetectedObjects.isNotEmpty()) { active ->
+                        Crossfade(targetState = isProcessingMovement ||
+                                myDetectedObjects.map { it.trackingId }.contains(trackingId)) { active ->
                             if (active) {
                                 RecordButton {
                                     isProcessingMovement = !isProcessingMovement
@@ -292,7 +310,7 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
 
 @Composable
 fun MultipleBoundingBoxOverlay(
-    detectedObjects: List<Pair<RectF, Int>>,
+    detectedObjects: List<DetectedObject>,
     selectedId: Int,
     onSelect: (Int) -> Unit,
     boxColor: Color,
@@ -302,11 +320,11 @@ fun MultipleBoundingBoxOverlay(
     Canvas(
         modifier = Modifier
             .fillMaxSize()
-            .pointerInput(detectedObjects.map { it.second }) {
+            .pointerInput(detectedObjects.map { it.trackingId }) {
                 detectTapGestures(
                     onTap = { offset ->
                         currentBoxes.forEach { obj ->
-                            val box = scaleBoundingBox(obj.first)
+                            val box = scaleBoundingBox(RectF(obj.boundingBox))
                             val left = maxOf(box.left - offsetX, 0f)
                             val right = maxOf(box.right - offsetX, box.width())
 
@@ -318,7 +336,7 @@ fun MultipleBoundingBoxOverlay(
                             )
 
                             if (boxCenter.contains(offset.x, offset.y)) {
-                                onSelect(obj.second)
+                                obj.trackingId?.let { onSelect(it) }
                             }
                         }
                     }
@@ -326,7 +344,7 @@ fun MultipleBoundingBoxOverlay(
             }
     ) {
         for (obj in detectedObjects) {
-            val box = scaleBoundingBox(obj.first)
+            val box = scaleBoundingBox(RectF(obj.boundingBox))
             val left = maxOf(box.left - offsetX, 0f)
             val right = maxOf(box.right - offsetX, box.width())
 
@@ -334,7 +352,7 @@ fun MultipleBoundingBoxOverlay(
             val bottomRight = Offset(right, box.bottom)
             val centerX = (left + right) / 2
 
-            if (obj.second == selectedId) {
+            if (obj.trackingId == selectedId) {
                 drawRect(
                     color = boxColor,
                     topLeft = topLeft,
