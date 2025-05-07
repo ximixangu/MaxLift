@@ -273,6 +273,7 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
                                         viewModel.resetBoundingBoxProcessing()
                                     } else {
                                         if (times?.isNotEmpty() == true) {
+                                            viewModel.stopProcessing()
                                             if (currentDestination == "mlkit") {
                                                 navController.navigate("result")
                                             }

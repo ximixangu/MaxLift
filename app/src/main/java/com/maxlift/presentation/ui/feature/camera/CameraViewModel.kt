@@ -25,15 +25,18 @@ class CameraViewModel: ViewModel() {
 
     private var initialPosition: Float? = null
     private var lastPosition: Float? = null
-    private var highestPosition: Float? = Float.MAX_VALUE
+    private var repDistance = mutableListOf<Float>()
+    private var lowestPosition:  Float = Float.MIN_VALUE
+    private var highestPosition: Float = Float.MAX_VALUE
 
     private var directionThreshold: Float? = null
     private var currentMovement = 0
+    private var framesNotMoving = 0
 
     fun processBoundingBoxPlus(boundingBox: RectF) {
         viewModelScope.launch {
             val currentPosition = boundingBox.top
-            directionThreshold = boundingBox.height() * 0.05f
+            directionThreshold = boundingBox.height() * 0.01f
 
             if (initialPosition == null) {
                 initialPosition = currentPosition
@@ -50,10 +53,14 @@ class CameraViewModel: ViewModel() {
                 if (currentMovement == 0) initialTime = null
                 currentMovement = 1
                 lastPosition = currentPosition
+                framesNotMoving = 0
             } else if (currentPosition < lastPosition!! - directionThreshold!!) {
                 if (currentMovement == 0) initialTime = timeSource.markNow()
                 currentMovement = -1
                 lastPosition = currentPosition
+                framesNotMoving = 0
+            } else {
+                framesNotMoving++
             }
 
             when(currentMovement) {
@@ -63,15 +70,25 @@ class CameraViewModel: ViewModel() {
                         stopTime = null
                         highestPosition = Float.MAX_VALUE
                     }
+                    if (currentPosition > lowestPosition) {
+                        lowestPosition = currentPosition
+                    }
                 }
                 -1 -> {
                     if (previousMovement == 1) {
                         initialTime = timeSource.markNow()
                     }
 
-                    if(currentPosition < highestPosition!!) {
+                    if(currentPosition < highestPosition) {
                         stopTime = timeSource.markNow()
                         highestPosition = currentPosition
+                    }
+
+                    if (framesNotMoving > 5 && initialTime != null) {
+                        storeElapsedTime()
+                        stopTime = null
+                        initialTime = null
+                        highestPosition = Float.MAX_VALUE
                     }
                 }
             }
@@ -83,13 +100,16 @@ class CameraViewModel: ViewModel() {
             if(stopTime != null) stopTime!! - initialTime!!
             else timeSource.markNow() - initialTime!!
 
-        if (elapsedTime.inWholeMilliseconds.toInt() > 0)
+        if (elapsedTime.inWholeMilliseconds.toInt() > 200)
             addTime(elapsedTime.inWholeMilliseconds.toInt())
     }
 
     private fun addTime(time: Int){
         if(_times.value == null) _times.value = mutableListOf()
         _times.value?.add(time)
+        repDistance.add(lowestPosition - highestPosition)
+        highestPosition = Float.MAX_VALUE
+        lowestPosition = Float.MIN_VALUE
     }
 
     fun setExerciseTitle(title: String) {
@@ -102,9 +122,28 @@ class CameraViewModel: ViewModel() {
 
     fun resetBoundingBoxProcessing() {
         _times.value = null
+        repDistance = mutableListOf()
         initialPosition = null
         initialTime = null
         currentMovement = 0
+    }
+
+    fun stopProcessing() {
+        viewModelScope.launch {
+            val maxDistance = repDistance.max()
+            val timesList = mutableListOf<Int>()
+            println(repDistance)
+            repDistance.forEachIndexed { i, distance ->
+                println(distance / maxDistance)
+                if (distance / maxDistance >= 0.7) {
+                    _times.value?.let {
+                        println(it.size)
+                        timesList.add(it[i])
+                    }
+                }
+            }
+            _times.value = timesList
+        }
     }
 
     fun saveCurrentExercise(context: Context) {
@@ -114,8 +153,8 @@ class CameraViewModel: ViewModel() {
             _exercise.value?.personId = sharedPreferences.getInt("person", 1)
             _exercise.value?.type = sharedPreferences.getString("type", "No Type")!!
             _exercise.value?.weight = sharedPreferences.getInt("weight", 50).toFloat()
-            _exercise.value?.times = _times.value?.map { it.toFloat() }!!
-            _exercise.value?.numberOfRepetitions = _times.value?.size!!
+            _exercise.value?.times = _times.value!!.map { it.toFloat() }
+            _exercise.value?.numberOfRepetitions = _times.value!!.size
 
             try {
                 _exercise.value?.let {
