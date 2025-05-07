@@ -363,7 +363,7 @@ fun MultipleBoundingBoxOverlay(
                     ),
                     alpha = 0.35f,
                 )
-            } else if(!isProcessingMovement) {
+            } else {
                 drawCircle(
                     color = boxColor,
                     radius = 40f,

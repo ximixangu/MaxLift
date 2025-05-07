@@ -34,9 +34,11 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.maxlift.presentation.ui.common.EditableTextField
 
 @Composable
 fun SelectWeightPopUp(
@@ -46,6 +48,7 @@ fun SelectWeightPopUp(
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
     val weight = sharedPreferences.getInt("weight", 50)
+    var currentWeight by remember { mutableStateOf(weight.toString()) }
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Surface(
@@ -77,7 +80,7 @@ fun SelectWeightPopUp(
                         width = 60.dp,
                         itemHeight = 35.dp,
                         items = (1..250).toList(),
-                        initialItem = weight,
+                        initialItem = currentWeight.toIntOrNull() ?: 1,
                         textStyle = MaterialTheme.typography.bodyMedium,
                         textColor = MaterialTheme.colorScheme.secondary,
                         selectedTextColor = MaterialTheme.colorScheme.primary,
@@ -93,6 +96,17 @@ fun SelectWeightPopUp(
                 }
 
                 Spacer(Modifier.size(5.dp))
+
+                EditableTextField(
+                    value = currentWeight,
+                    onValueChange = {
+                        currentWeight = it
+                        if (currentWeight.isBlank()) onSelect("1")
+                        else onSelect(currentWeight)
+                    },
+                    label = "Weight",
+                    keyboardType = KeyboardType.Number
+                )
 
                 Button(
                     onClick = { onDismiss() },
