@@ -85,7 +85,10 @@ fun SelectWeightPopUp(
                         textColor = MaterialTheme.colorScheme.secondary,
                         selectedTextColor = MaterialTheme.colorScheme.primary,
                         onItemSelected = { _, item ->
-                            onSelect(item.toString())
+                            if(currentWeight.toIntOrNull() == weight && item == 250) {
+                                onSelect(maxOf(currentWeight.toIntOrNull() ?: 0, item).toString())
+                            }
+                            else onSelect(item.toString())
                         }
                     )
                     Text(

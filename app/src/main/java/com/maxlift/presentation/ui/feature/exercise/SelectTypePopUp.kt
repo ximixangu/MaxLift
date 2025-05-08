@@ -96,11 +96,20 @@ fun SelectTypePopUp(
                     )
                 )
 
-                Button(
-                    onClick = { onDismiss() },
-                    modifier = Modifier.align(Alignment.Start)
-                ) {
-                    Text("Cancel")
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
+                    Button(
+                        onClick = { onDismiss() },
+                    ) {
+                        Text("Cancel")
+                    }
+                    Button(
+                        onClick = {
+                            if(customType.isNotBlank()) onSelect(customType)
+                            onDismiss()
+                        },
+                    ) {
+                        Text("OK")
+                    }
                 }
             }
         }
