@@ -137,19 +137,21 @@ fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: Pers
                         for(obj in detectedObjects) {
                             obj.trackingId?.let {
                                 objectCounter[it] = minOf(objectCounter.getOrDefault(it, 0) + 1, 15)
-                                currentObjects.add(obj)
+                                val index = myDetectedObjects.indexOfFirst { obj -> obj.trackingId == it }
+                                if(objectCounter[it]!! >= 15 || index != -1) {
+                                    currentObjects.add(obj)
+                                }
                             }
                         }
 
-                        val missingIds = objectCounter.keys - detectedObjects.map{ it.trackingId }.toSet()
+                        val missingIds = objectCounter.keys - detectedObjects.mapNotNull{ it.trackingId }.toSet()
                         for (id in missingIds) {
-                            id?.let {
-                                objectCounter[it] = objectCounter.getOrDefault(it, 0) - 1
-                                if(objectCounter.getOrDefault(it, 0) <= 0) {
-                                    objectCounter.remove(id)
-                                } else {
-                                    currentObjects.add(myDetectedObjects[myDetectedObjects.map { obj -> obj.trackingId }.indexOf(id)])
-                                }
+                            objectCounter[id] = objectCounter[id]!! - 1
+                            if(objectCounter[id]!! <= 0) {
+                                objectCounter.remove(id)
+                            } else {
+                                val index = myDetectedObjects.indexOfFirst { obj -> obj.trackingId == id }
+                                if(index != -1) currentObjects.add(myDetectedObjects[index])
                             }
                         }
                         myDetectedObjects = currentObjects
