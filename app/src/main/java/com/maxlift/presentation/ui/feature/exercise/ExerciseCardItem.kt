@@ -40,6 +40,7 @@ fun ExerciseCardItem(exercise: Exercise, onClick: () -> Unit) {
                 Modifier.fillMaxWidth().wrapContentHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(Modifier.size(3.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     var title = ""
                     exercise.title?.let {
@@ -69,6 +70,7 @@ fun ExerciseCardItem(exercise: Exercise, onClick: () -> Unit) {
                     text = formatDate(exercise.date),
                     style = MaterialTheme.typography.bodyMedium,
                 )
+                Spacer(Modifier.size(3.dp))
             }
         }
     }

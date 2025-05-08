@@ -156,7 +156,7 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
                             ExerciseList(exerciseList, navController, 10)
                         } else {
                             Text(
-                                text = "No Exercises Registered",
+                                text = "No Exercises were found",
                                 style = MaterialTheme.typography.labelMedium,
                                 modifier = Modifier
                                     .padding(10.dp)
