@@ -40,7 +40,7 @@ fun ExerciseList(
 
     if (!exerciseList.isNullOrEmpty()) {
         val totalPages = (exerciseList.size + pageSize - 1) / pageSize
-        if(currentPage > totalPages) currentPage = totalPages
+        if(currentPage > totalPages - 1) currentPage = totalPages - 1
         val start = currentPage * pageSize
         val end = minOf(start + pageSize, exerciseList.size)
         val pageItems = exerciseList.subList(start, end)
