@@ -1,1 +1,1 @@
-Android App (WIP) to compute an athlete's weight lifting maximum strength.
+Android App to help estimate an athlete's weight lifting maximum strength.
