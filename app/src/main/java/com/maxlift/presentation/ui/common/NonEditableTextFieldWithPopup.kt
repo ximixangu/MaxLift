@@ -37,7 +37,7 @@ fun NonEditableTextFieldWithPopup(
         label = { Text(label) },
         readOnly = true,
         modifier = Modifier
-            .fillMaxWidth(0.9f)
+            .fillMaxWidth()
             .border(
                 width = 2.dp,
                 color = MaterialTheme.colorScheme.primaryContainer,
@@ -62,7 +62,6 @@ fun NonEditableTextFieldWithPopup(
                 is PressInteraction.Release -> {
                     showPopup = true
                 }
-                else -> {}
             }
         }
     }

@@ -28,23 +28,29 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.maxlift.data.datasource.database.AppDatabase
+import com.maxlift.data.repository.MyRepository
+import com.maxlift.domain.usecase.person.FetchAllPersonsUseCase
 import com.maxlift.presentation.ui.common.MyScaffold
-import com.maxlift.presentation.ui.feature.camera.CameraViewModel
-import com.maxlift.presentation.ui.feature.camera.MLKitObjectDetectionScreen
-import com.maxlift.presentation.ui.feature.exercise.ExerciseEditScreen
-import com.maxlift.presentation.ui.feature.exercise.ExerciseViewModel
-import com.maxlift.presentation.ui.feature.exercise.info.ExerciseScreen
-import com.maxlift.presentation.ui.feature.person.info.PersonInfoScreen
-import com.maxlift.presentation.ui.feature.person.info.PersonInfoViewModel
-import com.maxlift.presentation.ui.feature.person.list.PersonListScreen
-import com.maxlift.presentation.ui.feature.person.list.PersonViewModel
+import com.maxlift.presentation.ui.view.camera.CameraViewModel
+import com.maxlift.presentation.ui.view.camera.MLKitObjectDetectionScreen
+import com.maxlift.presentation.ui.view.exercise.ExerciseEditScreen
+import com.maxlift.presentation.ui.view.exercise.ExerciseViewModel
+import com.maxlift.presentation.ui.view.exercise.info.ExerciseScreen
+import com.maxlift.presentation.ui.view.person.info.PersonInfoScreen
+import com.maxlift.presentation.ui.view.person.info.PersonInfoViewModel
+import com.maxlift.presentation.ui.view.person.list.PersonListScreen
+import com.maxlift.presentation.ui.view.person.list.PersonViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val appDatabase = AppDatabase.getDatabase(this)
+        val myRepository = MyRepository(appDatabase.exerciseDataSource(), appDatabase.personDataSource())
+
         setContent {
-            MyApp()
+            MyApp(myRepository)
         }
         if(permissionDenied(this)) {
             doPermissionRequest(this, packageName)
@@ -60,14 +66,16 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MyApp() {
+fun MyApp(
+    myRepository: MyRepository
+) {
     val navController = rememberNavController()
 
     val sharedViewModel: CameraViewModel = viewModel(
         viewModelStoreOwner = LocalViewModelStoreOwner.current ?:
         error("No ViewModelStoreOwner found")
     )
-    val personViewModel: PersonViewModel = viewModel()
+    val personViewModel = PersonViewModel(FetchAllPersonsUseCase(myRepository))
     val personInfoViewModel: PersonInfoViewModel = viewModel()
     val exerciseViewModel: ExerciseViewModel = viewModel()
 

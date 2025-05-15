@@ -1,4 +1,4 @@
-package com.maxlift.data.model.database
+    package com.maxlift.data.model.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
