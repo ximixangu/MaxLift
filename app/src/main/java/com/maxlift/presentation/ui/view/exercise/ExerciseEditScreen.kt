@@ -42,7 +42,11 @@ import com.maxlift.presentation.ui.view.person.SelectPersonPopUp
 import com.maxlift.presentation.ui.view.person.list.PersonViewModel
 
 @Composable
-fun ExerciseEditScreen(viewModel: CameraViewModel, personViewModel: PersonViewModel, navController: NavController) {
+fun ExerciseEditScreen(
+    viewModel: CameraViewModel,
+    personViewModel: PersonViewModel,
+    navController: NavController
+) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)

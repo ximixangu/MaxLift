@@ -21,8 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,6 +28,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.maxlift.data.datasource.database.AppDatabase
 import com.maxlift.data.repository.MyRepository
+import com.maxlift.domain.usecase.exercise.DeleteExerciseUseCase
+import com.maxlift.domain.usecase.exercise.FetchExerciseUseCase
+import com.maxlift.domain.usecase.exercise.FetchExercisesByPersonUseCase
+import com.maxlift.domain.usecase.exercise.FetchExercisesByPersonWithFiltersUseCase
+import com.maxlift.domain.usecase.exercise.SaveExerciseUseCase
+import com.maxlift.domain.usecase.exercise.UpdateExerciseUseCase
 import com.maxlift.domain.usecase.person.DeletePersonUseCase
 import com.maxlift.domain.usecase.person.EditPersonUseCase
 import com.maxlift.domain.usecase.person.FetchAllPersonsUseCase
@@ -37,12 +41,11 @@ import com.maxlift.domain.usecase.person.FetchPersonUseCase
 import com.maxlift.domain.usecase.person.SavePersonUseCase
 import com.maxlift.presentation.ui.common.MyScaffold
 import com.maxlift.presentation.ui.view.camera.CameraViewModel
-import com.maxlift.presentation.ui.view.camera.MLKitObjectDetectionScreen
+import com.maxlift.presentation.ui.view.camera.DetectionScreen
 import com.maxlift.presentation.ui.view.exercise.ExerciseEditScreen
 import com.maxlift.presentation.ui.view.exercise.ExerciseViewModel
 import com.maxlift.presentation.ui.view.exercise.info.ExerciseScreen
 import com.maxlift.presentation.ui.view.person.info.PersonInfoScreen
-import com.maxlift.presentation.ui.view.person.info.PersonInfoViewModel
 import com.maxlift.presentation.ui.view.person.list.PersonListScreen
 import com.maxlift.presentation.ui.view.person.list.PersonViewModel
 
@@ -75,21 +78,23 @@ fun MyApp(
 ) {
     val navController = rememberNavController()
 
-    val sharedViewModel: CameraViewModel = viewModel(
-        viewModelStoreOwner = LocalViewModelStoreOwner.current ?:
-        error("No ViewModelStoreOwner found")
+    val sharedViewModel = CameraViewModel(
+        SaveExerciseUseCase(myRepository)
     )
     val personViewModel = PersonViewModel(
         FetchAllPersonsUseCase(myRepository),
         FetchPersonUseCase(myRepository),
-        SavePersonUseCase(myRepository),
-    )
-    val personInfoViewModel = PersonInfoViewModel(
-        FetchPersonUseCase(myRepository),
         DeletePersonUseCase(myRepository),
         EditPersonUseCase(myRepository),
+        SavePersonUseCase(myRepository),
     )
-    val exerciseViewModel: ExerciseViewModel = viewModel()
+    val exerciseViewModel = ExerciseViewModel(
+        FetchExercisesByPersonUseCase(myRepository),
+        DeleteExerciseUseCase(myRepository),
+        FetchExercisesByPersonWithFiltersUseCase(myRepository),
+        FetchExerciseUseCase(myRepository),
+        UpdateExerciseUseCase(myRepository),
+    )
 
     MyScaffold(navController) { innerPadding ->
         NavHost(
@@ -105,7 +110,11 @@ fun MyApp(
                 popEnterTransition = { slideInVertically { -it } },
                 popExitTransition = { slideOutVertically { it } },
             ) {
-                ExerciseEditScreen(sharedViewModel, personViewModel, navController)
+                ExerciseEditScreen(
+                    viewModel = sharedViewModel,
+                    personViewModel = personViewModel,
+                    navController = navController
+                )
             }
             composable(
                 route = "mlkit",
@@ -114,7 +123,11 @@ fun MyApp(
                 popEnterTransition = { slideInVertically { -it } },
                 popExitTransition = { slideOutVertically { it } },
             ) {
-                MLKitObjectDetectionScreen(sharedViewModel, personViewModel, navController)
+                DetectionScreen(
+                    viewModel = sharedViewModel,
+                    personViewModel = personViewModel,
+                    navController = navController
+                )
             }
             composable(
                 route = "personInfo/{id}",
@@ -124,7 +137,12 @@ fun MyApp(
                 popEnterTransition = { slideInHorizontally { -it } },
                 popExitTransition = { slideOutHorizontally { it } },
             ) { entry ->
-                PersonInfoScreen(personId = entry.arguments?.getInt("id") ?: 0, personInfoViewModel, navController)
+                PersonInfoScreen(
+                    personId = entry.arguments?.getInt("id") ?: 0,
+                    personViewModel = personViewModel,
+                    exerciseViewModel = exerciseViewModel,
+                    navController = navController
+                )
             }
             composable(
                 route = "exerciseInfo/{id}",
@@ -134,7 +152,11 @@ fun MyApp(
                 popEnterTransition = { slideInHorizontally { -it } },
                 popExitTransition = { slideOutHorizontally { it } },
             ) { entry ->
-                ExerciseScreen(id = entry.arguments?.getInt("id") ?: 0, exerciseViewModel, navController)
+                ExerciseScreen(
+                    id = entry.arguments?.getInt("id") ?: 0,
+                    exerciseViewModel = exerciseViewModel,
+                    navController = navController
+                )
             }
         }
     }

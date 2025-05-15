@@ -1,17 +1,11 @@
 package com.maxlift.domain.usecase.exercise
 
-import android.content.Context
-import com.maxlift.data.datasource.database.AppDatabase
-import com.maxlift.data.repository.MyRepository
+import com.maxlift.domain.repository.IMyRepository
 
-class DeleteExerciseUseCase {
-    companion object {
-        suspend fun execute(context: Context, id: Int) {
-            val database = AppDatabase.getDatabase(context)
-            MyRepository(
-                database.exerciseDataSource(),
-                database.personDataSource()
-            ).deleteExerciseById(id)
-        }
+class DeleteExerciseUseCase(
+    private val myRepository: IMyRepository
+) {
+    suspend operator fun invoke(id: Int) {
+        myRepository.deleteExerciseById(id)
     }
 }

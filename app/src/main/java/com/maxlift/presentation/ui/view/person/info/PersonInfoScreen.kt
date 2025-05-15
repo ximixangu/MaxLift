@@ -30,15 +30,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.maxlift.presentation.ui.view.exercise.ExerciseViewModel
 import com.maxlift.presentation.ui.view.exercise.formatDate
+import com.maxlift.presentation.ui.view.person.list.PersonViewModel
 import java.util.Date
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, navController: NavController) {
+fun PersonInfoScreen(
+    personId: Int,
+    personViewModel: PersonViewModel,
+    exerciseViewModel: ExerciseViewModel,
+    navController: NavController
+) {
     val context = LocalContext.current
-    val person by personInfoViewModel.personState.observeAsState()
-    val exerciseList by personInfoViewModel.exerciseListState.observeAsState()
+    val person by personViewModel.personState.observeAsState()
+    val exerciseList by exerciseViewModel.exerciseListState.observeAsState()
     val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
 
     var minWeight by remember { mutableIntStateOf(0) }
@@ -53,13 +60,13 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
     sharedPreferences.edit().putInt("person", personId).apply()
 
     LaunchedEffect(Unit) {
-        personInfoViewModel.fetchPersonAndExercises(context, personId)
+        personViewModel.fetchPersonById(personId)
+        exerciseViewModel.fetchExercisesByPerson(personId)
     }
 
     LaunchedEffect(title, minReps, maxReps, minWeight, maxWeight, startDate, endDate, sortField) {
-        personInfoViewModel.fetchExercisesSearch(
+        exerciseViewModel.fetchExercisesSearch(
             id = personId,
-            context = context,
             title = title,
             minReps = minReps,
             maxReps = maxReps,
@@ -80,11 +87,11 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
                 PersonTitle(
                     person = person!!,
                     onEdit = {
-                        personInfoViewModel.editPerson(it)
-                        personInfoViewModel.fetchPersonAndExercises(context, it.id)
+                        personViewModel.editPerson(it)
+                        exerciseViewModel.fetchExercisesByPerson(it.id)
                     },
                     onClickDelete = {
-                        personInfoViewModel.deletePerson(personId)
+                        personViewModel.deletePerson(personId)
                         navController.navigateUp()
                     }
                 )

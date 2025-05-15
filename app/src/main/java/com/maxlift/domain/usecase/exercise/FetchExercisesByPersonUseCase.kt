@@ -1,18 +1,12 @@
 package com.maxlift.domain.usecase.exercise
 
-import android.content.Context
-import com.maxlift.data.datasource.database.AppDatabase
-import com.maxlift.data.repository.MyRepository
 import com.maxlift.domain.model.Exercise
+import com.maxlift.domain.repository.IMyRepository
 
-class FetchExercisesByPersonUseCase {
-    companion object {
-        suspend fun execute(context: Context, id: Int): List<Exercise> {
-            val database = AppDatabase.getDatabase(context)
-            return MyRepository(
-                database.exerciseDataSource(),
-                database.personDataSource()
-            ).fetchExercisesByPersonId(id)
-        }
+class FetchExercisesByPersonUseCase(
+    private val myRepository: IMyRepository
+){
+    suspend operator fun invoke(id: Int): List<Exercise> {
+        return myRepository.fetchExercisesByPersonId(id)
     }
 }

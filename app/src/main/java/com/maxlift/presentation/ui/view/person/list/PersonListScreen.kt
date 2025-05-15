@@ -40,16 +40,17 @@ import com.maxlift.presentation.ui.view.person.PersonCardItem
 import kotlinx.coroutines.delay
 
 @Composable
-fun PersonListScreen(personViewModel: PersonViewModel, navController: NavController) {
+fun PersonListScreen(
+    personViewModel: PersonViewModel,
+    navController: NavController
+) {
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry.value?.destination?.route
     val personList by personViewModel.personListState.observeAsState(null)
-    var shouldUpdate by remember { mutableStateOf(true) }
     val context = LocalContext.current
 
-    LaunchedEffect(shouldUpdate) {
+    LaunchedEffect(Unit) {
         personViewModel.fetchAllPersons()
-        shouldUpdate = false
     }
 
     Surface(
@@ -85,7 +86,6 @@ fun PersonListScreen(personViewModel: PersonViewModel, navController: NavControl
                                 AddPersonCardItem(
                                     onSave = { name ->
                                         personViewModel.savePerson(Person(0, name))
-                                        shouldUpdate = true
                                     }
                                 )
                             }

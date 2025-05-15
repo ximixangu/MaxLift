@@ -78,7 +78,7 @@ private var offsetX: Float = 0f
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
-fun MLKitObjectDetectionScreen(viewModel: CameraViewModel, personViewModel: PersonViewModel, navController: NavController) {
+fun DetectionScreen(viewModel: CameraViewModel, personViewModel: PersonViewModel, navController: NavController) {
     val context = LocalContext.current
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry.value?.destination?.route

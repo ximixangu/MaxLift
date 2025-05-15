@@ -12,7 +12,9 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.TimeSource
 
-class CameraViewModel: ViewModel() {
+class CameraViewModel(
+    private val saveExerciseUseCase: SaveExerciseUseCase,
+): ViewModel() {
     private val _times = MutableLiveData<MutableList<Int>?>()
     val times: LiveData<MutableList<Int>?> = _times
 
@@ -156,7 +158,7 @@ class CameraViewModel: ViewModel() {
 
             try {
                 _exercise.value?.let {
-                    SaveExerciseUseCase.execute(context, it)
+                    saveExerciseUseCase(it)
                 }
             } catch (e: Exception) {
                 println("Error saving current exercise: ${e.message}")

@@ -5,7 +5,7 @@ import com.maxlift.domain.model.Person
 
 interface IMyRepository {
     suspend fun fetchExerciseById(id: Int): Exercise?
-    suspend fun fetchExercisesByPersonId(personId: Int): List<Exercise>?
+    suspend fun fetchExercisesByPersonId(personId: Int): List<Exercise>
     suspend fun fetchExercisesByPersonWithFilters(
         personId: Int,
         title: String?,
