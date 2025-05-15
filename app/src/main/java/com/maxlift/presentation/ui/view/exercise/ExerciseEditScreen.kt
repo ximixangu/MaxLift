@@ -56,7 +56,7 @@ fun ExerciseEditScreen(viewModel: CameraViewModel, personViewModel: PersonViewMo
     var type by remember { mutableStateOf(sharedPreferences.getString("type", "No type")) }
 
     LaunchedEffect(personId) {
-        personViewModel.fetchPersonById(context, personId)
+        personViewModel.fetchPersonById(personId)
     }
 
     Column(

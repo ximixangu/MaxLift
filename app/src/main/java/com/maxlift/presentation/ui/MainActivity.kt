@@ -30,7 +30,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.maxlift.data.datasource.database.AppDatabase
 import com.maxlift.data.repository.MyRepository
+import com.maxlift.domain.usecase.person.DeletePersonUseCase
+import com.maxlift.domain.usecase.person.EditPersonUseCase
 import com.maxlift.domain.usecase.person.FetchAllPersonsUseCase
+import com.maxlift.domain.usecase.person.FetchPersonUseCase
+import com.maxlift.domain.usecase.person.SavePersonUseCase
 import com.maxlift.presentation.ui.common.MyScaffold
 import com.maxlift.presentation.ui.view.camera.CameraViewModel
 import com.maxlift.presentation.ui.view.camera.MLKitObjectDetectionScreen
@@ -75,8 +79,16 @@ fun MyApp(
         viewModelStoreOwner = LocalViewModelStoreOwner.current ?:
         error("No ViewModelStoreOwner found")
     )
-    val personViewModel = PersonViewModel(FetchAllPersonsUseCase(myRepository))
-    val personInfoViewModel: PersonInfoViewModel = viewModel()
+    val personViewModel = PersonViewModel(
+        FetchAllPersonsUseCase(myRepository),
+        FetchPersonUseCase(myRepository),
+        SavePersonUseCase(myRepository),
+    )
+    val personInfoViewModel = PersonInfoViewModel(
+        FetchPersonUseCase(myRepository),
+        DeletePersonUseCase(myRepository),
+        EditPersonUseCase(myRepository),
+    )
     val exerciseViewModel: ExerciseViewModel = viewModel()
 
     MyScaffold(navController) { innerPadding ->

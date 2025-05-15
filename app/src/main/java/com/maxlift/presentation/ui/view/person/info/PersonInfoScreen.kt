@@ -80,11 +80,11 @@ fun PersonInfoScreen(personId: Int, personInfoViewModel: PersonInfoViewModel, na
                 PersonTitle(
                     person = person!!,
                     onEdit = {
-                        personInfoViewModel.editPerson(context, it)
+                        personInfoViewModel.editPerson(it)
                         personInfoViewModel.fetchPersonAndExercises(context, it.id)
                     },
                     onClickDelete = {
-                        personInfoViewModel.deletePerson(context, personId)
+                        personInfoViewModel.deletePerson(personId)
                         navController.navigateUp()
                     }
                 )

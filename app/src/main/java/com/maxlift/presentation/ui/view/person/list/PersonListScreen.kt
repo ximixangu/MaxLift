@@ -84,7 +84,7 @@ fun PersonListScreen(personViewModel: PersonViewModel, navController: NavControl
                             item {
                                 AddPersonCardItem(
                                     onSave = { name ->
-                                        personViewModel.savePerson(context, Person(0, name))
+                                        personViewModel.savePerson(Person(0, name))
                                         shouldUpdate = true
                                     }
                                 )

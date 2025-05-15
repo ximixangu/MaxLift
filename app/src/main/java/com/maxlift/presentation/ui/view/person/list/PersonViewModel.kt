@@ -1,6 +1,5 @@
 package com.maxlift.presentation.ui.view.person.list
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,13 +11,15 @@ import com.maxlift.domain.usecase.person.SavePersonUseCase
 import kotlinx.coroutines.launch
 
 class PersonViewModel(
-    private val fetchAllPersonsUseCase: FetchAllPersonsUseCase
+    private val fetchAllPersonsUseCase: FetchAllPersonsUseCase,
+    private val fetchPersonUseCase: FetchPersonUseCase,
+    private val savePersonUseCase: SavePersonUseCase,
 ): ViewModel() {
     private var _personList = MutableLiveData<List<Person>>()
     val personListState: LiveData<List<Person>> = _personList
 
-    private var _person = MutableLiveData<Person>()
-    val personState: LiveData<Person> = _person
+    private var _person = MutableLiveData<Person?>()
+    val personState: LiveData<Person?> = _person
 
     fun fetchAllPersons() {
         viewModelScope.launch {
@@ -30,20 +31,20 @@ class PersonViewModel(
         }
     }
 
-    fun fetchPersonById(context: Context, id: Int) {
+    fun fetchPersonById(id: Int) {
         viewModelScope.launch {
             try {
-                _person.value = FetchPersonUseCase.execute(context, id)
+                _person.value = fetchPersonUseCase(id)
             } catch (e: Exception) {
                 println("Error fetching person: ${e.message}")
             }
         }
     }
 
-    fun savePerson(context: Context, person: Person) {
+    fun savePerson(person: Person) {
         viewModelScope.launch {
             try {
-                SavePersonUseCase.execute(context, person)
+                savePersonUseCase(person)
             } catch (e: Exception) {
                 println("Error fetching person: ${e.message}")
             }

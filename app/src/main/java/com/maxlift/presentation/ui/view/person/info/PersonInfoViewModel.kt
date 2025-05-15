@@ -14,23 +14,27 @@ import com.maxlift.domain.usecase.person.EditPersonUseCase
 import com.maxlift.domain.usecase.person.FetchPersonUseCase
 import kotlinx.coroutines.launch
 
-class PersonInfoViewModel: ViewModel() {
-    private var _person = MutableLiveData<Person>()
-    val personState: LiveData<Person> = _person
+class PersonInfoViewModel(
+    private val fetchPersonUseCase: FetchPersonUseCase,
+    private val deletePersonUseCase: DeletePersonUseCase,
+    private val editPersonUseCase: EditPersonUseCase,
+): ViewModel() {
+    private var _person = MutableLiveData<Person?>()
+    val personState: LiveData<Person?> = _person
 
     private var _exerciseList = MutableLiveData<List<Exercise>>()
     val exerciseListState: LiveData<List<Exercise>> = _exerciseList
 
     fun fetchPersonAndExercises(context: Context, id: Int) {
         viewModelScope.launch {
-            fetchPerson(context, id)
+            fetchPerson(id)
             fetchExercisesByPerson(context)
         }
     }
 
-    private suspend fun fetchPerson(context: Context, id: Int) {
+    private suspend fun fetchPerson(id: Int) {
         try {
-            _person.value = FetchPersonUseCase.execute(context, id)
+            _person.value = fetchPersonUseCase(id)
         } catch (e: Exception) {
             println("Error fetching person: ${e.message}")
         }
@@ -78,20 +82,20 @@ class PersonInfoViewModel: ViewModel() {
         }
     }
 
-    fun editPerson(context: Context, person: Person) {
+    fun editPerson(person: Person) {
         try {
             viewModelScope.launch {
-                EditPersonUseCase.execute(context, person)
+                editPersonUseCase(person)
             }
         } catch (e: Exception) {
             println("Error editing person: ${e.message}")
         }
     }
 
-    fun deletePerson(context: Context, id: Int) {
+    fun deletePerson(id: Int) {
         viewModelScope.launch {
             try {
-                DeletePersonUseCase.execute(context, id)
+                deletePersonUseCase(id)
             } catch (e: Exception) {
                 println("Error deleting person: ${e.message}")
             }
