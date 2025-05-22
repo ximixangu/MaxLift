@@ -35,7 +35,7 @@ class CameraViewModel(
     private var currentMovement = 0
     private var framesNotMoving = 0
 
-    fun processBoundingBoxPlus(boundingBox: RectF) {
+    fun processBoundingBox(boundingBox: RectF) {
         viewModelScope.launch {
             val currentPosition = boundingBox.top
             directionThreshold = boundingBox.height() * 0.01f
@@ -66,7 +66,7 @@ class CameraViewModel(
             }
 
             when(currentMovement) {
-                1 -> {
+                1 -> { // DOWN
                     if (initialTime != null && previousMovement == -1) {
                         storeElapsedTime()
                     }
@@ -74,12 +74,12 @@ class CameraViewModel(
                         lowestPosition = currentPosition
                     }
                 }
-                -1 -> {
+                -1 -> { // UP
                     if (previousMovement == 1) {
                         initialTime = timeSource.markNow()
                     }
 
-                    if(currentPosition < highestPosition) {
+                    if(currentPosition < highestPosition && framesNotMoving == 0) {
                         stopTime = timeSource.markNow()
                         highestPosition = currentPosition
                     }

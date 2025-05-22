@@ -20,14 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.maxlift.domain.model.Exercise
+import com.maxlift.domain.model.ExerciseSummary
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
 
 @Composable
-fun ExerciseCardItem(exercise: Exercise, onClick: () -> Unit) {
+fun ExerciseCardItem(exercise: ExerciseSummary, onClick: () -> Unit) {
     Surface(
         modifier = Modifier.wrapContentSize(),
         shadowElevation = 5.dp,

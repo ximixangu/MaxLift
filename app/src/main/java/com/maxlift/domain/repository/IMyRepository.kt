@@ -1,11 +1,12 @@
 package com.maxlift.domain.repository
 
 import com.maxlift.domain.model.Exercise
+import com.maxlift.domain.model.ExerciseSummary
 import com.maxlift.domain.model.Person
 
 interface IMyRepository {
     suspend fun fetchExerciseById(id: Int): Exercise?
-    suspend fun fetchExercisesByPersonId(personId: Int): List<Exercise>
+    suspend fun fetchExercisesByPersonId(personId: Int): List<ExerciseSummary>
     suspend fun fetchExercisesByPersonWithFilters(
         personId: Int,
         title: String?,
@@ -16,7 +17,7 @@ interface IMyRepository {
         startDate: String?,
         endDate: String?,
         sortField: String?,
-    ): List<Exercise>?
+    ): List<ExerciseSummary>?
     suspend fun fetchPersonById(personId: Int): Person?
     suspend fun fetchAllPersons(): List<Person>
     suspend fun savePerson(person: Person)

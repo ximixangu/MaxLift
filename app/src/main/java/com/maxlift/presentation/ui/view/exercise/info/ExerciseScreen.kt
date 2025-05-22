@@ -36,7 +36,11 @@ import com.maxlift.presentation.ui.view.exercise.ExerciseViewModel
 import com.maxlift.presentation.ui.view.exercise.formatDate
 
 @Composable
-fun ExerciseScreen(id: Int, exerciseViewModel: ExerciseViewModel, navController: NavController) {
+fun ExerciseScreen(
+    id: Int,
+    exerciseViewModel: ExerciseViewModel,
+    navController: NavController
+) {
     val exercise by exerciseViewModel.exercise.observeAsState()
     var showDeletePopUp by remember { mutableStateOf(false) }
     var showEditPopUp by remember { mutableStateOf(false) }

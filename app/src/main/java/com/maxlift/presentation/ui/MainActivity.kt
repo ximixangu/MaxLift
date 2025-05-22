@@ -54,7 +54,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val appDatabase = AppDatabase.getDatabase(this)
-        val myRepository = MyRepository(appDatabase.exerciseDataSource(), appDatabase.personDataSource())
+        val myRepository =
+            MyRepository(
+                appDatabase.exerciseDataSource(),
+                appDatabase.personDataSource()
+            )
 
         setContent {
             MyApp(myRepository)
@@ -102,7 +106,9 @@ fun MyApp(
             startDestination = "persons",
             modifier = Modifier.padding(innerPadding),
         ) {
-            composable("persons") { PersonListScreen(personViewModel, navController) }
+            composable("persons") {
+                PersonListScreen(personViewModel, navController)
+            }
             composable(
                 route = "result",
                 enterTransition = { slideInVertically { it } },

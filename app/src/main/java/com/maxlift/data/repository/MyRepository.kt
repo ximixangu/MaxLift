@@ -6,6 +6,7 @@ import com.maxlift.data.model.database.ExerciseEntity
 import com.maxlift.data.model.database.PersonEntity
 import com.maxlift.data.model.database.toExerciseDomain
 import com.maxlift.data.model.database.toPersonDomain
+import com.maxlift.domain.model.ExerciseSummary
 import com.maxlift.domain.model.Exercise
 import com.maxlift.domain.model.Person
 import com.maxlift.domain.repository.IMyRepository
@@ -19,11 +20,9 @@ class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: 
         }
     }
 
-    override suspend fun fetchExercisesByPersonId(personId: Int): List<Exercise> {
+    override suspend fun fetchExercisesByPersonId(personId: Int): List<ExerciseSummary> {
         return withContext(Dispatchers.IO) {
-            exerciseDao.getExercisesByPerson(personId).map {
-                it.toExerciseDomain()
-            }
+            exerciseDao.getExercisesByPerson(personId)
         }
     }
 
@@ -37,7 +36,7 @@ class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: 
         startDate: String?,
         endDate: String?,
         sortField: String?,
-    ): List<Exercise> {
+    ): List<ExerciseSummary> {
         return withContext(Dispatchers.IO) {
             exerciseDao.searchQueryExercises(
                 personId,
@@ -49,7 +48,7 @@ class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: 
                 startDate,
                 endDate,
                 sortField,
-            ).map { it.toExerciseDomain() }
+            )
         }
     }
 

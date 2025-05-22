@@ -3,7 +3,6 @@ package com.maxlift.presentation.ui.view.camera
 import android.content.Context
 import android.graphics.Rect
 import android.graphics.RectF
-import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
@@ -55,6 +54,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.mlkit.vision.common.InputImage
@@ -78,12 +78,16 @@ private var offsetX: Float = 0f
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
-fun DetectionScreen(viewModel: CameraViewModel, personViewModel: PersonViewModel, navController: NavController) {
+fun DetectionScreen(
+    viewModel: CameraViewModel,
+    personViewModel: PersonViewModel,
+    navController: NavController
+) {
     val context = LocalContext.current
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry.value?.destination?.route
     val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     var isProcessingMovement by remember { mutableStateOf(false) }
 
     var timeColor by remember { mutableStateOf(Color.Green) }
@@ -97,7 +101,6 @@ fun DetectionScreen(viewModel: CameraViewModel, personViewModel: PersonViewModel
 
     val previewView = remember { PreviewView(context).apply {
         this.scaleType = PreviewView.ScaleType.FILL_CENTER
-        this.background = ColorDrawable(0)
     } }
 
     var showWeightPopUp by remember { mutableStateOf(false) }
@@ -409,7 +412,7 @@ private fun generateColor(newTime: Int, previousTime: Int): Color {
 
 private fun sendToBackgroundProcessing(boundingBox: RectF, viewModel: CameraViewModel) {
     CoroutineScope(Dispatchers.IO).launch {
-        viewModel.processBoundingBoxPlus(boundingBox)
+        viewModel.processBoundingBox(boundingBox)
     }
 }
 

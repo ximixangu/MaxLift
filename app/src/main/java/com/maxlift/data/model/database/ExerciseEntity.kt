@@ -5,10 +5,9 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.maxlift.domain.model.Exercise
-import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.Date
 
-@Entity(
+    @Entity(
     tableName = "exercise",
     foreignKeys = [
         ForeignKey(
@@ -25,13 +24,12 @@ data class ExerciseEntity(
     @ColumnInfo(name = "type") val type: String,
     @ColumnInfo(name = "weight") val weight: Float,
     @ColumnInfo(name = "times") val times: List<Float>,
-    @ColumnInfo(name = "numberOfReps") val numberOfRepetitions: Int,
-    @ColumnInfo(name = "date") val date: String,
+    @ColumnInfo(name = "numberOfRepetitions") val numberOfRepetitions: Int,
+    @ColumnInfo(name = "date") val date: Date,
     @ColumnInfo(name = "title") val title: String?,
     @ColumnInfo(name = "description") val description: String?,
 ){
     companion object {
-        private val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
         fun fromExerciseDomain(exercise: Exercise): ExerciseEntity {
             return ExerciseEntity(
                 exercise.id,
@@ -40,7 +38,7 @@ data class ExerciseEntity(
                 exercise.weight,
                 exercise.times,
                 exercise.numberOfRepetitions,
-                formatter.format(exercise.date),
+                exercise.date,
                 exercise.title,
                 exercise.description
             )
@@ -49,7 +47,6 @@ data class ExerciseEntity(
 }
 
 fun ExerciseEntity.toExerciseDomain(): Exercise {
-    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
     return Exercise(
         id,
         personId,
@@ -57,7 +54,7 @@ fun ExerciseEntity.toExerciseDomain(): Exercise {
         weight,
         times,
         numberOfRepetitions,
-        formatter.parse(date)!!,
+        date,
         title,
         description
     )

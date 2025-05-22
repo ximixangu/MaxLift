@@ -1,6 +1,6 @@
 package com.maxlift.domain.usecase.exercise
 
-import com.maxlift.domain.model.Exercise
+import com.maxlift.domain.model.ExerciseSummary
 import com.maxlift.domain.repository.IMyRepository
 
 class FetchExercisesByPersonWithFiltersUseCase(
@@ -16,7 +16,7 @@ class FetchExercisesByPersonWithFiltersUseCase(
         startDate: String?,
         endDate: String?,
         sortField: String?,
-    ): List<Exercise>? {
+    ): List<ExerciseSummary>? {
         return myRepository.fetchExercisesByPersonWithFilters(
             id,
             title,

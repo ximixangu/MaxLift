@@ -26,12 +26,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.maxlift.domain.model.Exercise
+import com.maxlift.domain.model.ExerciseSummary
 import com.maxlift.presentation.ui.view.exercise.ExerciseCardItem
 
 @Composable
 fun ExerciseList(
-    exerciseList: List<Exercise>?,
+    exerciseList: List<ExerciseSummary>?,
     navController: NavController,
     pageSize: Int = 20
 ) {

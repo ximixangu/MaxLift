@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.maxlift.domain.model.Exercise
+import com.maxlift.domain.model.ExerciseSummary
 import com.maxlift.domain.usecase.exercise.DeleteExerciseUseCase
 import com.maxlift.domain.usecase.exercise.FetchExerciseUseCase
 import com.maxlift.domain.usecase.exercise.FetchExercisesByPersonUseCase
@@ -22,8 +23,8 @@ class ExerciseViewModel(
     private val _exercise = MutableLiveData<Exercise?>(null)
     val exercise: LiveData<Exercise?> = _exercise
 
-    private var _exerciseList = MutableLiveData<List<Exercise>?>()
-    val exerciseListState: LiveData<List<Exercise>?> = _exerciseList
+    private var _exerciseList = MutableLiveData<List<ExerciseSummary>?>()
+    val exerciseListState: LiveData<List<ExerciseSummary>?> = _exerciseList
 
     fun fetchExercise(id: Int) {
         viewModelScope.launch {
@@ -90,6 +91,7 @@ class ExerciseViewModel(
         viewModelScope.launch {
             try {
                 deleteExerciseUseCase(id)
+                _exercise.value = null
             } catch (e: Exception) {
                 println("Error fetching exercise: ${e.message}")
             }
