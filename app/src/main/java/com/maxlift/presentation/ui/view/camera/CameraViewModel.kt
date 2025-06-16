@@ -28,7 +28,7 @@ class CameraViewModel(
     private var initialPosition: Float? = null
     private var lastPosition: Float? = null
     private var repDistance = mutableListOf<Float>()
-    private var lowestPosition:  Float = Float.MIN_VALUE
+    private var lowestPosition:  Float = 0f
     private var highestPosition: Float = Float.MAX_VALUE
 
     private var directionThreshold: Float? = null
@@ -99,10 +99,11 @@ class CameraViewModel(
 
         stopTime = null
         initialTime = null
-        highestPosition = Float.MAX_VALUE
 
         if (elapsedTime.inWholeMilliseconds.toInt() > 200)
             addTime(elapsedTime.inWholeMilliseconds.toInt())
+
+        highestPosition = Float.MAX_VALUE
     }
 
     private fun addTime(time: Int){
@@ -137,7 +138,6 @@ class CameraViewModel(
                 println(distance / maxDistance)
                 if (distance / maxDistance >= 0.7) {
                     _times.value?.let {
-                        println(it.size)
                         timesList.add(it[i])
                     }
                 }

@@ -13,7 +13,10 @@ import com.maxlift.domain.repository.IMyRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class MyRepository(private val exerciseDao: ExerciseDao, private val personDao: PersonDao): IMyRepository {
+class MyRepository(
+    private val exerciseDao: ExerciseDao,
+    private val personDao: PersonDao
+): IMyRepository {
     override suspend fun fetchExerciseById(id: Int): Exercise? {
         return withContext(Dispatchers.IO) {
             exerciseDao.getExerciseById(id)?.toExerciseDomain()

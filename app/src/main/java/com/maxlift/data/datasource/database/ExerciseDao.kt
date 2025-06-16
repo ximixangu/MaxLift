@@ -41,8 +41,7 @@ interface ExerciseDao {
             WHEN 'reps' THEN numberOfRepetitions
             WHEN 'type' THEN type
             ELSE id
-        END
-        DESC
+        END DESC
     """)
     fun searchQueryExercises(
         personId: Int?,

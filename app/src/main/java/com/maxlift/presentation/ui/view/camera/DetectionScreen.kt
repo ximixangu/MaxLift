@@ -154,7 +154,9 @@ fun DetectionScreen(
                                 objectCounter.remove(id)
                             } else {
                                 val index = myDetectedObjects.indexOfFirst { obj -> obj.trackingId == id }
-                                if(index != -1) currentObjects.add(myDetectedObjects[index])
+                                if(index != -1) {
+                                    currentObjects.add(myDetectedObjects[index])
+                                }
                             }
                         }
                         myDetectedObjects = currentObjects
@@ -384,9 +386,9 @@ fun MultipleBoundingBoxOverlay(
  */
 private fun scaleBoundingBox(boundingBox: RectF): RectF {
     return RectF(
-        (boundingBox.left * scaleX),
+        (boundingBox.left * scaleY),
         (boundingBox.top * scaleY),
-        (boundingBox.right * scaleX),
+        (boundingBox.right * scaleY),
         (boundingBox.bottom * scaleY)
     )
 }
@@ -399,11 +401,10 @@ private fun scaleBoundingBox(boundingBox: RectF): RectF {
  */
 private fun setDrawingOffsetAndScale(previewView: PreviewView, cropRect: Rect) {
     val cameraAspectRatio = cropRect.width().toFloat() / cropRect.height()
-    val realWidth = (previewView.height.toFloat() / cropRect.height()) * cropRect.width()
+    scaleY = previewView.height.toFloat() / cropRect.height()
+    val realWidth = scaleY * cropRect.width()
 
     offsetX = (realWidth - previewView.width) / 2
-    scaleX = previewView.height.toFloat() * cameraAspectRatio / cropRect.width()
-    scaleY = previewView.height.toFloat() / cropRect.height()
 }
 
 private fun generateColor(newTime: Int, previousTime: Int): Color {

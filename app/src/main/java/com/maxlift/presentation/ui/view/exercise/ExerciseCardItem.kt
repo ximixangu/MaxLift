@@ -77,6 +77,6 @@ fun ExerciseCardItem(exercise: ExerciseSummary, onClick: () -> Unit) {
 }
 
 fun formatDate(date: Date): String {
-    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
     return formatter.format(date)
 }
